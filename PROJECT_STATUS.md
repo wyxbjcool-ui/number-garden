@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 6: Basic home experience polish.
+Step 7: Manual test plan and stability check.
 
 ## Completed
 
@@ -38,6 +38,10 @@ Step 6: Basic home experience polish.
 - Clearer home sections for plant, tasks, badges, and collection.
 - Softer completed task presentation.
 - Localized collection rarity labels.
+- Manual test plan.
+- TypeScript stability check.
+- Expo startup check.
+- Ionicons icon typing cleanup.
 
 ## Not Included Yet
 
@@ -50,3 +54,4 @@ Step 6: Basic home experience polish.
 - Badge reward payouts.
 - Random collection drops.
 - Advanced animations.
+- Automated test suite.

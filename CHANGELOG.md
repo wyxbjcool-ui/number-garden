@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added manual test plan for startup, tasks, plant growth, badges, collection, date reset, and persistence.
+- Verified TypeScript compilation with `npx tsc --noEmit`.
+- Verified Expo start command reaches Metro startup.
+- Removed an unnecessary Ionicons type assertion after narrowing Badge icon typing.
 - Polished the Today screen with ScrollView support.
 - Moved coins and fertilizers into a clearer top resource row.
 - Made the plant area feel more like a growth card.

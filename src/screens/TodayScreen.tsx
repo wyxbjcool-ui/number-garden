@@ -167,7 +167,7 @@ export function TodayScreen() {
               >
                 <View style={styles.badgeIcon}>
                   <Ionicons
-                    name={badge.iconName as keyof typeof Ionicons.glyphMap}
+                    name={badge.iconName}
                     size={24}
                     color={isUnlocked ? Colors.headerText : Colors.bodyText}
                   />

@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 6 Today screen experience polish.
+Please review the Step 7 manual test plan and stability check.
 
 ## Focus Areas
 
@@ -27,6 +27,9 @@ Please review the Step 6 Today screen experience polish.
 - Plant, task, badge, and collection sections are visually clearer.
 - Completed daily tasks are visually weaker while remaining readable.
 - Collection rarity labels show 普通 and 稀有.
+- TEST_PLAN.md covers startup, daily tasks, plant growth, badges, collection, date reset, persistence, and known limits.
+- TypeScript checks pass.
+- Expo start reaches Metro startup.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -39,6 +42,7 @@ Please review the Step 6 Today screen experience polish.
 - Badge reward payouts.
 - Random collection drops.
 - Complex animations.
+- Automated test suite.
 
 ## Manual Test Ideas
 
@@ -56,6 +60,7 @@ Please review the Step 6 Today screen experience polish.
 - Confirm the Today screen scrolls when content is taller than the viewport.
 - Confirm completed task cards look visually weaker and cannot be claimed again.
 - Confirm common collection items show 普通 and rare items show 稀有.
+- Follow TEST_PLAN.md manually on an iPad or simulator.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.
