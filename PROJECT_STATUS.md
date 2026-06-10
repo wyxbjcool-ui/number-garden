@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 2: Plant growth system.
+Step 3: Daily task system.
 
 ## Completed
 
@@ -19,6 +19,10 @@ Step 2: Plant growth system.
 - Single-plant growth system.
 - Plant XP and level rules.
 - Watering action persisted through Zustand.
+- DailyTask model.
+- Built-in daily task list.
+- Daily task completion rewards coins, fertilizers, and plant XP.
+- Completed daily task IDs persisted through Zustand.
 
 ## Not Included Yet
 
@@ -27,3 +31,4 @@ Step 2: Plant growth system.
 - Payment, ads, or store features.
 - Complex animation.
 - Multi-plant collection UI.
+- Daily reset by calendar date.

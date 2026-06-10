@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added first version of the daily task system.
+- Added three built-in daily tasks: 整理书包, 阅读 10 分钟, 早睡打卡.
+- Added task completion rewards: +5 coins, +1 fertilizer, and one plant watering.
+- Prevented completed tasks from being claimed more than once.
 - Added project tracking documents.
 - Added first version of the plant growth system.
 - Added single-plant model with level, XP, and water count.

@@ -3,11 +3,42 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
+import type { DailyTask } from '../types/dailyTask';
+
+const dailyTasks: DailyTask[] = [
+  {
+    id: 'pack-school-bag',
+    title: '整理书包',
+    description: '把明天要用的东西放好',
+    rewardCoins: 5,
+    rewardFertilizers: 1,
+  },
+  {
+    id: 'read-10-minutes',
+    title: '阅读 10 分钟',
+    description: '安静读一本喜欢的书',
+    rewardCoins: 5,
+    rewardFertilizers: 1,
+  },
+  {
+    id: 'early-bedtime',
+    title: '早睡打卡',
+    description: '睡前准备完成啦',
+    rewardCoins: 5,
+    rewardFertilizers: 1,
+  },
+];
 
 export function TodayScreen() {
   const title = useGardenStore((state) => state.currentTitle);
+  const coins = useGardenStore((state) => state.coins);
+  const fertilizers = useGardenStore((state) => state.fertilizers);
   const selectedPlantId = useGardenStore((state) => state.selectedPlantId);
   const plant = useGardenStore((state) => state.plants[state.selectedPlantId]);
+  const completedTodayTaskIds = useGardenStore(
+    (state) => state.completedTodayTaskIds,
+  );
+  const completeDailyTask = useGardenStore((state) => state.completeDailyTask);
   const waterSelectedPlant = useGardenStore((state) => state.waterSelectedPlant);
   const xpPercent = plant ? plant.xp / 100 : 0;
 
@@ -20,6 +51,10 @@ export function TodayScreen() {
         <Text style={styles.title}>数字花园 Number Garden</Text>
         <Text style={styles.subtitle}>帮助孩子养成好习惯的成长游戏</Text>
         <Text style={styles.badge}>{title}</Text>
+      </View>
+      <View style={styles.resourceRow}>
+        <Text style={styles.resourceText}>金币 {coins}</Text>
+        <Text style={styles.resourceText}>肥料 {fertilizers}</Text>
       </View>
       {plant ? (
         <View style={styles.plantPanel}>
@@ -47,6 +82,41 @@ export function TodayScreen() {
       ) : (
         <Text style={styles.plantMeta}>未找到植物：{selectedPlantId}</Text>
       )}
+      <View style={styles.taskSection}>
+        <Text style={styles.sectionTitle}>今日任务</Text>
+        {dailyTasks.map((task) => {
+          const isCompleted = completedTodayTaskIds.includes(task.id);
+
+          return (
+            <View key={task.id} style={styles.taskCard}>
+              <View style={styles.taskContent}>
+                <Text style={styles.taskTitle}>{task.title}</Text>
+                <Text style={styles.taskDescription}>{task.description}</Text>
+                <Text style={styles.taskReward}>
+                  +{task.rewardCoins} 金币 · +{task.rewardFertilizers} 肥料
+                </Text>
+              </View>
+              <Pressable
+                style={[
+                  styles.taskButton,
+                  isCompleted && styles.taskButtonCompleted,
+                ]}
+                disabled={isCompleted}
+                onPress={() => completeDailyTask(task)}
+              >
+                <Text
+                  style={[
+                    styles.taskButtonText,
+                    isCompleted && styles.taskButtonTextCompleted,
+                  ]}
+                >
+                  {isCompleted ? '已完成' : '完成'}
+                </Text>
+              </Pressable>
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -96,6 +166,21 @@ const styles = StyleSheet.create({
     color: Colors.headerText,
     fontSize: 18,
     fontWeight: '700',
+  },
+  resourceRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  resourceText: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: Colors.lightBlue,
+    color: Colors.headerText,
+    fontSize: 17,
+    fontWeight: '800',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
   },
   plantPanel: {
     gap: 14,
@@ -152,5 +237,62 @@ const styles = StyleSheet.create({
     color: Colors.headerText,
     fontSize: 19,
     fontWeight: '800',
+  },
+  taskSection: {
+    gap: 12,
+    marginTop: 18,
+  },
+  sectionTitle: {
+    color: Colors.headerText,
+    fontSize: 24,
+    fontWeight: '800',
+  },
+  taskCard: {
+    alignItems: 'center',
+    borderRadius: 24,
+    flexDirection: 'row',
+    gap: 14,
+    justifyContent: 'space-between',
+    backgroundColor: Colors.lightYellow,
+    padding: 16,
+  },
+  taskContent: {
+    flex: 1,
+    gap: 4,
+  },
+  taskTitle: {
+    color: Colors.headerText,
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  taskDescription: {
+    color: Colors.bodyText,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  taskReward: {
+    color: Colors.leaf,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  taskButton: {
+    alignItems: 'center',
+    borderRadius: 22,
+    justifyContent: 'center',
+    minHeight: 48,
+    minWidth: 92,
+    backgroundColor: Colors.lightBlue,
+    paddingHorizontal: 16,
+  },
+  taskButtonCompleted: {
+    backgroundColor: Colors.lightGreen,
+  },
+  taskButtonText: {
+    color: Colors.headerText,
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  taskButtonTextCompleted: {
+    color: Colors.bodyText,
   },
 });

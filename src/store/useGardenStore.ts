@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import type { DailyTask } from '../types/dailyTask';
 import type { Plant } from '../types/plant';
 
 type GardenState = {
@@ -14,6 +15,7 @@ type GardenState = {
   completedTodayTaskIds: string[];
   unlockedBadgeIds: string[];
   collectedItemIds: string[];
+  completeDailyTask: (task: DailyTask) => void;
   waterSelectedPlant: () => void;
   resetGarden: () => void;
 };
@@ -42,6 +44,41 @@ export const useGardenStore = create<GardenState>()(
   persist(
     (set) => ({
       ...initialState,
+      completeDailyTask: (task) =>
+        set((state) => {
+          if (state.completedTodayTaskIds.includes(task.id)) {
+            return state;
+          }
+
+          const plant = state.plants[state.selectedPlantId];
+
+          if (!plant) {
+            return {
+              coins: state.coins + task.rewardCoins,
+              fertilizers: state.fertilizers + task.rewardFertilizers,
+              completedTodayTaskIds: [...state.completedTodayTaskIds, task.id],
+            };
+          }
+
+          const totalXp = plant.xp + 10;
+          const levelGain = Math.floor(totalXp / 100);
+          const nextPlant = {
+            ...plant,
+            level: plant.level + levelGain,
+            xp: totalXp % 100,
+            waterCount: plant.waterCount + 1,
+          };
+
+          return {
+            coins: state.coins + task.rewardCoins,
+            fertilizers: state.fertilizers + task.rewardFertilizers,
+            completedTodayTaskIds: [...state.completedTodayTaskIds, task.id],
+            plants: {
+              ...state.plants,
+              [plant.id]: nextPlant,
+            },
+          };
+        }),
       waterSelectedPlant: () =>
         set((state) => {
           const plant = state.plants[state.selectedPlantId];

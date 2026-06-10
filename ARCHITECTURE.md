@@ -28,9 +28,12 @@ The global store owns lightweight MVP state such as coins, fertilizers, title, s
 
 Plant growth in Step 2 starts as a single-plant model stored inside the global Zustand store. The selected plant has a level, XP, and water count. Future steps can expand the model into multi-plant collections without introducing a backend.
 
+Daily tasks in Step 3 are defined as local static data on the Today screen. Completing a task updates the global store atomically: coins, fertilizers, completed task IDs, and selected plant growth are persisted together.
+
 ## Boundaries
 
 - No backend in MVP V1.
 - No authentication in MVP V1.
 - No cloud sync in MVP V1.
 - No payment or ads in MVP V1.
+- No calendar-based daily reset yet.
