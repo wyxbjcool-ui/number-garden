@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { badges } from '../data/badges';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
 import type { DailyTask } from '../types/dailyTask';
@@ -39,6 +40,7 @@ export function TodayScreen() {
   const completedTodayTaskIds = useGardenStore(
     (state) => state.completedTodayTaskIds,
   );
+  const unlockedBadgeIds = useGardenStore((state) => state.unlockedBadgeIds);
   const completeDailyTask = useGardenStore((state) => state.completeDailyTask);
   const refreshDailyTasksForToday = useGardenStore(
     (state) => state.refreshDailyTasksForToday,
@@ -124,6 +126,33 @@ export function TodayScreen() {
             </View>
           );
         })}
+      </View>
+      <View style={styles.badgeSection}>
+        <Text style={styles.sectionTitle}>
+          徽章 {unlockedBadgeIds.length}/{badges.length}
+        </Text>
+        <View style={styles.badgeList}>
+          {badges.map((badge) => {
+            const isUnlocked = unlockedBadgeIds.includes(badge.id);
+
+            return (
+              <View
+                key={badge.id}
+                style={[styles.badgeCard, !isUnlocked && styles.badgeLocked]}
+              >
+                <View style={styles.badgeIcon}>
+                  <Ionicons
+                    name={badge.iconName as keyof typeof Ionicons.glyphMap}
+                    size={24}
+                    color={isUnlocked ? Colors.headerText : Colors.bodyText}
+                  />
+                </View>
+                <Text style={styles.badgeTitle}>{badge.title}</Text>
+                <Text style={styles.badgeDescription}>{badge.description}</Text>
+              </View>
+            );
+          })}
+        </View>
       </View>
     </View>
   );
@@ -302,5 +331,44 @@ const styles = StyleSheet.create({
   },
   taskButtonTextCompleted: {
     color: Colors.bodyText,
+  },
+  badgeSection: {
+    gap: 12,
+    marginTop: 18,
+  },
+  badgeList: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  badgeCard: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightBlue,
+    borderRadius: 20,
+    flex: 1,
+    gap: 6,
+    padding: 12,
+  },
+  badgeLocked: {
+    opacity: 0.45,
+  },
+  badgeIcon: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightYellow,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  badgeTitle: {
+    color: Colors.headerText,
+    fontSize: 15,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  badgeDescription: {
+    color: Colors.bodyText,
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });

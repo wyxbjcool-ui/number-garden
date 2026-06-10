@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added first version of the badge achievement system.
+- Added three built-in badges: first-task, level-2-plant, and three-waters.
+- Added automatic badge unlock checks after completing tasks and watering plants.
+- Added badge count and badge list to the home screen.
 - Added local-date reset for completed daily tasks.
 - Added `currentTaskDate` to persist the active daily task date.
 - Added `refreshDailyTasksForToday` for resetting completed task IDs when the date changes.

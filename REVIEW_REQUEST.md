@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 3 daily task system and its interaction with the Step 2 plant growth system.
+Please review the Step 4 badge achievement system and its interaction with daily tasks and plant growth.
 
 ## Focus Areas
 
@@ -13,6 +13,10 @@ Please review the Step 3 daily task system and its interaction with the Step 2 p
 - Completing a daily task rewards +5 coins, +1 fertilizer, and one plant watering.
 - Completed task IDs prevent duplicate claims and are persisted.
 - Daily task reset uses local `YYYY-MM-DD` date and only clears completed task IDs.
+- Badge model is simple and local-first.
+- Badges unlock automatically after completing tasks or watering plants.
+- Unlocked badge IDs are not duplicated and are persisted.
+- Home screen badge count and badge list render clearly.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -22,6 +26,7 @@ Please review the Step 3 daily task system and its interaction with the Step 2 p
 - Store or payment flow.
 - Multi-plant management UI.
 - Server-time validation.
+- Badge reward payouts.
 
 ## Manual Test Ideas
 
@@ -31,5 +36,9 @@ Please review the Step 3 daily task system and its interaction with the Step 2 p
 - Tap a daily task completion button and confirm coins, fertilizers, and plant XP update.
 - Confirm a completed task cannot be claimed again.
 - Change to a new local date and confirm completed tasks reset without clearing coins, fertilizers, or plants.
+- Complete one task and confirm the first-task badge unlocks.
+- Water until the plant reaches Level 2 and confirm the level-2-plant badge unlocks.
+- Water 3 total times and confirm the three-waters badge unlocks.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
+- Restart the app and confirm unlocked badges are retained.

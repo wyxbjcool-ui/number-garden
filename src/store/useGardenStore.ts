@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { badges } from '../data/badges';
 import type { DailyTask } from '../types/dailyTask';
 import type { Plant } from '../types/plant';
 
@@ -12,6 +13,39 @@ const getLocalDateString = () => {
   const day = String(today.getDate()).padStart(2, '0');
 
   return `${year}-${month}-${day}`;
+};
+
+type BadgeCheckState = {
+  completedTodayTaskIds: string[];
+  plants: Record<string, Plant>;
+  unlockedBadgeIds: string[];
+};
+
+const getNextUnlockedBadgeIds = (state: BadgeCheckState) => {
+  const nextUnlockedBadgeIds = new Set(state.unlockedBadgeIds);
+  const plantList = Object.values(state.plants);
+  const hasCompletedTask = state.completedTodayTaskIds.length > 0;
+  const hasLevelTwoPlant = plantList.some((plant) => plant.level >= 2);
+  const totalWaterCount = plantList.reduce(
+    (sum, plant) => sum + plant.waterCount,
+    0,
+  );
+
+  badges.forEach((badge) => {
+    if (badge.id === 'first-task' && hasCompletedTask) {
+      nextUnlockedBadgeIds.add(badge.id);
+    }
+
+    if (badge.id === 'level-2-plant' && hasLevelTwoPlant) {
+      nextUnlockedBadgeIds.add(badge.id);
+    }
+
+    if (badge.id === 'three-waters' && totalWaterCount >= 3) {
+      nextUnlockedBadgeIds.add(badge.id);
+    }
+  });
+
+  return Array.from(nextUnlockedBadgeIds);
 };
 
 type GardenState = {
@@ -65,10 +99,19 @@ export const useGardenStore = create<GardenState>()(
           const plant = state.plants[state.selectedPlantId];
 
           if (!plant) {
+            const completedTodayTaskIds = [
+              ...state.completedTodayTaskIds,
+              task.id,
+            ];
+
             return {
               coins: state.coins + task.rewardCoins,
               fertilizers: state.fertilizers + task.rewardFertilizers,
-              completedTodayTaskIds: [...state.completedTodayTaskIds, task.id],
+              completedTodayTaskIds,
+              unlockedBadgeIds: getNextUnlockedBadgeIds({
+                ...state,
+                completedTodayTaskIds,
+              }),
             };
           }
 
@@ -81,14 +124,25 @@ export const useGardenStore = create<GardenState>()(
             waterCount: plant.waterCount + 1,
           };
 
+          const completedTodayTaskIds = [
+            ...state.completedTodayTaskIds,
+            task.id,
+          ];
+          const plants = {
+            ...state.plants,
+            [plant.id]: nextPlant,
+          };
+
           return {
             coins: state.coins + task.rewardCoins,
             fertilizers: state.fertilizers + task.rewardFertilizers,
-            completedTodayTaskIds: [...state.completedTodayTaskIds, task.id],
-            plants: {
-              ...state.plants,
-              [plant.id]: nextPlant,
-            },
+            completedTodayTaskIds,
+            plants,
+            unlockedBadgeIds: getNextUnlockedBadgeIds({
+              ...state,
+              completedTodayTaskIds,
+              plants,
+            }),
           };
         }),
       refreshDailyTasksForToday: () =>
@@ -121,11 +175,17 @@ export const useGardenStore = create<GardenState>()(
             waterCount: plant.waterCount + 1,
           };
 
+          const plants = {
+            ...state.plants,
+            [plant.id]: nextPlant,
+          };
+
           return {
-            plants: {
-              ...state.plants,
-              [plant.id]: nextPlant,
-            },
+            plants,
+            unlockedBadgeIds: getNextUnlockedBadgeIds({
+              ...state,
+              plants,
+            }),
           };
         }),
       resetGarden: () => set(initialState),
