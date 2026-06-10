@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
 import { mathGames } from '../data/mathGames';
+import { plantIds, plants as plantCatalog } from '../data/plants';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
 import type { DailyTask } from '../types/dailyTask';
@@ -42,6 +43,8 @@ export function TodayScreen() {
   const fertilizers = useGardenStore((state) => state.fertilizers);
   const selectedPlantId = useGardenStore((state) => state.selectedPlantId);
   const plant = useGardenStore((state) => state.plants[state.selectedPlantId]);
+  const plants = useGardenStore((state) => state.plants);
+  const ownedPlantIds = useGardenStore((state) => state.ownedPlantIds);
   const completedTodayTaskIds = useGardenStore(
     (state) => state.completedTodayTaskIds,
   );
@@ -52,6 +55,7 @@ export function TodayScreen() {
   );
   const completeDailyTask = useGardenStore((state) => state.completeDailyTask);
   const answerMathQuestion = useGardenStore((state) => state.answerMathQuestion);
+  const selectPlant = useGardenStore((state) => state.selectPlant);
   const refreshDailyTasksForToday = useGardenStore(
     (state) => state.refreshDailyTasksForToday,
   );
@@ -123,6 +127,47 @@ export function TodayScreen() {
       ) : (
         <Text style={styles.plantMeta}>未找到植物：{selectedPlantId}</Text>
       )}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>植物图鉴</Text>
+          <Text style={styles.sectionCount}>
+            {ownedPlantIds.length}/{plantIds.length}
+          </Text>
+        </View>
+        <View style={styles.plantList}>
+          {plantIds.map((plantId) => {
+            const catalogPlant = plantCatalog[plantId];
+            const gardenPlant = plants[plantId] ?? catalogPlant;
+            const isOwned = ownedPlantIds.includes(plantId);
+            const isSelected = selectedPlantId === plantId;
+
+            return (
+              <Pressable
+                key={plantId}
+                style={[
+                  styles.plantListCard,
+                  isSelected && styles.plantListCardSelected,
+                  !isOwned && styles.plantListCardLocked,
+                ]}
+                disabled={!isOwned}
+                onPress={() => selectPlant(plantId)}
+              >
+                <View style={styles.plantListIcon}>
+                  <Ionicons
+                    name={isOwned ? 'leaf' : 'lock-closed'}
+                    size={22}
+                    color={isOwned ? Colors.headerText : Colors.bodyText}
+                  />
+                </View>
+                <Text style={styles.plantListName}>{catalogPlant.name}</Text>
+                <Text style={styles.plantListMeta}>
+                  {isOwned ? `Level ${gardenPlant.level}` : '未拥有'}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>今日任务</Text>
@@ -389,6 +434,46 @@ const styles = StyleSheet.create({
     color: Colors.bodyText,
     fontSize: 17,
     fontWeight: '700',
+  },
+  plantList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  plantListCard: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightGreen,
+    borderRadius: 20,
+    gap: 6,
+    minWidth: 118,
+    padding: 12,
+  },
+  plantListCardSelected: {
+    borderColor: Colors.leaf,
+    borderWidth: 3,
+  },
+  plantListCardLocked: {
+    opacity: 0.45,
+  },
+  plantListIcon: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightYellow,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  plantListName: {
+    color: Colors.headerText,
+    fontSize: 15,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  plantListMeta: {
+    color: Colors.bodyText,
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   progressTrack: {
     height: 18,

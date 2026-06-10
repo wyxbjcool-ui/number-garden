@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added first version of the multi-plant system.
+- Added four built-in plants: 多肉, 彩叶芋, 碰碰草, 蝴蝶兰.
+- Added plant catalog UI with owned, locked, and selected states.
+- Added selected plant switching for owned plants.
+- Preserved existing succulent growth data during persisted state merge.
 - Fixed math mini-game retry behavior so incorrect answers do not mark questions as answered.
 - Confirmed the built-in math game set contains five questions across addition/subtraction, patterns, and comparison.
 - Added first version of the math mini-game system.

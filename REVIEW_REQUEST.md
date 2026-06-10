@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 9 math mini-game system.
+Please review the Step 10 multi-plant system.
 
 ## Focus Areas
 
@@ -41,6 +41,11 @@ Please review the Step 9 math mini-game system.
 - Incorrect math answers remain retryable and do not grant rewards.
 - Correct answers reward +3 coins, +1 fertilizer, and +10 plant XP.
 - Answered math question IDs persist.
+- Plant catalog contains 多肉, 彩叶芋, 碰碰草, and 蝴蝶兰.
+- Only owned plants can be selected.
+- Unowned plants render as locked and are not clickable.
+- Rewards from tasks, watering, and math apply to selectedPlantId.
+- Persisted succulent growth data is preserved after adding new plants.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -56,6 +61,7 @@ Please review the Step 9 math mini-game system.
 - Automated test suite.
 - Business logic changes.
 - Generated or randomized math questions.
+- Plant purchase or unlock flow.
 
 ## Manual Test Ideas
 
@@ -80,6 +86,10 @@ Please review the Step 9 math mini-game system.
 - Answer one math question incorrectly and confirm no reward is given.
 - Confirm the same question remains available after an incorrect answer.
 - Confirm answered math questions do not appear again.
+- Confirm the plant catalog shows 4 plants.
+- Confirm succulent is owned by default and selectable.
+- Confirm locked plants cannot be selected.
+- Confirm selected plant receives watering, task, and math XP rewards.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

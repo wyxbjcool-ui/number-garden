@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 9: First math mini-game system.
+Step 10: First multi-plant system.
 
 ## Completed
 
@@ -48,6 +48,11 @@ Step 9: First math mini-game system.
 - Correct math answers reward coins, fertilizer, and plant XP.
 - Home screen math mini-game section.
 - Incorrect math answers can be retried without consuming the question.
+- Four built-in plants.
+- Owned plant list defaults to succulent.
+- Home screen plant catalog and selected plant switching.
+- Locked display for unowned plants.
+- Persisted plant merge keeps existing succulent growth data.
 
 ## Not Included Yet
 
@@ -62,3 +67,4 @@ Step 9: First math mini-game system.
 - Advanced animations.
 - Automated test suite.
 - Randomized math question generation.
+- Plant purchase or unlock flow.

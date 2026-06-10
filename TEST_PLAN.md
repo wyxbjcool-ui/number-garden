@@ -37,6 +37,19 @@
 - Confirm XP keeps the remainder after leveling.
 - Complete a daily task and confirm it also waters the selected plant once.
 
+## Multi-Plant Tests
+
+- Confirm the 植物图鉴 section appears on the Today screen.
+- Confirm four plants appear: 多肉, 彩叶芋, 碰碰草, 蝴蝶兰.
+- Confirm 多肉 is owned by default.
+- Confirm 彩叶芋, 碰碰草, and 蝴蝶兰 show 未拥有.
+- Tap 多肉 and confirm it remains selected.
+- Tap a locked plant and confirm selectedPlantId does not change.
+- Confirm watering applies XP to the selected plant.
+- Confirm daily task rewards apply plant XP to the selected plant.
+- Confirm math rewards apply plant XP to the selected plant.
+- Restart the app and confirm existing 多肉 growth data is retained.
+
 ## Badge Tests
 
 - Complete the first daily task and confirm the first-task badge unlocks.
@@ -93,4 +106,5 @@
 - There are no complex animations.
 - There is no automated test suite yet.
 - Math questions are built in and not randomly generated yet.
+- Plant purchase and unlock flows are not implemented yet.
 - iOS Simulator and Android device preview depend on local machine/device availability.

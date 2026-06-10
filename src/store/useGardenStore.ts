@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
+import { plants as initialPlants } from '../data/plants';
 import type { DailyTask } from '../types/dailyTask';
 import type { MathGame } from '../types/mathGame';
 import type { Plant } from '../types/plant';
@@ -76,6 +77,7 @@ type GardenState = {
   answeredMathQuestionIds: string[];
   completeDailyTask: (task: DailyTask) => void;
   answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
+  selectPlant: (plantId: string) => void;
   refreshDailyTasksForToday: () => void;
   waterSelectedPlant: () => void;
   resetGarden: () => void;
@@ -87,15 +89,7 @@ const initialState = {
   currentTitle: '成长小种子',
   currentTaskDate: '',
   selectedPlantId: 'succulent',
-  plants: {
-    succulent: {
-      id: 'succulent',
-      name: '多肉',
-      level: 1,
-      xp: 0,
-      waterCount: 0,
-    },
-  },
+  plants: initialPlants,
   ownedPlantIds: ['succulent'],
   completedTodayTaskIds: [],
   unlockedBadgeIds: [],
@@ -220,6 +214,16 @@ export const useGardenStore = create<GardenState>()(
             }),
           };
         }),
+      selectPlant: (plantId) =>
+        set((state) => {
+          if (!state.ownedPlantIds.includes(plantId)) {
+            return state;
+          }
+
+          return {
+            selectedPlantId: plantId,
+          };
+        }),
       refreshDailyTasksForToday: () =>
         set((state) => {
           const today = getLocalDateString();
@@ -268,6 +272,29 @@ export const useGardenStore = create<GardenState>()(
     {
       name: 'number-garden-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<GardenState> | undefined;
+        const ownedPlantIds =
+          persisted?.ownedPlantIds && persisted.ownedPlantIds.length > 0
+            ? Array.from(new Set(['succulent', ...persisted.ownedPlantIds]))
+            : currentState.ownedPlantIds;
+        const selectedPlantId =
+          persisted?.selectedPlantId &&
+          ownedPlantIds.includes(persisted.selectedPlantId)
+            ? persisted.selectedPlantId
+            : currentState.selectedPlantId;
+
+        return {
+          ...currentState,
+          ...persisted,
+          ownedPlantIds,
+          selectedPlantId,
+          plants: {
+            ...currentState.plants,
+            ...persisted?.plants,
+          },
+        };
+      },
       onRehydrateStorage: () => {
         if (__DEV__) {
           console.log('Number Garden storage hydration started.');

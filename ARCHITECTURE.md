@@ -40,6 +40,8 @@ Step 6 is a presentation-only Today screen polish. It keeps the existing store a
 
 Math games in Step 9 are defined as local static data. The Zustand store persists answered question IDs and applies correct-answer rewards atomically with plant growth.
 
+Plants in Step 10 are defined as local static data. Zustand stores per-plant growth state, owned plant IDs, and the selected plant ID. Persisted state is merged with the current built-in plant catalog so existing succulent progress is retained while new built-in plants are added.
+
 ## Boundaries
 
 - No backend in MVP V1.
@@ -51,3 +53,4 @@ Math games in Step 9 are defined as local static data. The Zustand store persist
 - No random collection drop logic yet.
 - No complex animation layer.
 - No generated math question engine yet.
+- No plant purchase or unlock flow yet.
