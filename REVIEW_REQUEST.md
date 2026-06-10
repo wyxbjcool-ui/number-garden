@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 7 manual test plan and stability check.
+Please review the Step 8 home preview and UI polish.
 
 ## Focus Areas
 
@@ -30,6 +30,11 @@ Please review the Step 7 manual test plan and stability check.
 - TEST_PLAN.md covers startup, daily tasks, plant growth, badges, collection, date reset, persistence, and known limits.
 - TypeScript checks pass.
 - Expo start reaches Metro startup.
+- Top resource pills wrap on narrow screens.
+- Daily task buttons are larger and easier to tap.
+- Badge cards wrap instead of staying cramped in one row.
+- Collection cards can grow and wrap cleanly.
+- ScrollView uses automatic content inset adjustment.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -43,6 +48,7 @@ Please review the Step 7 manual test plan and stability check.
 - Random collection drops.
 - Complex animations.
 - Automated test suite.
+- Business logic changes.
 
 ## Manual Test Ideas
 
@@ -61,6 +67,8 @@ Please review the Step 7 manual test plan and stability check.
 - Confirm completed task cards look visually weaker and cannot be claimed again.
 - Confirm common collection items show 普通 and rare items show 稀有.
 - Follow TEST_PLAN.md manually on an iPad or simulator.
+- Check iPhone small screen layout for resource pills, task buttons, badges, and collection cards.
+- Check Android layout when an Android device or emulator is available.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

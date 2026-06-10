@@ -7,6 +7,17 @@
 - Run `npx expo start --localhost --port 8082` and confirm Metro starts.
 - Stop the Expo server after confirming it starts.
 
+## Home UI Preview Tests
+
+- Confirm the Today screen scrolls from top resources through collection items.
+- Confirm the top coins and fertilizers pills wrap instead of squeezing on small screens.
+- Confirm the plant card title, level, XP, and watering button are readable.
+- Confirm daily task buttons are large enough to tap comfortably.
+- Confirm completed tasks look visually weaker.
+- Confirm badge cards wrap when the screen is narrow.
+- Confirm collection cards wrap and do not overlap.
+- Confirm the screen respects safe area through the native navigation layout.
+
 ## Daily Task Tests
 
 - Open the Today screen.
@@ -66,3 +77,4 @@
 - There is no backend, login, or cloud sync.
 - There are no complex animations.
 - There is no automated test suite yet.
+- iOS Simulator and Android device preview depend on local machine/device availability.

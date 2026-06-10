@@ -60,6 +60,8 @@ export function TodayScreen() {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
+      contentInsetAdjustmentBehavior="automatic"
+      showsVerticalScrollIndicator={false}
     >
       <View style={styles.resourceRow}>
         <View style={styles.resourcePill}>
@@ -271,6 +273,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   resourceRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     gap: 12,
     justifyContent: 'center',
@@ -280,6 +283,8 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     flexDirection: 'row',
     gap: 8,
+    justifyContent: 'center',
+    minWidth: 128,
     backgroundColor: Colors.lightBlue,
     paddingHorizontal: 18,
     paddingVertical: 12,
@@ -412,8 +417,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 22,
     justifyContent: 'center',
-    minHeight: 48,
-    minWidth: 92,
+    minHeight: 56,
+    minWidth: 98,
     backgroundColor: Colors.lightBlue,
     paddingHorizontal: 16,
   },
@@ -429,6 +434,7 @@ const styles = StyleSheet.create({
     color: Colors.bodyText,
   },
   badgeList: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     gap: 12,
   },
@@ -438,6 +444,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     flex: 1,
     gap: 6,
+    minWidth: 118,
     padding: 12,
   },
   badgeLocked: {
@@ -473,6 +480,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightGreen,
     borderRadius: 20,
     gap: 6,
+    flexGrow: 1,
     minWidth: 96,
     padding: 12,
   },
