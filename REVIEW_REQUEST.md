@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 12 plant growth logic cleanup.
+Please review the Step 13 plant growth semantics correction.
 
 ## Focus Areas
 
@@ -52,6 +52,10 @@ Please review the Step 12 plant growth logic cleanup.
 - Already owned plants cannot be charged again.
 - Repeated plant growth calculations now use one internal helper.
 - Task rewards, math rewards, and manual watering keep the same XP, level, and water count behavior.
+- The growth helper now separates XP growth from water count semantics.
+- Manual watering and daily task watering increment water count.
+- Math rewards add plant XP without incrementing water count.
+- The three-waters badge still uses waterCount, so math rewards no longer contribute to it.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -68,7 +72,7 @@ Please review the Step 12 plant growth logic cleanup.
 - Business logic changes.
 - Generated or randomized math questions.
 - Advanced plant shop.
-- Functional behavior changes from the plant growth refactor.
+- New business features.
 
 ## Manual Test Ideas
 
@@ -103,7 +107,8 @@ Please review the Step 12 plant growth logic cleanup.
 - Confirm unlocked plants can be selected without repeat cost.
 - Confirm manual watering still adds 10 XP and 1 water count.
 - Confirm task rewards still add 10 selected-plant XP and 1 water count.
-- Confirm math rewards still add 10 selected-plant XP and 1 water count.
+- Confirm math rewards still add 10 selected-plant XP and do not increase water count.
+- Confirm the three-waters badge does not unlock from math rewards alone.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

@@ -63,7 +63,15 @@ const getNextCollectedItemIds = (collectedItemIds: string[]) => {
   return [...collectedItemIds, nextItem.id];
 };
 
-const growPlantByXp = (plant: Plant, xpAmount: number) => {
+type GrowPlantOptions = {
+  countAsWater?: boolean;
+};
+
+const growPlantByXp = (
+  plant: Plant,
+  xpAmount: number,
+  options?: GrowPlantOptions,
+) => {
   const totalXp = plant.xp + xpAmount;
   const levelGain = Math.floor(totalXp / 100);
 
@@ -71,7 +79,7 @@ const growPlantByXp = (plant: Plant, xpAmount: number) => {
     ...plant,
     level: plant.level + levelGain,
     xp: totalXp % 100,
-    waterCount: plant.waterCount + 1,
+    waterCount: plant.waterCount + (options?.countAsWater ? 1 : 0),
   };
 };
 
@@ -143,7 +151,7 @@ export const useGardenStore = create<GardenState>()(
             };
           }
 
-          const nextPlant = growPlantByXp(plant, 10);
+          const nextPlant = growPlantByXp(plant, 10, { countAsWater: true });
 
           const completedTodayTaskIds = [
             ...state.completedTodayTaskIds,
@@ -196,7 +204,7 @@ export const useGardenStore = create<GardenState>()(
             };
           }
 
-          const nextPlant = growPlantByXp(plant, 10);
+          const nextPlant = growPlantByXp(plant, 10, { countAsWater: false });
           const plants = {
             ...state.plants,
             [plant.id]: nextPlant,
@@ -262,7 +270,7 @@ export const useGardenStore = create<GardenState>()(
             return state;
           }
 
-          const nextPlant = growPlantByXp(plant, 10);
+          const nextPlant = growPlantByXp(plant, 10, { countAsWater: true });
 
           const plants = {
             ...state.plants,

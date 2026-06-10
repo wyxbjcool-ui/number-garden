@@ -37,7 +37,7 @@
 - Confirm the plant level increases by 1.
 - Confirm XP keeps the remainder after leveling.
 - Complete a daily task and confirm it also waters the selected plant once.
-- Answer a math question correctly and confirm it also waters the selected plant once.
+- Answer a math question correctly and confirm it adds 10 plant XP without increasing water count.
 
 ## Multi-Plant Tests
 
@@ -69,6 +69,7 @@
 - Complete the first daily task and confirm the first-task badge unlocks.
 - Water until the plant reaches Level 2 and confirm the level-2-plant badge unlocks.
 - Water 3 total times and confirm the three-waters badge unlocks.
+- Confirm math rewards alone do not unlock the three-waters badge.
 - Confirm unlocked badges do not duplicate.
 
 ## Collection Tests
@@ -87,6 +88,7 @@
 - Confirm a correct answer gives +3 coins.
 - Confirm a correct answer gives +1 fertilizer.
 - Confirm a correct answer adds +10 plant XP.
+- Confirm a correct answer does not increase plant water count.
 - Tap an incorrect answer on another question and confirm the feedback says 再试试.
 - Confirm an incorrect answer gives no reward.
 - Confirm an incorrect answer does not advance to the next question.

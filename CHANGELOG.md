@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Updated plant growth helper semantics so math XP rewards no longer increment water count.
+- Kept manual watering and daily task watering counted toward water count.
 - Refactored repeated plant growth calculation into a shared internal helper.
 - Kept plant level, XP remainder, and water count behavior unchanged.
 - Added first version of the plant unlock system.
