@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { badges } from '../data/badges';
+import { collectionItems } from '../data/collectionItems';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
 import type { DailyTask } from '../types/dailyTask';
@@ -41,6 +42,7 @@ export function TodayScreen() {
     (state) => state.completedTodayTaskIds,
   );
   const unlockedBadgeIds = useGardenStore((state) => state.unlockedBadgeIds);
+  const collectedItemIds = useGardenStore((state) => state.collectedItemIds);
   const completeDailyTask = useGardenStore((state) => state.completeDailyTask);
   const refreshDailyTasksForToday = useGardenStore(
     (state) => state.refreshDailyTasksForToday,
@@ -149,6 +151,40 @@ export function TodayScreen() {
                 </View>
                 <Text style={styles.badgeTitle}>{badge.title}</Text>
                 <Text style={styles.badgeDescription}>{badge.description}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+      <View style={styles.collectionSection}>
+        <Text style={styles.sectionTitle}>
+          收集册 {collectedItemIds.length}/{collectionItems.length}
+        </Text>
+        <View style={styles.collectionList}>
+          {collectionItems.map((item) => {
+            const isCollected = collectedItemIds.includes(item.id);
+
+            return (
+              <View
+                key={item.id}
+                style={[
+                  styles.collectionCard,
+                  !isCollected && styles.collectionLocked,
+                ]}
+              >
+                <View style={styles.collectionIcon}>
+                  <Ionicons
+                    name={item.iconName}
+                    size={24}
+                    color={isCollected ? Colors.headerText : Colors.bodyText}
+                  />
+                </View>
+                <Text style={styles.collectionName}>
+                  {isCollected ? item.name : '？？？'}
+                </Text>
+                <Text style={styles.collectionMeta}>
+                  {isCollected ? item.rarity : '未获得'}
+                </Text>
               </View>
             );
           })}
@@ -366,6 +402,46 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   badgeDescription: {
+    color: Colors.bodyText,
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  collectionSection: {
+    gap: 12,
+    marginTop: 18,
+  },
+  collectionList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  collectionCard: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightGreen,
+    borderRadius: 20,
+    gap: 6,
+    minWidth: 96,
+    padding: 12,
+  },
+  collectionLocked: {
+    opacity: 0.45,
+  },
+  collectionIcon: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightYellow,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  collectionName: {
+    color: Colors.headerText,
+    fontSize: 15,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  collectionMeta: {
     color: Colors.bodyText,
     fontSize: 12,
     fontWeight: '700',

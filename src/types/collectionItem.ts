@@ -1,8 +1,9 @@
 import type { Ionicons } from '@expo/vector-icons';
 
-export type Badge = {
+export type CollectionItem = {
   id: string;
-  title: string;
+  name: string;
   description: string;
   iconName: keyof typeof Ionicons.glyphMap;
+  rarity: 'common' | 'rare';
 };

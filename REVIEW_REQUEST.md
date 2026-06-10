@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 4 badge achievement system and its interaction with daily tasks and plant growth.
+Please review the Step 5 basic collection system and its interaction with daily tasks.
 
 ## Focus Areas
 
@@ -17,6 +17,11 @@ Please review the Step 4 badge achievement system and its interaction with daily
 - Badges unlock automatically after completing tasks or watering plants.
 - Unlocked badge IDs are not duplicated and are persisted.
 - Home screen badge count and badge list render clearly.
+- CollectionItem model is simple and local-first.
+- Completing a daily task grants the next uncollected collection item.
+- Collected item IDs are not duplicated and are persisted.
+- Home screen collection progress and item list render clearly.
+- Badge icon typing is narrowed to Ionicons icon names.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -27,6 +32,7 @@ Please review the Step 4 badge achievement system and its interaction with daily
 - Multi-plant management UI.
 - Server-time validation.
 - Badge reward payouts.
+- Random collection drops.
 
 ## Manual Test Ideas
 
@@ -39,6 +45,9 @@ Please review the Step 4 badge achievement system and its interaction with daily
 - Complete one task and confirm the first-task badge unlocks.
 - Water until the plant reaches Level 2 and confirm the level-2-plant badge unlocks.
 - Water 3 total times and confirm the three-waters badge unlocks.
+- Complete daily tasks and confirm collection items unlock in list order.
+- Confirm collected items cannot be duplicated.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.
+- Restart the app and confirm collected items are retained.

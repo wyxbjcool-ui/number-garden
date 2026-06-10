@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 4: Badge achievement system.
+Step 5: Basic collection system.
 
 ## Completed
 
@@ -29,6 +29,11 @@ Step 4: Badge achievement system.
 - Automatic badge unlock checks after daily tasks and watering.
 - Unlocked badge IDs persisted through Zustand.
 - Home screen badge count and badge list.
+- CollectionItem model.
+- Five built-in collection items.
+- Daily task completion grants the next uncollected item.
+- Collected item IDs persisted through Zustand.
+- Home screen collection progress and item list.
 
 ## Not Included Yet
 
@@ -39,3 +44,4 @@ Step 4: Badge achievement system.
 - Multi-plant collection UI.
 - Server-time daily reset.
 - Badge reward payouts.
+- Random collection drops.

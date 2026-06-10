@@ -34,6 +34,8 @@ The active task date is stored as a local `YYYY-MM-DD` value. When TodayScreen m
 
 Badges in Step 4 are defined as local static data. The Zustand store checks badge conditions after task completion and plant watering, then persists unlocked badge IDs.
 
+Collection items in Step 5 are defined as local static data. Completing a daily task grants the next uncollected item in list order and persists collected item IDs in the global store.
+
 ## Boundaries
 
 - No backend in MVP V1.
@@ -42,3 +44,4 @@ Badges in Step 4 are defined as local static data. The Zustand store checks badg
 - No payment or ads in MVP V1.
 - No server-time validation.
 - No badge reward payouts yet.
+- No random collection drop logic yet.

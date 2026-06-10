@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { badges } from '../data/badges';
+import { collectionItems } from '../data/collectionItems';
 import type { DailyTask } from '../types/dailyTask';
 import type { Plant } from '../types/plant';
 
@@ -46,6 +47,18 @@ const getNextUnlockedBadgeIds = (state: BadgeCheckState) => {
   });
 
   return Array.from(nextUnlockedBadgeIds);
+};
+
+const getNextCollectedItemIds = (collectedItemIds: string[]) => {
+  const nextItem = collectionItems.find(
+    (item) => !collectedItemIds.includes(item.id),
+  );
+
+  if (!nextItem) {
+    return collectedItemIds;
+  }
+
+  return [...collectedItemIds, nextItem.id];
 };
 
 type GardenState = {
@@ -103,11 +116,15 @@ export const useGardenStore = create<GardenState>()(
               ...state.completedTodayTaskIds,
               task.id,
             ];
+            const collectedItemIds = getNextCollectedItemIds(
+              state.collectedItemIds,
+            );
 
             return {
               coins: state.coins + task.rewardCoins,
               fertilizers: state.fertilizers + task.rewardFertilizers,
               completedTodayTaskIds,
+              collectedItemIds,
               unlockedBadgeIds: getNextUnlockedBadgeIds({
                 ...state,
                 completedTodayTaskIds,
@@ -132,11 +149,15 @@ export const useGardenStore = create<GardenState>()(
             ...state.plants,
             [plant.id]: nextPlant,
           };
+          const collectedItemIds = getNextCollectedItemIds(
+            state.collectedItemIds,
+          );
 
           return {
             coins: state.coins + task.rewardCoins,
             fertilizers: state.fertilizers + task.rewardFertilizers,
             completedTodayTaskIds,
+            collectedItemIds,
             plants,
             unlockedBadgeIds: getNextUnlockedBadgeIds({
               ...state,

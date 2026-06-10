@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added first version of the collection system.
+- Added five built-in collection items.
+- Added ordered collection reward after completing daily tasks.
+- Added collection progress and item list to the home screen.
+- Tightened Badge `iconName` typing to Ionicons icon names.
 - Added first version of the badge achievement system.
 - Added three built-in badges: first-task, level-2-plant, and three-waters.
 - Added automatic badge unlock checks after completing tasks and watering plants.
