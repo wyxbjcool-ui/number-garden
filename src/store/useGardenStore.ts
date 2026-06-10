@@ -5,6 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
 import type { DailyTask } from '../types/dailyTask';
+import type { MathGame } from '../types/mathGame';
 import type { Plant } from '../types/plant';
 
 const getLocalDateString = () => {
@@ -72,7 +73,9 @@ type GardenState = {
   completedTodayTaskIds: string[];
   unlockedBadgeIds: string[];
   collectedItemIds: string[];
+  answeredMathQuestionIds: string[];
   completeDailyTask: (task: DailyTask) => void;
+  answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
   refreshDailyTasksForToday: () => void;
   waterSelectedPlant: () => void;
   resetGarden: () => void;
@@ -97,6 +100,7 @@ const initialState = {
   completedTodayTaskIds: [],
   unlockedBadgeIds: [],
   collectedItemIds: [],
+  answeredMathQuestionIds: [],
 };
 
 export const useGardenStore = create<GardenState>()(
@@ -162,6 +166,58 @@ export const useGardenStore = create<GardenState>()(
             unlockedBadgeIds: getNextUnlockedBadgeIds({
               ...state,
               completedTodayTaskIds,
+              plants,
+            }),
+          };
+        }),
+      answerMathQuestion: (question, selectedOptionId) =>
+        set((state) => {
+          if (state.answeredMathQuestionIds.includes(question.id)) {
+            return state;
+          }
+
+          const answeredMathQuestionIds = [
+            ...state.answeredMathQuestionIds,
+            question.id,
+          ];
+          const isCorrect = selectedOptionId === question.correctOptionId;
+
+          if (!isCorrect) {
+            return {
+              answeredMathQuestionIds,
+            };
+          }
+
+          const plant = state.plants[state.selectedPlantId];
+
+          if (!plant) {
+            return {
+              coins: state.coins + 3,
+              fertilizers: state.fertilizers + 1,
+              answeredMathQuestionIds,
+            };
+          }
+
+          const totalXp = plant.xp + 10;
+          const levelGain = Math.floor(totalXp / 100);
+          const nextPlant = {
+            ...plant,
+            level: plant.level + levelGain,
+            xp: totalXp % 100,
+            waterCount: plant.waterCount + 1,
+          };
+          const plants = {
+            ...state.plants,
+            [plant.id]: nextPlant,
+          };
+
+          return {
+            coins: state.coins + 3,
+            fertilizers: state.fertilizers + 1,
+            answeredMathQuestionIds,
+            plants,
+            unlockedBadgeIds: getNextUnlockedBadgeIds({
+              ...state,
               plants,
             }),
           };

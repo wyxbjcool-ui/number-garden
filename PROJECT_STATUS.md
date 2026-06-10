@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 7: Manual test plan and stability check.
+Step 9: First math mini-game system.
 
 ## Completed
 
@@ -42,6 +42,11 @@ Step 7: Manual test plan and stability check.
 - TypeScript stability check.
 - Expo startup check.
 - Ionicons icon typing cleanup.
+- MathGame model.
+- Five built-in math questions for early elementary level.
+- Math answer state persisted through Zustand.
+- Correct math answers reward coins, fertilizer, and plant XP.
+- Home screen math mini-game section.
 
 ## Not Included Yet
 
@@ -55,3 +60,4 @@ Step 7: Manual test plan and stability check.
 - Random collection drops.
 - Advanced animations.
 - Automated test suite.
+- Randomized math question generation.

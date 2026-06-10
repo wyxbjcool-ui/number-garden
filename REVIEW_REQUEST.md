@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 8 home preview and UI polish.
+Please review the Step 9 math mini-game system.
 
 ## Focus Areas
 
@@ -35,6 +35,11 @@ Please review the Step 8 home preview and UI polish.
 - Badge cards wrap instead of staying cramped in one row.
 - Collection cards can grow and wrap cleanly.
 - ScrollView uses automatic content inset adjustment.
+- MathGame model is simple and local-first.
+- Built-in questions cover 20以内加减法, simple patterns, and comparison.
+- Each math question can only be answered once.
+- Correct answers reward +3 coins, +1 fertilizer, and +10 plant XP.
+- Answered math question IDs persist.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -49,6 +54,7 @@ Please review the Step 8 home preview and UI polish.
 - Complex animations.
 - Automated test suite.
 - Business logic changes.
+- Generated or randomized math questions.
 
 ## Manual Test Ideas
 
@@ -69,6 +75,9 @@ Please review the Step 8 home preview and UI polish.
 - Follow TEST_PLAN.md manually on an iPad or simulator.
 - Check iPhone small screen layout for resource pills, task buttons, badges, and collection cards.
 - Check Android layout when an Android device or emulator is available.
+- Answer one math question correctly and confirm coins, fertilizer, and plant XP update.
+- Answer one math question incorrectly and confirm no reward is given.
+- Confirm answered math questions do not appear again.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

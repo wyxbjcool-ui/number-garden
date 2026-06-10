@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
+import { mathGames } from '../data/mathGames';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
 import type { DailyTask } from '../types/dailyTask';
@@ -33,6 +34,9 @@ const dailyTasks: DailyTask[] = [
 ];
 
 export function TodayScreen() {
+  const [lastMathResult, setLastMathResult] = useState<
+    'correct' | 'incorrect' | null
+  >(null);
   const title = useGardenStore((state) => state.currentTitle);
   const coins = useGardenStore((state) => state.coins);
   const fertilizers = useGardenStore((state) => state.fertilizers);
@@ -43,12 +47,19 @@ export function TodayScreen() {
   );
   const unlockedBadgeIds = useGardenStore((state) => state.unlockedBadgeIds);
   const collectedItemIds = useGardenStore((state) => state.collectedItemIds);
+  const answeredMathQuestionIds = useGardenStore(
+    (state) => state.answeredMathQuestionIds,
+  );
   const completeDailyTask = useGardenStore((state) => state.completeDailyTask);
+  const answerMathQuestion = useGardenStore((state) => state.answerMathQuestion);
   const refreshDailyTasksForToday = useGardenStore(
     (state) => state.refreshDailyTasksForToday,
   );
   const waterSelectedPlant = useGardenStore((state) => state.waterSelectedPlant);
   const xpPercent = plant ? plant.xp / 100 : 0;
+  const currentMathQuestion = mathGames.find(
+    (question) => !answeredMathQuestionIds.includes(question.id),
+  );
   const formatRarity = (rarity: 'common' | 'rare') =>
     rarity === 'rare' ? '稀有' : '普通';
 
@@ -150,6 +161,50 @@ export function TodayScreen() {
             </View>
           );
         })}
+      </View>
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>数字小游戏</Text>
+          <Text style={styles.sectionCount}>
+            {answeredMathQuestionIds.length}/{mathGames.length}
+          </Text>
+        </View>
+        {currentMathQuestion ? (
+          <View style={styles.mathCard}>
+            <Text style={styles.mathQuestion}>
+              {currentMathQuestion.question}
+            </Text>
+            <View style={styles.mathOptionList}>
+              {currentMathQuestion.options.map((option) => (
+                <Pressable
+                  key={option.id}
+                  style={styles.mathOptionButton}
+                  onPress={() => {
+                    const isCorrect =
+                      option.id === currentMathQuestion.correctOptionId;
+
+                    answerMathQuestion(currentMathQuestion, option.id);
+                    setLastMathResult(isCorrect ? 'correct' : 'incorrect');
+                  }}
+                >
+                  <Text style={styles.mathOptionText}>{option.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+            {lastMathResult ? (
+              <Text style={styles.mathFeedback}>
+                {lastMathResult === 'correct' ? '答对了' : '再试试'}
+              </Text>
+            ) : (
+              <Text style={styles.mathReward}>答对 +3 金币 · +1 肥料</Text>
+            )}
+          </View>
+        ) : (
+          <View style={styles.mathCard}>
+            <Text style={styles.mathQuestion}>今天的题目都完成啦</Text>
+            <Text style={styles.mathReward}>小脑袋亮晶晶</Text>
+          </View>
+        )}
       </View>
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
@@ -432,6 +487,50 @@ const styles = StyleSheet.create({
   },
   taskButtonTextCompleted: {
     color: Colors.bodyText,
+  },
+  mathCard: {
+    gap: 14,
+    borderRadius: 22,
+    backgroundColor: Colors.lightYellow,
+    padding: 16,
+  },
+  mathQuestion: {
+    color: Colors.headerText,
+    fontSize: 24,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  mathOptionList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'center',
+  },
+  mathOptionButton: {
+    alignItems: 'center',
+    borderRadius: 22,
+    justifyContent: 'center',
+    minHeight: 54,
+    minWidth: 86,
+    backgroundColor: Colors.lightBlue,
+    paddingHorizontal: 18,
+  },
+  mathOptionText: {
+    color: Colors.headerText,
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  mathFeedback: {
+    color: Colors.leaf,
+    fontSize: 18,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  mathReward: {
+    color: Colors.bodyText,
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   badgeList: {
     flexWrap: 'wrap',

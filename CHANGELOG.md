@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added first version of the math mini-game system.
+- Added five built-in questions covering 20以内加减法, simple patterns, and comparison.
+- Added persisted answered math question IDs.
+- Added correct-answer rewards: +3 coins, +1 fertilizer, and +10 plant XP.
+- Added a home screen math mini-game section.
 - Added manual test plan for startup, tasks, plant growth, badges, collection, date reset, and persistence.
 - Verified TypeScript compilation with `npx tsc --noEmit`.
 - Verified Expo start command reaches Metro startup.

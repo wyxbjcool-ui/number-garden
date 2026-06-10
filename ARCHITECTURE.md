@@ -38,6 +38,8 @@ Collection items in Step 5 are defined as local static data. Completing a daily 
 
 Step 6 is a presentation-only Today screen polish. It keeps the existing store and business rules intact while making the home screen scrollable and visually clearer.
 
+Math games in Step 9 are defined as local static data. The Zustand store persists answered question IDs and applies correct-answer rewards atomically with plant growth.
+
 ## Boundaries
 
 - No backend in MVP V1.
@@ -48,3 +50,4 @@ Step 6 is a presentation-only Today screen polish. It keeps the existing store a
 - No badge reward payouts yet.
 - No random collection drop logic yet.
 - No complex animation layer.
+- No generated math question engine yet.

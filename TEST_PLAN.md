@@ -52,6 +52,18 @@
 - Confirm uncollected items display as ？？？.
 - Confirm common items show 普通 and rare items show 稀有.
 
+## Math Mini-Game Tests
+
+- Confirm the 数字小游戏 section appears on the Today screen.
+- Confirm one unanswered question is shown at a time.
+- Tap the correct answer and confirm the feedback says 答对了.
+- Confirm a correct answer gives +3 coins.
+- Confirm a correct answer gives +1 fertilizer.
+- Confirm a correct answer adds +10 plant XP.
+- Tap an incorrect answer on another question and confirm the feedback says 再试试.
+- Confirm an incorrect answer gives no reward.
+- Confirm answered questions do not appear again.
+
 ## Date Reset Tests
 
 - Confirm `currentTaskDate` uses local `YYYY-MM-DD` format.
@@ -69,6 +81,7 @@
 - Confirm completed task state persists for the same date.
 - Confirm unlocked badges persist.
 - Confirm collected items persist.
+- Confirm answered math question IDs persist.
 
 ## Known Limits
 
@@ -77,4 +90,5 @@
 - There is no backend, login, or cloud sync.
 - There are no complex animations.
 - There is no automated test suite yet.
+- Math questions are built in and not randomly generated yet.
 - iOS Simulator and Android device preview depend on local machine/device availability.
