@@ -67,6 +67,10 @@ export function TodayScreen() {
     refreshDailyTasksForToday();
   }, [refreshDailyTasksForToday]);
 
+  useEffect(() => {
+    setLastMathResult(null);
+  }, [currentMathQuestion?.id]);
+
   return (
     <ScrollView
       style={styles.container}

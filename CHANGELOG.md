@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixed math mini-game retry behavior so incorrect answers do not mark questions as answered.
+- Confirmed the built-in math game set contains five questions across addition/subtraction, patterns, and comparison.
 - Added first version of the math mini-game system.
 - Added five built-in questions covering 20以内加减法, simple patterns, and comparison.
 - Added persisted answered math question IDs.

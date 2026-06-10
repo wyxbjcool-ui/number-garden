@@ -38,6 +38,7 @@ Please review the Step 9 math mini-game system.
 - MathGame model is simple and local-first.
 - Built-in questions cover 20以内加减法, simple patterns, and comparison.
 - Each math question can only be answered once.
+- Incorrect math answers remain retryable and do not grant rewards.
 - Correct answers reward +3 coins, +1 fertilizer, and +10 plant XP.
 - Answered math question IDs persist.
 - UI remains simple and child-friendly.
@@ -77,6 +78,7 @@ Please review the Step 9 math mini-game system.
 - Check Android layout when an Android device or emulator is available.
 - Answer one math question correctly and confirm coins, fertilizer, and plant XP update.
 - Answer one math question incorrectly and confirm no reward is given.
+- Confirm the same question remains available after an incorrect answer.
 - Confirm answered math questions do not appear again.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.

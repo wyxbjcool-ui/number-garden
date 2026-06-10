@@ -47,6 +47,7 @@ Step 9: First math mini-game system.
 - Math answer state persisted through Zustand.
 - Correct math answers reward coins, fertilizer, and plant XP.
 - Home screen math mini-game section.
+- Incorrect math answers can be retried without consuming the question.
 
 ## Not Included Yet
 

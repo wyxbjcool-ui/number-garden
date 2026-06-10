@@ -176,18 +176,16 @@ export const useGardenStore = create<GardenState>()(
             return state;
           }
 
+          const isCorrect = selectedOptionId === question.correctOptionId;
+
+          if (!isCorrect) {
+            return state;
+          }
+
           const answeredMathQuestionIds = [
             ...state.answeredMathQuestionIds,
             question.id,
           ];
-          const isCorrect = selectedOptionId === question.correctOptionId;
-
-          if (!isCorrect) {
-            return {
-              answeredMathQuestionIds,
-            };
-          }
-
           const plant = state.plants[state.selectedPlantId];
 
           if (!plant) {

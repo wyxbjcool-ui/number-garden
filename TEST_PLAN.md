@@ -62,6 +62,8 @@
 - Confirm a correct answer adds +10 plant XP.
 - Tap an incorrect answer on another question and confirm the feedback says 再试试.
 - Confirm an incorrect answer gives no reward.
+- Confirm an incorrect answer does not advance to the next question.
+- Try the same question again after an incorrect answer and confirm a correct answer can still complete it.
 - Confirm answered questions do not appear again.
 
 ## Date Reset Tests
