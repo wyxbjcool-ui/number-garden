@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 10: First multi-plant system.
+Step 11: First plant unlock system.
 
 ## Completed
 
@@ -53,6 +53,10 @@ Step 10: First multi-plant system.
 - Home screen plant catalog and selected plant switching.
 - Locked display for unowned plants.
 - Persisted plant merge keeps existing succulent growth data.
+- Plant unlock costs.
+- Coin-based plant unlock action.
+- Unlocked plants join ownedPlantIds and become selectable.
+- Plant catalog unlock price and affordability states.
 
 ## Not Included Yet
 
@@ -67,4 +71,4 @@ Step 10: First multi-plant system.
 - Advanced animations.
 - Automated test suite.
 - Randomized math question generation.
-- Plant purchase or unlock flow.
+- Advanced plant shop or unlock conditions.

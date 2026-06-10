@@ -4,4 +4,5 @@ export type Plant = {
   level: number;
   xp: number;
   waterCount: number;
+  unlockCost: number;
 };

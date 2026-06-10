@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added first version of the plant unlock system.
+- Added unlock costs for all built-in plants.
+- Added coin-based `unlockPlant` action.
+- Added unlock, insufficient-coins, and owned states to the plant catalog.
+- Unlocking a plant now adds it to ownedPlantIds and selects it immediately.
 - Added first version of the multi-plant system.
 - Added four built-in plants: 多肉, 彩叶芋, 碰碰草, 蝴蝶兰.
 - Added plant catalog UI with owned, locked, and selected states.

@@ -7,6 +7,7 @@ export const plants: Record<string, Plant> = {
     level: 1,
     xp: 0,
     waterCount: 0,
+    unlockCost: 0,
   },
   caladium: {
     id: 'caladium',
@@ -14,6 +15,7 @@ export const plants: Record<string, Plant> = {
     level: 1,
     xp: 0,
     waterCount: 0,
+    unlockCost: 20,
   },
   'touch-me-not': {
     id: 'touch-me-not',
@@ -21,6 +23,7 @@ export const plants: Record<string, Plant> = {
     level: 1,
     xp: 0,
     waterCount: 0,
+    unlockCost: 30,
   },
   orchid: {
     id: 'orchid',
@@ -28,6 +31,7 @@ export const plants: Record<string, Plant> = {
     level: 1,
     xp: 0,
     waterCount: 0,
+    unlockCost: 50,
   },
 };
 

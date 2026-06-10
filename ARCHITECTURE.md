@@ -42,6 +42,8 @@ Math games in Step 9 are defined as local static data. The Zustand store persist
 
 Plants in Step 10 are defined as local static data. Zustand stores per-plant growth state, owned plant IDs, and the selected plant ID. Persisted state is merged with the current built-in plant catalog so existing succulent progress is retained while new built-in plants are added.
 
+Plant unlocks in Step 11 use local coin costs on the Plant model. The store validates ownership, coin balance, and plant existence before subtracting coins, appending to ownedPlantIds, and selecting the unlocked plant.
+
 ## Boundaries
 
 - No backend in MVP V1.
@@ -53,4 +55,4 @@ Plants in Step 10 are defined as local static data. Zustand stores per-plant gro
 - No random collection drop logic yet.
 - No complex animation layer.
 - No generated math question engine yet.
-- No plant purchase or unlock flow yet.
+- No advanced plant shop or unlock conditions yet.

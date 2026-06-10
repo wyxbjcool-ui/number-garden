@@ -50,6 +50,18 @@
 - Confirm math rewards apply plant XP to the selected plant.
 - Restart the app and confirm existing 多肉 growth data is retained.
 
+## Plant Unlock Tests
+
+- Confirm 多肉 shows cost 0 through default ownership.
+- Confirm 彩叶芋 costs 20 coins.
+- Confirm 碰碰草 costs 30 coins.
+- Confirm 蝴蝶兰 costs 50 coins.
+- With insufficient coins, confirm locked plant cards show 金币不足 and do not unlock.
+- With enough coins, tap 解锁 and confirm coins decrease by the plant cost.
+- Confirm the unlocked plant is added to ownedPlantIds and selected immediately.
+- Tap an already owned plant and confirm coins are not charged again.
+- Restart the app and confirm unlocked plant ownership persists.
+
 ## Badge Tests
 
 - Complete the first daily task and confirm the first-task badge unlocks.
@@ -106,5 +118,5 @@
 - There are no complex animations.
 - There is no automated test suite yet.
 - Math questions are built in and not randomly generated yet.
-- Plant purchase and unlock flows are not implemented yet.
+- Advanced plant shop and unlock conditions are not implemented yet.
 - iOS Simulator and Android device preview depend on local machine/device availability.

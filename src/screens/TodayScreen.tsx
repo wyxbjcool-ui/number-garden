@@ -56,6 +56,7 @@ export function TodayScreen() {
   const completeDailyTask = useGardenStore((state) => state.completeDailyTask);
   const answerMathQuestion = useGardenStore((state) => state.answerMathQuestion);
   const selectPlant = useGardenStore((state) => state.selectPlant);
+  const unlockPlant = useGardenStore((state) => state.unlockPlant);
   const refreshDailyTasksForToday = useGardenStore(
     (state) => state.refreshDailyTasksForToday,
   );
@@ -140,6 +141,7 @@ export function TodayScreen() {
             const gardenPlant = plants[plantId] ?? catalogPlant;
             const isOwned = ownedPlantIds.includes(plantId);
             const isSelected = selectedPlantId === plantId;
+            const canUnlock = !isOwned && coins >= catalogPlant.unlockCost;
 
             return (
               <Pressable
@@ -149,19 +151,31 @@ export function TodayScreen() {
                   isSelected && styles.plantListCardSelected,
                   !isOwned && styles.plantListCardLocked,
                 ]}
-                disabled={!isOwned}
-                onPress={() => selectPlant(plantId)}
+                disabled={!isOwned && !canUnlock}
+                onPress={() => {
+                  if (isOwned) {
+                    selectPlant(plantId);
+                    return;
+                  }
+
+                  unlockPlant(plantId);
+                }}
               >
                 <View style={styles.plantListIcon}>
                   <Ionicons
-                    name={isOwned ? 'leaf' : 'lock-closed'}
+                    name={isOwned ? 'leaf' : canUnlock ? 'key' : 'lock-closed'}
                     size={22}
                     color={isOwned ? Colors.headerText : Colors.bodyText}
                   />
                 </View>
                 <Text style={styles.plantListName}>{catalogPlant.name}</Text>
                 <Text style={styles.plantListMeta}>
-                  {isOwned ? `Level ${gardenPlant.level}` : '未拥有'}
+                  {isOwned
+                    ? `Level ${gardenPlant.level}`
+                    : `${catalogPlant.unlockCost} 金币`}
+                </Text>
+                <Text style={styles.plantListAction}>
+                  {isOwned ? (isSelected ? '使用中' : '切换') : canUnlock ? '解锁' : '金币不足'}
                 </Text>
               </Pressable>
             );
@@ -473,6 +487,12 @@ const styles = StyleSheet.create({
     color: Colors.bodyText,
     fontSize: 12,
     fontWeight: '700',
+    textAlign: 'center',
+  },
+  plantListAction: {
+    color: Colors.leaf,
+    fontSize: 13,
+    fontWeight: '800',
     textAlign: 'center',
   },
   progressTrack: {

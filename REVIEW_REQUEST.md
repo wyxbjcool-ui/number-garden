@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 10 multi-plant system.
+Please review the Step 11 plant unlock system.
 
 ## Focus Areas
 
@@ -46,6 +46,10 @@ Please review the Step 10 multi-plant system.
 - Unowned plants render as locked and are not clickable.
 - Rewards from tasks, watering, and math apply to selectedPlantId.
 - Persisted succulent growth data is preserved after adding new plants.
+- Each plant has an unlockCost.
+- Locked plants can be unlocked only when the user has enough coins.
+- Unlocking subtracts coins once, adds the plant to ownedPlantIds, and selects it.
+- Already owned plants cannot be charged again.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -61,7 +65,7 @@ Please review the Step 10 multi-plant system.
 - Automated test suite.
 - Business logic changes.
 - Generated or randomized math questions.
-- Plant purchase or unlock flow.
+- Advanced plant shop.
 
 ## Manual Test Ideas
 
@@ -90,6 +94,10 @@ Please review the Step 10 multi-plant system.
 - Confirm succulent is owned by default and selectable.
 - Confirm locked plants cannot be selected.
 - Confirm selected plant receives watering, task, and math XP rewards.
+- Confirm plants show unlock price when locked.
+- Confirm insufficient coins prevents unlock.
+- Confirm enough coins unlocks a plant and subtracts the correct cost.
+- Confirm unlocked plants can be selected without repeat cost.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

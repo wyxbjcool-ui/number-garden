@@ -78,6 +78,7 @@ type GardenState = {
   completeDailyTask: (task: DailyTask) => void;
   answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
   selectPlant: (plantId: string) => void;
+  unlockPlant: (plantId: string) => void;
   refreshDailyTasksForToday: () => void;
   waterSelectedPlant: () => void;
   resetGarden: () => void;
@@ -224,6 +225,24 @@ export const useGardenStore = create<GardenState>()(
             selectedPlantId: plantId,
           };
         }),
+      unlockPlant: (plantId) =>
+        set((state) => {
+          if (state.ownedPlantIds.includes(plantId)) {
+            return state;
+          }
+
+          const plant = state.plants[plantId];
+
+          if (!plant || state.coins < plant.unlockCost) {
+            return state;
+          }
+
+          return {
+            coins: state.coins - plant.unlockCost,
+            ownedPlantIds: [...state.ownedPlantIds, plantId],
+            selectedPlantId: plantId,
+          };
+        }),
       refreshDailyTasksForToday: () =>
         set((state) => {
           const today = getLocalDateString();
@@ -291,7 +310,18 @@ export const useGardenStore = create<GardenState>()(
           selectedPlantId,
           plants: {
             ...currentState.plants,
-            ...persisted?.plants,
+            ...Object.fromEntries(
+              Object.entries(persisted?.plants ?? {}).map(([plantId, plant]) => [
+                plantId,
+                {
+                  ...currentState.plants[plantId],
+                  ...plant,
+                  unlockCost:
+                    currentState.plants[plantId]?.unlockCost ??
+                    plant.unlockCost,
+                },
+              ]),
+            ),
           },
         };
       },
