@@ -5,10 +5,20 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type { DailyTask } from '../types/dailyTask';
 import type { Plant } from '../types/plant';
 
+const getLocalDateString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
 type GardenState = {
   coins: number;
   fertilizers: number;
   currentTitle: string;
+  currentTaskDate: string;
   selectedPlantId: string;
   plants: Record<string, Plant>;
   ownedPlantIds: string[];
@@ -16,6 +26,7 @@ type GardenState = {
   unlockedBadgeIds: string[];
   collectedItemIds: string[];
   completeDailyTask: (task: DailyTask) => void;
+  refreshDailyTasksForToday: () => void;
   waterSelectedPlant: () => void;
   resetGarden: () => void;
 };
@@ -24,6 +35,7 @@ const initialState = {
   coins: 0,
   fertilizers: 0,
   currentTitle: '成长小种子',
+  currentTaskDate: '',
   selectedPlantId: 'succulent',
   plants: {
     succulent: {
@@ -77,6 +89,19 @@ export const useGardenStore = create<GardenState>()(
               ...state.plants,
               [plant.id]: nextPlant,
             },
+          };
+        }),
+      refreshDailyTasksForToday: () =>
+        set((state) => {
+          const today = getLocalDateString();
+
+          if (state.currentTaskDate === today) {
+            return state;
+          }
+
+          return {
+            currentTaskDate: today,
+            completedTodayTaskIds: [],
           };
         }),
       waterSelectedPlant: () =>

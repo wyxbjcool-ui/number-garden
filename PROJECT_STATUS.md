@@ -23,6 +23,7 @@ Step 3: Daily task system.
 - Built-in daily task list.
 - Daily task completion rewards coins, fertilizers, and plant XP.
 - Completed daily task IDs persisted through Zustand.
+- Local-date daily task reset.
 
 ## Not Included Yet
 
@@ -31,4 +32,4 @@ Step 3: Daily task system.
 - Payment, ads, or store features.
 - Complex animation.
 - Multi-plant collection UI.
-- Daily reset by calendar date.
+- Server-time daily reset.

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useGardenStore } from '../store/useGardenStore';
@@ -39,8 +40,15 @@ export function TodayScreen() {
     (state) => state.completedTodayTaskIds,
   );
   const completeDailyTask = useGardenStore((state) => state.completeDailyTask);
+  const refreshDailyTasksForToday = useGardenStore(
+    (state) => state.refreshDailyTasksForToday,
+  );
   const waterSelectedPlant = useGardenStore((state) => state.waterSelectedPlant);
   const xpPercent = plant ? plant.xp / 100 : 0;
+
+  useEffect(() => {
+    refreshDailyTasksForToday();
+  }, [refreshDailyTasksForToday]);
 
   return (
     <View style={styles.container}>

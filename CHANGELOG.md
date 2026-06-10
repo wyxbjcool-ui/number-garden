@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added local-date reset for completed daily tasks.
+- Added `currentTaskDate` to persist the active daily task date.
+- Added `refreshDailyTasksForToday` for resetting completed task IDs when the date changes.
 - Added first version of the daily task system.
 - Added three built-in daily tasks: 整理书包, 阅读 10 分钟, 早睡打卡.
 - Added task completion rewards: +5 coins, +1 fertilizer, and one plant watering.

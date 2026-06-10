@@ -30,10 +30,12 @@ Plant growth in Step 2 starts as a single-plant model stored inside the global Z
 
 Daily tasks in Step 3 are defined as local static data on the Today screen. Completing a task updates the global store atomically: coins, fertilizers, completed task IDs, and selected plant growth are persisted together.
 
+The active task date is stored as a local `YYYY-MM-DD` value. When TodayScreen mounts, the store compares `currentTaskDate` with the device's current local date and clears only `completedTodayTaskIds` if the date changed.
+
 ## Boundaries
 
 - No backend in MVP V1.
 - No authentication in MVP V1.
 - No cloud sync in MVP V1.
 - No payment or ads in MVP V1.
-- No calendar-based daily reset yet.
+- No server-time validation.
