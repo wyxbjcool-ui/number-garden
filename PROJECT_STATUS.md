@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 5: Basic collection system.
+Step 6: Basic home experience polish.
 
 ## Completed
 
@@ -34,6 +34,10 @@ Step 5: Basic collection system.
 - Daily task completion grants the next uncollected item.
 - Collected item IDs persisted through Zustand.
 - Home screen collection progress and item list.
+- Scrollable Today screen.
+- Clearer home sections for plant, tasks, badges, and collection.
+- Softer completed task presentation.
+- Localized collection rarity labels.
 
 ## Not Included Yet
 
@@ -45,3 +49,4 @@ Step 5: Basic collection system.
 - Server-time daily reset.
 - Badge reward payouts.
 - Random collection drops.
+- Advanced animations.

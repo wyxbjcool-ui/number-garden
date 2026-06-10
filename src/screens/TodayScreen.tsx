@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
@@ -49,13 +49,28 @@ export function TodayScreen() {
   );
   const waterSelectedPlant = useGardenStore((state) => state.waterSelectedPlant);
   const xpPercent = plant ? plant.xp / 100 : 0;
+  const formatRarity = (rarity: 'common' | 'rare') =>
+    rarity === 'rare' ? '稀有' : '普通';
 
   useEffect(() => {
     refreshDailyTasksForToday();
   }, [refreshDailyTasksForToday]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
+      <View style={styles.resourceRow}>
+        <View style={styles.resourcePill}>
+          <Ionicons name="logo-bitcoin" size={22} color={Colors.headerText} />
+          <Text style={styles.resourceText}>金币 {coins}</Text>
+        </View>
+        <View style={styles.resourcePill}>
+          <Ionicons name="flower" size={22} color={Colors.headerText} />
+          <Text style={styles.resourceText}>肥料 {fertilizers}</Text>
+        </View>
+      </View>
       <View style={styles.hero}>
         <View style={styles.iconBubble}>
           <Ionicons name="leaf" size={56} color={Colors.leaf} />
@@ -64,14 +79,11 @@ export function TodayScreen() {
         <Text style={styles.subtitle}>帮助孩子养成好习惯的成长游戏</Text>
         <Text style={styles.badge}>{title}</Text>
       </View>
-      <View style={styles.resourceRow}>
-        <Text style={styles.resourceText}>金币 {coins}</Text>
-        <Text style={styles.resourceText}>肥料 {fertilizers}</Text>
-      </View>
       {plant ? (
         <View style={styles.plantPanel}>
           <View style={styles.plantHeader}>
             <View>
+              <Text style={styles.sectionEyebrow}>我的植物</Text>
               <Text style={styles.plantName}>{plant.name}</Text>
               <Text style={styles.plantMeta}>Level {plant.level}</Text>
             </View>
@@ -94,13 +106,21 @@ export function TodayScreen() {
       ) : (
         <Text style={styles.plantMeta}>未找到植物：{selectedPlantId}</Text>
       )}
-      <View style={styles.taskSection}>
-        <Text style={styles.sectionTitle}>今日任务</Text>
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>今日任务</Text>
+          <Text style={styles.sectionCount}>
+            {completedTodayTaskIds.length}/{dailyTasks.length}
+          </Text>
+        </View>
         {dailyTasks.map((task) => {
           const isCompleted = completedTodayTaskIds.includes(task.id);
 
           return (
-            <View key={task.id} style={styles.taskCard}>
+            <View
+              key={task.id}
+              style={[styles.taskCard, isCompleted && styles.taskCardCompleted]}
+            >
               <View style={styles.taskContent}>
                 <Text style={styles.taskTitle}>{task.title}</Text>
                 <Text style={styles.taskDescription}>{task.description}</Text>
@@ -129,10 +149,13 @@ export function TodayScreen() {
           );
         })}
       </View>
-      <View style={styles.badgeSection}>
-        <Text style={styles.sectionTitle}>
-          徽章 {unlockedBadgeIds.length}/{badges.length}
-        </Text>
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>徽章</Text>
+          <Text style={styles.sectionCount}>
+            {unlockedBadgeIds.length}/{badges.length}
+          </Text>
+        </View>
         <View style={styles.badgeList}>
           {badges.map((badge) => {
             const isUnlocked = unlockedBadgeIds.includes(badge.id);
@@ -156,10 +179,13 @@ export function TodayScreen() {
           })}
         </View>
       </View>
-      <View style={styles.collectionSection}>
-        <Text style={styles.sectionTitle}>
-          收集册 {collectedItemIds.length}/{collectionItems.length}
-        </Text>
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>收集册</Text>
+          <Text style={styles.sectionCount}>
+            {collectedItemIds.length}/{collectionItems.length}
+          </Text>
+        </View>
         <View style={styles.collectionList}>
           {collectionItems.map((item) => {
             const isCollected = collectedItemIds.includes(item.id);
@@ -183,14 +209,14 @@ export function TodayScreen() {
                   {isCollected ? item.name : '？？？'}
                 </Text>
                 <Text style={styles.collectionMeta}>
-                  {isCollected ? item.rarity : '未获得'}
+                  {isCollected ? formatRarity(item.rarity) : '未获得'}
                 </Text>
               </View>
             );
           })}
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -198,14 +224,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  contentContainer: {
+    gap: 18,
     padding: 24,
+    paddingBottom: 36,
   },
   hero: {
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
-    paddingTop: 36,
-    paddingBottom: 28,
+    paddingTop: 12,
+    paddingBottom: 8,
   },
   iconBubble: {
     width: 120,
@@ -243,25 +273,29 @@ const styles = StyleSheet.create({
   resourceRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 16,
+    justifyContent: 'center',
+  },
+  resourcePill: {
+    alignItems: 'center',
+    borderRadius: 24,
+    flexDirection: 'row',
+    gap: 8,
+    backgroundColor: Colors.lightBlue,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
   },
   resourceText: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    backgroundColor: Colors.lightBlue,
     color: Colors.headerText,
     fontSize: 17,
     fontWeight: '800',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
   },
   plantPanel: {
-    gap: 14,
-    borderRadius: 28,
+    gap: 16,
+    borderRadius: 24,
     backgroundColor: Colors.lightGreen,
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: Colors.lightYellow,
-    padding: 22,
+    padding: 20,
   },
   plantHeader: {
     alignItems: 'center',
@@ -275,6 +309,12 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 29,
     backgroundColor: Colors.lightBlue,
+  },
+  sectionEyebrow: {
+    color: Colors.leaf,
+    fontSize: 14,
+    fontWeight: '800',
+    marginBottom: 4,
   },
   plantName: {
     color: Colors.headerText,
@@ -311,14 +351,31 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: '800',
   },
-  taskSection: {
+  section: {
     gap: 12,
-    marginTop: 18,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.42)',
+    padding: 16,
+  },
+  sectionHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   sectionTitle: {
     color: Colors.headerText,
     fontSize: 24,
     fontWeight: '800',
+  },
+  sectionCount: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: Colors.lightBlue,
+    color: Colors.headerText,
+    fontSize: 15,
+    fontWeight: '800',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
   taskCard: {
     alignItems: 'center',
@@ -328,6 +385,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: Colors.lightYellow,
     padding: 16,
+  },
+  taskCardCompleted: {
+    opacity: 0.58,
   },
   taskContent: {
     flex: 1,
@@ -368,10 +428,6 @@ const styles = StyleSheet.create({
   taskButtonTextCompleted: {
     color: Colors.bodyText,
   },
-  badgeSection: {
-    gap: 12,
-    marginTop: 18,
-  },
   badgeList: {
     flexDirection: 'row',
     gap: 12,
@@ -406,10 +462,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     textAlign: 'center',
-  },
-  collectionSection: {
-    gap: 12,
-    marginTop: 18,
   },
   collectionList: {
     flexDirection: 'row',

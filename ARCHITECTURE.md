@@ -36,6 +36,8 @@ Badges in Step 4 are defined as local static data. The Zustand store checks badg
 
 Collection items in Step 5 are defined as local static data. Completing a daily task grants the next uncollected item in list order and persists collected item IDs in the global store.
 
+Step 6 is a presentation-only Today screen polish. It keeps the existing store and business rules intact while making the home screen scrollable and visually clearer.
+
 ## Boundaries
 
 - No backend in MVP V1.
@@ -45,3 +47,4 @@ Collection items in Step 5 are defined as local static data. Completing a daily 
 - No server-time validation.
 - No badge reward payouts yet.
 - No random collection drop logic yet.
+- No complex animation layer.

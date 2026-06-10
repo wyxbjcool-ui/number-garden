@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Polished the Today screen with ScrollView support.
+- Moved coins and fertilizers into a clearer top resource row.
+- Made the plant area feel more like a growth card.
+- Clarified task, badge, and collection sections.
+- Added softer completed-task styling and localized collection rarity labels.
 - Added first version of the collection system.
 - Added five built-in collection items.
 - Added ordered collection reward after completing daily tasks.

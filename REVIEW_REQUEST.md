@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 5 basic collection system and its interaction with daily tasks.
+Please review the Step 6 Today screen experience polish.
 
 ## Focus Areas
 
@@ -22,6 +22,11 @@ Please review the Step 5 basic collection system and its interaction with daily 
 - Collected item IDs are not duplicated and are persisted.
 - Home screen collection progress and item list render clearly.
 - Badge icon typing is narrowed to Ionicons icon names.
+- Today screen uses ScrollView and avoids content overflow.
+- Coins and fertilizers are visible near the top.
+- Plant, task, badge, and collection sections are visually clearer.
+- Completed daily tasks are visually weaker while remaining readable.
+- Collection rarity labels show 普通 and 稀有.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -33,6 +38,7 @@ Please review the Step 5 basic collection system and its interaction with daily 
 - Server-time validation.
 - Badge reward payouts.
 - Random collection drops.
+- Complex animations.
 
 ## Manual Test Ideas
 
@@ -47,6 +53,9 @@ Please review the Step 5 basic collection system and its interaction with daily 
 - Water 3 total times and confirm the three-waters badge unlocks.
 - Complete daily tasks and confirm collection items unlock in list order.
 - Confirm collected items cannot be duplicated.
+- Confirm the Today screen scrolls when content is taller than the viewport.
+- Confirm completed task cards look visually weaker and cannot be claimed again.
+- Confirm common collection items show 普通 and rare items show 稀有.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.
