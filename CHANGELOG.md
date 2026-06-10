@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refactored repeated plant growth calculation into a shared internal helper.
+- Kept plant level, XP remainder, and water count behavior unchanged.
 - Added first version of the plant unlock system.
 - Added unlock costs for all built-in plants.
 - Added coin-based `unlockPlant` action.

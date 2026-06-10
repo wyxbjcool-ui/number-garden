@@ -32,10 +32,12 @@
 
 - Tap 浇水 +10 XP.
 - Confirm plant XP increases by 10.
+- Confirm water count increases by 1.
 - Water until XP reaches 100 total.
 - Confirm the plant level increases by 1.
 - Confirm XP keeps the remainder after leveling.
 - Complete a daily task and confirm it also waters the selected plant once.
+- Answer a math question correctly and confirm it also waters the selected plant once.
 
 ## Multi-Plant Tests
 

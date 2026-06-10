@@ -63,6 +63,18 @@ const getNextCollectedItemIds = (collectedItemIds: string[]) => {
   return [...collectedItemIds, nextItem.id];
 };
 
+const growPlantByXp = (plant: Plant, xpAmount: number) => {
+  const totalXp = plant.xp + xpAmount;
+  const levelGain = Math.floor(totalXp / 100);
+
+  return {
+    ...plant,
+    level: plant.level + levelGain,
+    xp: totalXp % 100,
+    waterCount: plant.waterCount + 1,
+  };
+};
+
 type GardenState = {
   coins: number;
   fertilizers: number;
@@ -131,14 +143,7 @@ export const useGardenStore = create<GardenState>()(
             };
           }
 
-          const totalXp = plant.xp + 10;
-          const levelGain = Math.floor(totalXp / 100);
-          const nextPlant = {
-            ...plant,
-            level: plant.level + levelGain,
-            xp: totalXp % 100,
-            waterCount: plant.waterCount + 1,
-          };
+          const nextPlant = growPlantByXp(plant, 10);
 
           const completedTodayTaskIds = [
             ...state.completedTodayTaskIds,
@@ -191,14 +196,7 @@ export const useGardenStore = create<GardenState>()(
             };
           }
 
-          const totalXp = plant.xp + 10;
-          const levelGain = Math.floor(totalXp / 100);
-          const nextPlant = {
-            ...plant,
-            level: plant.level + levelGain,
-            xp: totalXp % 100,
-            waterCount: plant.waterCount + 1,
-          };
+          const nextPlant = growPlantByXp(plant, 10);
           const plants = {
             ...state.plants,
             [plant.id]: nextPlant,
@@ -264,14 +262,7 @@ export const useGardenStore = create<GardenState>()(
             return state;
           }
 
-          const totalXp = plant.xp + 10;
-          const levelGain = Math.floor(totalXp / 100);
-          const nextPlant = {
-            ...plant,
-            level: plant.level + levelGain,
-            xp: totalXp % 100,
-            waterCount: plant.waterCount + 1,
-          };
+          const nextPlant = growPlantByXp(plant, 10);
 
           const plants = {
             ...state.plants,

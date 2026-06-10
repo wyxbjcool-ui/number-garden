@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 11 plant unlock system.
+Please review the Step 12 plant growth logic cleanup.
 
 ## Focus Areas
 
@@ -50,6 +50,8 @@ Please review the Step 11 plant unlock system.
 - Locked plants can be unlocked only when the user has enough coins.
 - Unlocking subtracts coins once, adds the plant to ownedPlantIds, and selects it.
 - Already owned plants cannot be charged again.
+- Repeated plant growth calculations now use one internal helper.
+- Task rewards, math rewards, and manual watering keep the same XP, level, and water count behavior.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -66,6 +68,7 @@ Please review the Step 11 plant unlock system.
 - Business logic changes.
 - Generated or randomized math questions.
 - Advanced plant shop.
+- Functional behavior changes from the plant growth refactor.
 
 ## Manual Test Ideas
 
@@ -98,6 +101,9 @@ Please review the Step 11 plant unlock system.
 - Confirm insufficient coins prevents unlock.
 - Confirm enough coins unlocks a plant and subtracts the correct cost.
 - Confirm unlocked plants can be selected without repeat cost.
+- Confirm manual watering still adds 10 XP and 1 water count.
+- Confirm task rewards still add 10 selected-plant XP and 1 water count.
+- Confirm math rewards still add 10 selected-plant XP and 1 water count.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.
