@@ -10,6 +10,7 @@
 ## Home UI Preview Tests
 
 - Confirm the Today screen scrolls from top resources through collection items.
+- Confirm the section order is understandable: resources, hero, current plant, plant catalog, tasks, math, badges, collection.
 - Confirm the top coins and fertilizers pills wrap instead of squeezing on small screens.
 - Confirm the plant card title, level, XP, and watering button are readable.
 - Confirm daily task buttons are large enough to tap comfortably.
@@ -17,6 +18,13 @@
 - Confirm badge cards wrap when the screen is narrow.
 - Confirm collection cards wrap and do not overlap.
 - Confirm the screen respects safe area through the native navigation layout.
+
+## MVP Wrap-Up Checks
+
+- Confirm the home screen is readable even though several MVP systems share one page.
+- Confirm repeated visual patterns still feel consistent across plant, task, badge, collection, and math sections.
+- Confirm docs describe the current MVP scope.
+- Confirm no new business behavior was added during wrap-up cleanup.
 
 ## Daily Task Tests
 
@@ -123,4 +131,5 @@
 - There is no automated test suite yet.
 - Math questions are built in and not randomly generated yet.
 - Advanced plant shop and unlock conditions are not implemented yet.
+- The home screen is intentionally feature-dense for MVP and can later be split into tabs or separate screens.
 - iOS Simulator and Android device preview depend on local machine/device availability.

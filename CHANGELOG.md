@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Completed MVP wrap-up check.
+- Updated project status, review request, and test plan for the current MVP scope.
+- Verified TypeScript compilation with `npx tsc --noEmit`.
+- Verified Expo CLI availability with `npx expo start --help`.
+- Cleaned up plant catalog action label rendering without changing behavior.
 - Updated plant growth helper semantics so math XP rewards no longer increment water count.
 - Kept manual watering and daily task watering counted toward water count.
 - Refactored repeated plant growth calculation into a shared internal helper.

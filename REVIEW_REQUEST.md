@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 13 plant growth semantics correction.
+Please review the Step 14 MVP wrap-up check.
 
 ## Focus Areas
 
@@ -56,6 +56,12 @@ Please review the Step 13 plant growth semantics correction.
 - Manual watering and daily task watering increment water count.
 - Math rewards add plant XP without incrementing water count.
 - The three-waters badge still uses waterCount, so math rewards no longer contribute to it.
+- MVP home remains feature-dense, but sections are grouped in a single scrollable screen.
+- Project documents reflect the current MVP feature set.
+- TEST_PLAN.md covers the active MVP areas.
+- Plant catalog action label rendering is clearer without behavior changes.
+- `npx tsc --noEmit` passes.
+- `npx expo start --help` passes.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -73,6 +79,7 @@ Please review the Step 13 plant growth semantics correction.
 - Generated or randomized math questions.
 - Advanced plant shop.
 - New business features.
+- Large navigation restructure.
 
 ## Manual Test Ideas
 
@@ -109,6 +116,8 @@ Please review the Step 13 plant growth semantics correction.
 - Confirm task rewards still add 10 selected-plant XP and 1 water count.
 - Confirm math rewards still add 10 selected-plant XP and do not increase water count.
 - Confirm the three-waters badge does not unlock from math rewards alone.
+- Confirm all MVP sections are understandable while scrolling on the home screen.
+- Follow TEST_PLAN.md end to end before an internal preview.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

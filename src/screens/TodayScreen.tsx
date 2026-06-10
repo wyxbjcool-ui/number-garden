@@ -142,6 +142,13 @@ export function TodayScreen() {
             const isOwned = ownedPlantIds.includes(plantId);
             const isSelected = selectedPlantId === plantId;
             const canUnlock = !isOwned && coins >= catalogPlant.unlockCost;
+            const plantActionLabel = isOwned
+              ? isSelected
+                ? '使用中'
+                : '切换'
+              : canUnlock
+                ? '解锁'
+                : '金币不足';
 
             return (
               <Pressable
@@ -174,9 +181,7 @@ export function TodayScreen() {
                     ? `Level ${gardenPlant.level}`
                     : `${catalogPlant.unlockCost} 金币`}
                 </Text>
-                <Text style={styles.plantListAction}>
-                  {isOwned ? (isSelected ? '使用中' : '切换') : canUnlock ? '解锁' : '金币不足'}
-                </Text>
+                <Text style={styles.plantListAction}>{plantActionLabel}</Text>
               </Pressable>
             );
           })}
