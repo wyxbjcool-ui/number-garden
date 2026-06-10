@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 2 plant growth system once implemented.
+Please review the Step 2 plant growth system.
 
 ## Focus Areas
 
@@ -24,4 +24,3 @@ Please review the Step 2 plant growth system once implemented.
 - Tap the watering button once and confirm XP increases by 10.
 - Tap until XP reaches 100 and confirm level increases.
 - Restart the app and confirm plant state is retained.
-

@@ -16,9 +16,6 @@ Step 2: Plant growth system.
 - Shared color theme.
 - Initial home screen shell.
 - GitHub remote connected.
-
-## In Progress
-
 - Single-plant growth system.
 - Plant XP and level rules.
 - Watering action persisted through Zustand.
@@ -30,4 +27,3 @@ Step 2: Plant growth system.
 - Payment, ads, or store features.
 - Complex animation.
 - Multi-plant collection UI.
-

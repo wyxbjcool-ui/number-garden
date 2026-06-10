@@ -2,15 +2,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import type { Plant } from '../types/plant';
+
 type GardenState = {
   coins: number;
   fertilizers: number;
   currentTitle: string;
   selectedPlantId: string;
+  plants: Record<string, Plant>;
   ownedPlantIds: string[];
   completedTodayTaskIds: string[];
   unlockedBadgeIds: string[];
   collectedItemIds: string[];
+  waterSelectedPlant: () => void;
   resetGarden: () => void;
 };
 
@@ -19,6 +23,15 @@ const initialState = {
   fertilizers: 0,
   currentTitle: '成长小种子',
   selectedPlantId: 'succulent',
+  plants: {
+    succulent: {
+      id: 'succulent',
+      name: '多肉',
+      level: 1,
+      xp: 0,
+      waterCount: 0,
+    },
+  },
   ownedPlantIds: ['succulent'],
   completedTodayTaskIds: [],
   unlockedBadgeIds: [],
@@ -29,6 +42,30 @@ export const useGardenStore = create<GardenState>()(
   persist(
     (set) => ({
       ...initialState,
+      waterSelectedPlant: () =>
+        set((state) => {
+          const plant = state.plants[state.selectedPlantId];
+
+          if (!plant) {
+            return state;
+          }
+
+          const totalXp = plant.xp + 10;
+          const levelGain = Math.floor(totalXp / 100);
+          const nextPlant = {
+            ...plant,
+            level: plant.level + levelGain,
+            xp: totalXp % 100,
+            waterCount: plant.waterCount + 1,
+          };
+
+          return {
+            plants: {
+              ...state.plants,
+              [plant.id]: nextPlant,
+            },
+          };
+        }),
       resetGarden: () => set(initialState),
     }),
     {

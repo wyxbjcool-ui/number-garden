@@ -3,7 +3,9 @@
 ## Unreleased
 
 - Added project tracking documents.
-- Preparing first version of the plant growth system.
+- Added first version of the plant growth system.
+- Added single-plant model with level, XP, and water count.
+- Added watering action: each watering adds 10 XP, and every 100 XP increases one level.
 
 ## Step 1 Project Foundation
 
@@ -12,4 +14,3 @@
 - Added Zustand with AsyncStorage persistence.
 - Added shared theme colors.
 - Added initial Number Garden screen.
-

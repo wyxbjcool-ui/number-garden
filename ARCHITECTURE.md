@@ -26,7 +26,7 @@ The app is local-first. All MVP data is stored on the device through Zustand per
 
 The global store owns lightweight MVP state such as coins, fertilizers, title, selected plant, owned plants, badges, collected items, and today's completed task IDs.
 
-Plant growth in Step 2 starts as a single-plant model. Future steps can expand the model into multi-plant collections without introducing a backend.
+Plant growth in Step 2 starts as a single-plant model stored inside the global Zustand store. The selected plant has a level, XP, and water count. Future steps can expand the model into multi-plant collections without introducing a backend.
 
 ## Boundaries
 
@@ -34,4 +34,3 @@ Plant growth in Step 2 starts as a single-plant model. Future steps can expand t
 - No authentication in MVP V1.
 - No cloud sync in MVP V1.
 - No payment or ads in MVP V1.
-
