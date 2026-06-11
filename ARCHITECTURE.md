@@ -44,6 +44,8 @@ Plants in Step 10 are defined as local static data. Zustand stores per-plant gro
 
 Plant unlocks in Step 11 use local coin costs on the Plant model. The store validates ownership, coin balance, and plant existence before subtracting coins, appending to ownedPlantIds, and selecting the unlocked plant.
 
+Step 17 adds a unified growth layer to prepare for later garden, pet, or sprite main-character modes. `growthXp` and `growthLevel` live in the same persisted Zustand store. Watering, daily tasks, and correct math answers add global growth while existing per-plant level and XP data remains in place for compatibility.
+
 ## Boundaries
 
 - No backend in MVP V1.
@@ -56,3 +58,5 @@ Plant unlocks in Step 11 use local coin costs on the Plant model. The store vali
 - No complex animation layer.
 - No generated math question engine yet.
 - No advanced plant shop or unlock conditions yet.
+- No global growth badges yet.
+- No garden, pet, or sprite mode switching yet.

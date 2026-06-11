@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 14 MVP wrap-up check.
+Please review the Step 17 unified growth system.
 
 ## Focus Areas
 
@@ -62,6 +62,12 @@ Please review the Step 14 MVP wrap-up check.
 - Plant catalog action label rendering is clearer without behavior changes.
 - `npx tsc --noEmit` passes.
 - `npx expo start --help` passes.
+- Global growth state includes `growthXp` and `growthLevel`.
+- `addGrowthXp` applies the same 100 growth value per level rule and keeps remainders.
+- Watering, daily task completion, and correct math answers add +10 global growth.
+- Existing plant level and XP state is not removed or migrated away.
+- The Today screen displays growth level and growth value with child-friendly wording.
+- Existing plant badges still depend on plant level and water count.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -80,6 +86,8 @@ Please review the Step 14 MVP wrap-up check.
 - Advanced plant shop.
 - New business features.
 - Large navigation restructure.
+- Removing or migrating existing plant growth data.
+- Global growth badge logic.
 
 ## Manual Test Ideas
 
@@ -118,6 +126,11 @@ Please review the Step 14 MVP wrap-up check.
 - Confirm the three-waters badge does not unlock from math rewards alone.
 - Confirm all MVP sections are understandable while scrolling on the home screen.
 - Follow TEST_PLAN.md end to end before an internal preview.
+- Confirm global growth starts at 第 1 级 and 成长值 0/100 for a fresh install.
+- Confirm watering adds 10 global growth.
+- Confirm completing a daily task adds 10 global growth.
+- Confirm a correct math answer adds 10 global growth.
+- Confirm global growth levels up every 100 and keeps the remainder.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

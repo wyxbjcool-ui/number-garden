@@ -83,9 +83,25 @@ const growPlantByXp = (
   };
 };
 
+const growGlobalByXp = (
+  growthLevel: number,
+  growthXp: number,
+  xpAmount: number,
+) => {
+  const totalXp = growthXp + xpAmount;
+  const levelGain = Math.floor(totalXp / 100);
+
+  return {
+    growthLevel: growthLevel + levelGain,
+    growthXp: totalXp % 100,
+  };
+};
+
 type GardenState = {
   coins: number;
   fertilizers: number;
+  growthXp: number;
+  growthLevel: number;
   currentTitle: string;
   currentTaskDate: string;
   selectedPlantId: string;
@@ -96,6 +112,7 @@ type GardenState = {
   collectedItemIds: string[];
   answeredMathQuestionIds: string[];
   completeDailyTask: (task: DailyTask) => void;
+  addGrowthXp: (amount: number) => void;
   answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
   selectPlant: (plantId: string) => void;
   unlockPlant: (plantId: string) => void;
@@ -107,6 +124,8 @@ type GardenState = {
 const initialState = {
   coins: 0,
   fertilizers: 0,
+  growthXp: 0,
+  growthLevel: 1,
   currentTitle: '成长小种子',
   currentTaskDate: '',
   selectedPlantId: 'succulent',
@@ -129,6 +148,11 @@ export const useGardenStore = create<GardenState>()(
           }
 
           const plant = state.plants[state.selectedPlantId];
+          const growthProgress = growGlobalByXp(
+            state.growthLevel,
+            state.growthXp,
+            10,
+          );
 
           if (!plant) {
             const completedTodayTaskIds = [
@@ -142,6 +166,7 @@ export const useGardenStore = create<GardenState>()(
             return {
               coins: state.coins + task.rewardCoins,
               fertilizers: state.fertilizers + task.rewardFertilizers,
+              ...growthProgress,
               completedTodayTaskIds,
               collectedItemIds,
               unlockedBadgeIds: getNextUnlockedBadgeIds({
@@ -168,6 +193,7 @@ export const useGardenStore = create<GardenState>()(
           return {
             coins: state.coins + task.rewardCoins,
             fertilizers: state.fertilizers + task.rewardFertilizers,
+            ...growthProgress,
             completedTodayTaskIds,
             collectedItemIds,
             plants,
@@ -178,6 +204,10 @@ export const useGardenStore = create<GardenState>()(
             }),
           };
         }),
+      addGrowthXp: (amount) =>
+        set((state) =>
+          growGlobalByXp(state.growthLevel, state.growthXp, amount),
+        ),
       answerMathQuestion: (question, selectedOptionId) =>
         set((state) => {
           if (state.answeredMathQuestionIds.includes(question.id)) {
@@ -195,11 +225,17 @@ export const useGardenStore = create<GardenState>()(
             question.id,
           ];
           const plant = state.plants[state.selectedPlantId];
+          const growthProgress = growGlobalByXp(
+            state.growthLevel,
+            state.growthXp,
+            10,
+          );
 
           if (!plant) {
             return {
               coins: state.coins + 3,
               fertilizers: state.fertilizers + 1,
+              ...growthProgress,
               answeredMathQuestionIds,
             };
           }
@@ -213,6 +249,7 @@ export const useGardenStore = create<GardenState>()(
           return {
             coins: state.coins + 3,
             fertilizers: state.fertilizers + 1,
+            ...growthProgress,
             answeredMathQuestionIds,
             plants,
             unlockedBadgeIds: getNextUnlockedBadgeIds({
@@ -271,6 +308,11 @@ export const useGardenStore = create<GardenState>()(
           }
 
           const nextPlant = growPlantByXp(plant, 10, { countAsWater: true });
+          const growthProgress = growGlobalByXp(
+            state.growthLevel,
+            state.growthXp,
+            10,
+          );
 
           const plants = {
             ...state.plants,
@@ -279,6 +321,7 @@ export const useGardenStore = create<GardenState>()(
 
           return {
             plants,
+            ...growthProgress,
             unlockedBadgeIds: getNextUnlockedBadgeIds({
               ...state,
               plants,

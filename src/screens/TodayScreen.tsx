@@ -41,6 +41,8 @@ export function TodayScreen() {
   const title = useGardenStore((state) => state.currentTitle);
   const coins = useGardenStore((state) => state.coins);
   const fertilizers = useGardenStore((state) => state.fertilizers);
+  const growthLevel = useGardenStore((state) => state.growthLevel);
+  const growthXp = useGardenStore((state) => state.growthXp);
   const selectedPlantId = useGardenStore((state) => state.selectedPlantId);
   const plant = useGardenStore((state) => state.plants[state.selectedPlantId]);
   const plants = useGardenStore((state) => state.plants);
@@ -99,6 +101,10 @@ export function TodayScreen() {
         </View>
         <Text style={styles.title}>数字花园 Number Garden</Text>
         <Text style={styles.subtitle}>帮助孩子养成好习惯的成长游戏</Text>
+        <View style={styles.growthPanel}>
+          <Text style={styles.growthText}>成长等级 第 {growthLevel} 级</Text>
+          <Text style={styles.growthText}>成长值 {growthXp}/100</Text>
+        </View>
         <Text style={styles.badge}>{title}</Text>
       </View>
       {plant ? (
@@ -107,7 +113,7 @@ export function TodayScreen() {
             <View>
               <Text style={styles.sectionEyebrow}>我的植物</Text>
               <Text style={styles.plantName}>{plant.name}</Text>
-              <Text style={styles.plantMeta}>Level {plant.level}</Text>
+              <Text style={styles.plantMeta}>植物第 {plant.level} 级</Text>
             </View>
             <View style={styles.plantIcon}>
               <Ionicons name="water" size={30} color={Colors.lightBlueText} />
@@ -118,11 +124,11 @@ export function TodayScreen() {
             <View style={{ flex: 1 - xpPercent }} />
           </View>
           <Text style={styles.plantMeta}>
-            XP {plant.xp}/100 · 浇水 {plant.waterCount} 次
+            植物成长值 {plant.xp}/100 · 浇水 {plant.waterCount} 次
           </Text>
           <Pressable style={styles.waterButton} onPress={waterSelectedPlant}>
             <Ionicons name="water" size={24} color={Colors.headerText} />
-            <Text style={styles.waterButtonText}>浇水 +10 XP</Text>
+            <Text style={styles.waterButtonText}>浇水 +10 成长值</Text>
           </Pressable>
         </View>
       ) : (
@@ -178,7 +184,7 @@ export function TodayScreen() {
                 <Text style={styles.plantListName}>{catalogPlant.name}</Text>
                 <Text style={styles.plantListMeta}>
                   {isOwned
-                    ? `Level ${gardenPlant.level}`
+                    ? `第 ${gardenPlant.level} 级`
                     : `${catalogPlant.unlockCost} 金币`}
                 </Text>
                 <Text style={styles.plantListAction}>{plantActionLabel}</Text>
@@ -382,6 +388,20 @@ const styles = StyleSheet.create({
     color: Colors.bodyText,
     fontSize: 20,
     fontWeight: '600',
+    textAlign: 'center',
+  },
+  growthPanel: {
+    alignItems: 'center',
+    borderRadius: 24,
+    gap: 6,
+    backgroundColor: Colors.lightYellow,
+    paddingHorizontal: 22,
+    paddingVertical: 12,
+  },
+  growthText: {
+    color: Colors.headerText,
+    fontSize: 18,
+    fontWeight: '800',
     textAlign: 'center',
   },
   badge: {

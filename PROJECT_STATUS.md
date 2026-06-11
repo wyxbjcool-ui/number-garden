@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 14: MVP wrap-up check.
+Step 17: Unified growth system.
 
 ## Completed
 
@@ -65,6 +65,11 @@ Step 14: MVP wrap-up check.
 - TypeScript check.
 - Expo CLI availability check.
 - Home screen readability review.
+- Global growth XP and level state.
+- Shared `addGrowthXp` action.
+- Watering, daily tasks, and correct math answers now add global growth.
+- Existing per-plant level and XP data is retained.
+- Home screen shows child-friendly growth level and growth value.
 
 ## Not Included Yet
 
@@ -81,3 +86,5 @@ Step 14: MVP wrap-up check.
 - Randomized math question generation.
 - Advanced plant shop or unlock conditions.
 - Split-tab navigation for a less dense home screen.
+- Global growth badges.
+- Garden, pet, or sprite main-character mode switching.

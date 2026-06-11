@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added unified global growth state with `growthXp` and `growthLevel`.
+- Added `addGrowthXp` action for shared app growth rewards.
+- Connected watering, daily task completion, and correct math answers to global growth.
+- Kept existing per-plant level and XP data for compatibility.
+- Updated the Today screen to show child-friendly growth level and growth value text.
 - Completed MVP wrap-up check.
 - Updated project status, review request, and test plan for the current MVP scope.
 - Verified TypeScript compilation with `npx tsc --noEmit`.

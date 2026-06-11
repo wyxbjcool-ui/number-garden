@@ -38,7 +38,7 @@
 
 ## Plant Growth Tests
 
-- Tap 浇水 +10 XP.
+- Tap 浇水 +10 成长值.
 - Confirm plant XP increases by 10.
 - Confirm water count increases by 1.
 - Water until XP reaches 100 total.
@@ -46,6 +46,17 @@
 - Confirm XP keeps the remainder after leveling.
 - Complete a daily task and confirm it also waters the selected plant once.
 - Answer a math question correctly and confirm it adds 10 plant XP without increasing water count.
+
+## Global Growth Tests
+
+- On a fresh install, confirm growth starts at 第 1 级 and 成长值 0/100.
+- Tap 浇水 +10 成长值 and confirm global growth value increases by 10.
+- Complete a daily task and confirm global growth value increases by 10.
+- Answer a math question correctly and confirm global growth value increases by 10.
+- Answer a math question incorrectly and confirm global growth does not change.
+- Reach 100 total global growth and confirm growth level increases by 1.
+- Confirm global growth keeps the remainder after leveling.
+- Restart the app and confirm growth level and growth value persist.
 
 ## Multi-Plant Tests
 
@@ -116,6 +127,7 @@
 - Complete a task, water the plant, unlock a badge, and collect an item.
 - Restart the app.
 - Confirm coins and fertilizers persist.
+- Confirm growth level and growth value persist.
 - Confirm plant level, XP, and water count persist.
 - Confirm completed task state persists for the same date.
 - Confirm unlocked badges persist.
@@ -132,4 +144,6 @@
 - Math questions are built in and not randomly generated yet.
 - Advanced plant shop and unlock conditions are not implemented yet.
 - The home screen is intentionally feature-dense for MVP and can later be split into tabs or separate screens.
+- Global growth badges are not implemented yet.
+- Garden, pet, and sprite main-character modes are not implemented yet.
 - iOS Simulator and Android device preview depend on local machine/device availability.
