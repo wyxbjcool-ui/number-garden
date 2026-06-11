@@ -221,7 +221,7 @@ export function TodayScreen() {
       id: 'collection',
       title: '收集册',
       imageSource: gameAssets.collectionButton,
-      onPress: () => scrollToSection('collection'),
+      onPress: () => navigation.navigate('Collection'),
     },
     {
       id: 'badges',
