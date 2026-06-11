@@ -4,8 +4,14 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
+import {
+  gachaCost,
+  gachaDuplicateCoins,
+  getRandomGachaReward,
+} from '../data/gachaRewards';
 import { plants as initialPlants } from '../data/plants';
 import type { DailyTask } from '../types/dailyTask';
+import type { GachaDrawResult } from '../types/gacha';
 import type { MathGame } from '../types/mathGame';
 import type { Plant } from '../types/plant';
 import type { AvatarMode } from '../types/avatarMode';
@@ -113,9 +119,11 @@ type GardenState = {
   completedTodayTaskIds: string[];
   unlockedBadgeIds: string[];
   collectedItemIds: string[];
+  gachaRewardIds: string[];
   answeredMathQuestionIds: string[];
   completeDailyTask: (task: DailyTask) => void;
   addGrowthXp: (amount: number) => void;
+  drawGacha: () => GachaDrawResult;
   recordPoopToday: () => boolean;
   setAvatarMode: (mode: AvatarMode) => void;
   answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
@@ -141,6 +149,7 @@ const initialState = {
   completedTodayTaskIds: [],
   unlockedBadgeIds: [],
   collectedItemIds: [],
+  gachaRewardIds: [],
   answeredMathQuestionIds: [],
 };
 
@@ -215,6 +224,34 @@ export const useGardenStore = create<GardenState>()(
         set((state) =>
           growGlobalByXp(state.growthLevel, state.growthXp, amount),
         ),
+      drawGacha: () => {
+        const state = get();
+
+        if (state.coins < gachaCost) {
+          return {
+            success: false,
+            reason: 'not-enough-coins',
+          };
+        }
+
+        const reward = getRandomGachaReward();
+        const isNew = !state.gachaRewardIds.includes(reward.id);
+        const duplicateCoins = isNew ? 0 : gachaDuplicateCoins[reward.rarity];
+
+        set({
+          coins: state.coins - gachaCost + duplicateCoins,
+          gachaRewardIds: isNew
+            ? [...state.gachaRewardIds, reward.id]
+            : state.gachaRewardIds,
+        });
+
+        return {
+          success: true,
+          reward,
+          isNew,
+          duplicateCoins,
+        };
+      },
       recordPoopToday: () => {
         const state = get();
         const today = getLocalDateString();

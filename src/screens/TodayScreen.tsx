@@ -88,9 +88,6 @@ export function TodayScreen() {
   const [lastMathResult, setLastMathResult] = useState<
     'correct' | 'incorrect' | null
   >(null);
-  const [placeholderMessage, setPlaceholderMessage] = useState<string | null>(
-    null,
-  );
   const [pressedFeatureId, setPressedFeatureId] = useState<string | null>(null);
   const coins = useGardenStore((state) => state.coins);
   const fertilizers = useGardenStore((state) => state.fertilizers);
@@ -144,16 +141,10 @@ export function TodayScreen() {
     };
 
   const scrollToSection = (sectionKey: SectionKey) => {
-    setPlaceholderMessage(null);
-
     scrollViewRef.current?.scrollTo({
       y: Math.max((sectionOffsetsRef.current[sectionKey] ?? 0) - 16, 0),
       animated: true,
     });
-  };
-
-  const showPlaceholder = (message: string) => {
-    setPlaceholderMessage(message);
   };
 
   const holdFeaturePressFeedback = (featureId: string) => {
@@ -224,7 +215,7 @@ export function TodayScreen() {
       id: 'lottery',
       title: '抽奖机',
       imageSource: gameAssets.gachaButton,
-      onPress: () => showPlaceholder('神秘抽奖机马上就来'),
+      onPress: () => navigation.navigate('Gacha'),
     },
     {
       id: 'collection',
@@ -448,11 +439,6 @@ export function TodayScreen() {
           </View>
         </View>
 
-        {placeholderMessage ? (
-          <View style={styles.placeholderNotice}>
-            <Text style={styles.placeholderText}>{placeholderMessage}</Text>
-          </View>
-        ) : null}
       </View>
       <View style={styles.section} onLayout={handleSectionLayout('plants')}>
         <View style={styles.sectionHeader}>
@@ -856,21 +842,6 @@ const styles = StyleSheet.create({
   avatarSubtitle: {
     color: Colors.bodyText,
     fontSize: 14,
-    fontWeight: '800',
-    textAlign: 'center',
-  },
-  placeholderNotice: {
-    alignItems: 'center',
-    alignSelf: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.78)',
-    borderRadius: 22,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    zIndex: 3,
-  },
-  placeholderText: {
-    color: Colors.headerText,
-    fontSize: 17,
     fontWeight: '800',
     textAlign: 'center',
   },
