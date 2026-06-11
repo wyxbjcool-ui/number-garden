@@ -1,8 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
-import type { ComponentProps } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import type { LayoutChangeEvent } from 'react-native';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import type { ImageSourcePropType, LayoutChangeEvent } from 'react-native';
 
 import { avatarModeIds, avatarModes } from '../data/avatarModes';
 import { badges } from '../data/badges';
@@ -42,8 +48,25 @@ type SectionKey = 'plants' | 'tasks' | 'math' | 'badges' | 'collection';
 type FeatureOrb = {
   id: string;
   title: string;
-  iconName: ComponentProps<typeof Ionicons>['name'];
+  imageSource: ImageSourcePropType;
   onPress: () => void;
+};
+
+const gameAssets = {
+  background: require('../../assets/garden_bg.png'),
+  catHappy: require('../../assets/cat_happy.png'),
+  resourceCoin: require('../../assets/resource_coin.png'),
+  resourceFertilizer: require('../../assets/resource_fertilizer.png'),
+  taskButton: require('../../assets/btn_task.png'),
+  mathButton: require('../../assets/btn_math.png'),
+  poopButton: require('../../assets/btn_poop.png'),
+  gachaButton: require('../../assets/btn_gacha.png'),
+  collectionButton: require('../../assets/btn_collection.png'),
+  badgeButton: require('../../assets/btn_badge.png'),
+  growthPanelBackground: require('../../assets/growth_panel_bg.png'),
+  progressTrack: require('../../assets/progress_track.png'),
+  progressFill: require('../../assets/progress_fill.png'),
+  rewardGift: require('../../assets/reward_gift.png'),
 };
 
 export function TodayScreen() {
@@ -100,18 +123,6 @@ export function TodayScreen() {
       : avatarMode === 'pet'
         ? styles.petScene
         : styles.spriteScene;
-  const avatarIconName: ComponentProps<typeof Ionicons>['name'] =
-    avatarMode === 'garden'
-      ? 'leaf'
-      : avatarMode === 'pet'
-        ? 'paw'
-        : 'sparkles';
-  const avatarIconColor =
-    avatarMode === 'garden'
-      ? Colors.leaf
-      : avatarMode === 'pet'
-        ? Colors.lightBlueText
-        : Colors.headerText;
   const formatRarity = (rarity: 'common' | 'rare') =>
     rarity === 'rare' ? '稀有' : '普通';
 
@@ -137,37 +148,37 @@ export function TodayScreen() {
     {
       id: 'tasks',
       title: '今日任务',
-      iconName: 'checkbox',
+      imageSource: gameAssets.taskButton,
       onPress: () => scrollToSection('tasks'),
     },
     {
       id: 'math',
       title: '数字小游戏',
-      iconName: 'game-controller',
+      imageSource: gameAssets.mathButton,
       onPress: () => scrollToSection('math'),
     },
     {
       id: 'poop',
       title: '粑粑时间',
-      iconName: 'timer',
+      imageSource: gameAssets.poopButton,
       onPress: () => showPlaceholder('粑粑时间马上就来'),
     },
     {
       id: 'lottery',
       title: '抽奖机',
-      iconName: 'gift',
+      imageSource: gameAssets.gachaButton,
       onPress: () => showPlaceholder('神秘抽奖机马上就来'),
     },
     {
       id: 'collection',
       title: '收集册',
-      iconName: 'albums',
+      imageSource: gameAssets.collectionButton,
       onPress: () => scrollToSection('collection'),
     },
     {
       id: 'badges',
       title: '徽章',
-      iconName: 'ribbon',
+      imageSource: gameAssets.badgeButton,
       onPress: () => scrollToSection('badges'),
     },
   ];
@@ -192,6 +203,11 @@ export function TodayScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={[styles.gameHeroScene, sceneStyle]}>
+        <Image
+          source={gameAssets.background}
+          resizeMode="cover"
+          style={styles.gameHeroBackground}
+        />
         <View style={styles.sceneDecorationLayer}>
           <View style={[styles.sceneDecoration, styles.sceneDecorationOne]} />
           <View style={[styles.sceneDecoration, styles.sceneDecorationTwo]} />
@@ -203,33 +219,37 @@ export function TodayScreen() {
             <Text style={styles.gameTitle}>数字花园</Text>
           </View>
           <View style={styles.resourceCluster}>
-            <View style={styles.resourcePill}>
-              <Ionicons
-                name="logo-bitcoin"
-                size={22}
-                color={Colors.headerText}
+            <View style={styles.resourceBar}>
+              <Image
+                source={gameAssets.resourceCoin}
+                resizeMode="contain"
+                style={styles.resourceBarImage}
               />
-              <Text style={styles.resourceText}>{coins}</Text>
+              <Text style={styles.resourceBarText}>{coins}</Text>
             </View>
-            <View style={styles.resourcePill}>
-              <Ionicons name="flower" size={22} color={Colors.headerText} />
-              <Text style={styles.resourceText}>{fertilizers}</Text>
+            <View style={styles.resourceBar}>
+              <Image
+                source={gameAssets.resourceFertilizer}
+                resizeMode="contain"
+                style={styles.resourceBarImage}
+              />
+              <Text style={styles.resourceBarText}>{fertilizers}</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.homePlayfield}>
-          <View style={styles.orbColumn}>
+          <View style={[styles.orbColumn, styles.leftOrbColumn]}>
             {leftFeatureOrbs.map((feature) => (
               <Pressable
                 key={feature.id}
                 style={styles.featureOrb}
                 onPress={feature.onPress}
               >
-                <Ionicons
-                  name={feature.iconName}
-                  size={30}
-                  color={Colors.headerText}
+                <Image
+                  source={feature.imageSource}
+                  style={styles.featureOrbImage}
+                  resizeMode="contain"
                 />
                 <Text style={styles.featureOrbText}>{feature.title}</Text>
               </Pressable>
@@ -238,23 +258,25 @@ export function TodayScreen() {
 
           <View style={styles.avatarArtworkFrame}>
             <View style={styles.avatarArtworkPlaceholder}>
-              <Ionicons name={avatarIconName} size={96} color={avatarIconColor} />
+              <Image
+                source={gameAssets.catHappy}
+                style={styles.avatarArtwork}
+                resizeMode="contain"
+              />
             </View>
-            <Text style={styles.avatarTitle}>{avatarModeConfig.title}</Text>
-            <Text style={styles.avatarSubtitle}>主角图片预留位</Text>
           </View>
 
-          <View style={styles.orbColumn}>
+          <View style={[styles.orbColumn, styles.rightOrbColumn]}>
             {rightFeatureOrbs.map((feature) => (
               <Pressable
                 key={feature.id}
                 style={styles.featureOrb}
                 onPress={feature.onPress}
               >
-                <Ionicons
-                  name={feature.iconName}
-                  size={30}
-                  color={Colors.headerText}
+                <Image
+                  source={feature.imageSource}
+                  style={styles.featureOrbImage}
+                  resizeMode="contain"
                 />
                 <Text style={styles.featureOrbText}>{feature.title}</Text>
               </Pressable>
@@ -263,13 +285,40 @@ export function TodayScreen() {
         </View>
 
         <View style={styles.homeGrowthBar}>
-          <View style={styles.growthHeader}>
-            <Text style={styles.growthText}>成长进度</Text>
-            <Text style={styles.growthValue}>第 {growthLevel} 级 · {growthXp}/100</Text>
-          </View>
+          <Image
+            source={gameAssets.growthPanelBackground}
+            resizeMode="stretch"
+            style={styles.growthPanelBackground}
+          />
+          <Text style={styles.growthText}>成长进度</Text>
+          <Text style={styles.growthValue}>
+            第 {growthLevel} 级 · {growthXp}/100
+          </Text>
           <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { flex: growthXp / 100 }]} />
-            <View style={{ flex: 1 - growthXp / 100 }} />
+            <Image
+              source={gameAssets.progressTrack}
+              resizeMode="stretch"
+              style={styles.progressTrackImage}
+            />
+            <View
+              style={[
+                styles.progressFillMask,
+                { width: `${Math.min(growthXp, 100)}%` },
+              ]}
+            >
+              <Image
+                source={gameAssets.progressFill}
+                resizeMode="stretch"
+                style={styles.progressFillImage}
+              />
+            </View>
+          </View>
+          <View style={styles.rewardGiftFrame}>
+            <Image
+              source={gameAssets.rewardGift}
+              resizeMode="contain"
+              style={styles.rewardGift}
+            />
           </View>
         </View>
 
@@ -508,11 +557,21 @@ const styles = StyleSheet.create({
   },
   gameHeroScene: {
     borderRadius: 28,
-    gap: 18,
+    gap: 14,
     minHeight: 720,
     overflow: 'hidden',
-    padding: 16,
+    padding: 18,
     position: 'relative',
+  },
+  gameHeroBackground: {
+    bottom: 0,
+    height: '100%',
+    left: 0,
+    opacity: 0.98,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    width: '100%',
   },
   gardenScene: {
     backgroundColor: '#BFEAC9',
@@ -526,21 +585,27 @@ const styles = StyleSheet.create({
   sceneTopBar: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 10,
+    gap: 14,
     justifyContent: 'space-between',
     zIndex: 2,
   },
   welcomeBlock: {
+    backgroundColor: '#B8793B',
+    borderColor: '#FFF0BA',
+    borderRadius: 24,
+    borderWidth: 3,
     flexShrink: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   welcomeText: {
-    color: Colors.bodyText,
-    fontSize: 15,
+    color: '#FFF8D7',
+    fontSize: 17,
     fontWeight: '800',
   },
   gameTitle: {
-    color: Colors.headerText,
-    fontSize: 28,
+    color: '#FFFFFF',
+    fontSize: 34,
     fontWeight: '800',
   },
   resourceCluster: {
@@ -548,6 +613,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     gap: 8,
     justifyContent: 'flex-end',
+    marginRight: 34,
   },
   sceneDecorationLayer: {
     bottom: 0,
@@ -599,54 +665,61 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
-    gap: 10,
+    gap: 0,
     justifyContent: 'space-between',
-    minHeight: 500,
+    minHeight: 510,
+    paddingHorizontal: 48,
     zIndex: 2,
   },
   orbColumn: {
-    gap: 16,
+    gap: 12,
     justifyContent: 'center',
+    width: 128,
+  },
+  leftOrbColumn: {
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  rightOrbColumn: {
+    alignItems: 'center',
+    marginRight: 18,
   },
   featureOrb: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.82)',
-    borderColor: '#FFF4B8',
-    borderRadius: 35,
-    borderWidth: 3,
-    gap: 3,
-    height: 70,
+    gap: 2,
+    height: 126,
     justifyContent: 'center',
-    paddingHorizontal: 4,
-    width: 70,
+    width: 128,
+  },
+  featureOrbImage: {
+    height: 108,
+    width: 108,
   },
   featureOrbText: {
-    color: Colors.headerText,
-    fontSize: 10,
+    color: '#5B341B',
+    fontSize: 14,
     fontWeight: '800',
     textAlign: 'center',
   },
   avatarArtworkFrame: {
     alignItems: 'center',
     flexShrink: 1,
-    gap: 12,
-    maxWidth: 190,
-    minWidth: 160,
-    paddingVertical: 10,
+    gap: 8,
+    maxWidth: 430,
+    minWidth: 330,
+    paddingVertical: 4,
   },
   avatarArtworkPlaceholder: {
     alignItems: 'center',
-    backgroundColor: '#FFF2B7',
-    borderColor: '#FFFFFF',
-    borderRadius: 85,
-    borderWidth: 6,
-    height: 170,
     justifyContent: 'center',
-    width: 170,
+  },
+  avatarArtwork: {
+    height: 470,
+    width: 392,
   },
   avatarTitle: {
     color: Colors.headerText,
-    fontSize: 25,
+    fontSize: 32,
     fontWeight: '800',
     textAlign: 'center',
   },
@@ -709,28 +782,54 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   growthText: {
-    color: Colors.headerText,
-    fontSize: 18,
+    color: '#5A3A1F',
+    fontSize: 20,
     fontWeight: '800',
+    left: '12%',
+    position: 'absolute',
+    top: 26,
+    zIndex: 3,
   },
   growthValue: {
-    color: Colors.bodyText,
-    fontSize: 15,
+    color: '#31515F',
+    fontSize: 17,
     fontWeight: '800',
+    position: 'absolute',
+    right: '17%',
+    top: 27,
+    zIndex: 3,
   },
   homeGrowthBar: {
-    backgroundColor: 'rgba(255, 255, 255, 0.78)',
-    borderColor: '#FFF4B8',
-    borderRadius: 24,
-    borderWidth: 3,
-    gap: 10,
-    padding: 14,
+    minHeight: 132,
+    overflow: 'hidden',
+    position: 'relative',
     zIndex: 2,
   },
-  growthHeader: {
+  growthPanelBackground: {
+    height: 340,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: -112,
+    width: '100%',
+  },
+  rewardGiftFrame: {
     alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    height: 92,
+    justifyContent: 'center',
+    overflow: 'hidden',
+    position: 'absolute',
+    right: '6%',
+    top: 34,
+    width: 92,
+    zIndex: 4,
+  },
+  rewardGift: {
+    height: 188,
+    left: -94,
+    position: 'absolute',
+    top: -50,
+    width: 282,
   },
   badge: {
     marginTop: 8,
@@ -753,19 +852,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 244, 184, 0.94)',
     borderColor: '#FFFFFF',
-    borderRadius: 24,
-    borderWidth: 2,
+    borderRadius: 30,
+    borderWidth: 3,
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
     justifyContent: 'center',
-    minWidth: 82,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    minWidth: 104,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   resourceText: {
     color: Colors.headerText,
-    fontSize: 17,
+    fontSize: 22,
     fontWeight: '800',
+  },
+  resourceIcon: {
+    height: 42,
+    width: 42,
+  },
+  resourceBar: {
+    height: 64,
+    position: 'relative',
+    width: 188,
+  },
+  resourceBarImage: {
+    height: '100%',
+    width: '100%',
+  },
+  resourceBarText: {
+    color: '#4B3521',
+    fontSize: 24,
+    fontWeight: '800',
+    left: 92,
+    position: 'absolute',
+    textAlign: 'center',
+    top: 17,
+    width: 52,
   },
   modeSwitcher: {
     flexDirection: 'row',
@@ -879,14 +1001,32 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   progressTrack: {
-    height: 20,
-    borderRadius: 10,
-    flexDirection: 'row',
+    height: 40,
+    left: '18%',
     overflow: 'hidden',
-    backgroundColor: '#8B5A2B',
+    position: 'absolute',
+    top: '58%',
+    width: '58%',
+    zIndex: 3,
   },
-  progressFill: {
-    backgroundColor: '#96D94B',
+  progressTrackImage: {
+    height: 150,
+    position: 'absolute',
+    top: -58,
+    width: '100%',
+    zIndex: 1,
+  },
+  progressFillMask: {
+    height: '100%',
+    overflow: 'hidden',
+    position: 'absolute',
+    zIndex: 2,
+  },
+  progressFillImage: {
+    height: 150,
+    position: 'absolute',
+    top: -58,
+    width: '100%',
   },
   waterButton: {
     alignItems: 'center',
