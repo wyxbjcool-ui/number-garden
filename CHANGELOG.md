@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added three avatar modes: garden, pet, and sprite.
+- Added persisted `avatarMode` state and `setAvatarMode`.
+- Added shared `avatarModes` configuration for mode-specific display text.
+- Added a Today screen mode switcher for 花园, 宠物, and 精灵.
+- Adapted the main character card title, subtitle, growth label, and action text by mode while keeping one shared growth system.
 - Added unified global growth state with `growthXp` and `growthLevel`.
 - Added `addGrowthXp` action for shared app growth rewards.
 - Connected watering, daily task completion, and correct math answers to global growth.

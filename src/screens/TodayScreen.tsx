@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { avatarModeIds, avatarModes } from '../data/avatarModes';
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
 import { mathGames } from '../data/mathGames';
@@ -43,6 +44,7 @@ export function TodayScreen() {
   const fertilizers = useGardenStore((state) => state.fertilizers);
   const growthLevel = useGardenStore((state) => state.growthLevel);
   const growthXp = useGardenStore((state) => state.growthXp);
+  const avatarMode = useGardenStore((state) => state.avatarMode);
   const selectedPlantId = useGardenStore((state) => state.selectedPlantId);
   const plant = useGardenStore((state) => state.plants[state.selectedPlantId]);
   const plants = useGardenStore((state) => state.plants);
@@ -58,6 +60,7 @@ export function TodayScreen() {
   const completeDailyTask = useGardenStore((state) => state.completeDailyTask);
   const answerMathQuestion = useGardenStore((state) => state.answerMathQuestion);
   const selectPlant = useGardenStore((state) => state.selectPlant);
+  const setAvatarMode = useGardenStore((state) => state.setAvatarMode);
   const unlockPlant = useGardenStore((state) => state.unlockPlant);
   const refreshDailyTasksForToday = useGardenStore(
     (state) => state.refreshDailyTasksForToday,
@@ -67,6 +70,13 @@ export function TodayScreen() {
   const currentMathQuestion = mathGames.find(
     (question) => !answeredMathQuestionIds.includes(question.id),
   );
+  const avatarModeConfig = avatarModes[avatarMode];
+  const avatarActionText =
+    avatarMode === 'garden'
+      ? `${avatarModeConfig.actionLabel}，让它长大`
+      : avatarMode === 'pet'
+        ? `${avatarModeConfig.actionLabel}，让它开心`
+        : `${avatarModeConfig.actionLabel}，让魔法变亮`;
   const formatRarity = (rarity: 'common' | 'rare') =>
     rarity === 'rare' ? '稀有' : '普通';
 
@@ -95,6 +105,31 @@ export function TodayScreen() {
           <Text style={styles.resourceText}>肥料 {fertilizers}</Text>
         </View>
       </View>
+      <View style={styles.modeSwitcher}>
+        {avatarModeIds.map((mode) => {
+          const isSelected = avatarMode === mode;
+
+          return (
+            <Pressable
+              key={mode}
+              style={[
+                styles.modeButton,
+                isSelected && styles.modeButtonSelected,
+              ]}
+              onPress={() => setAvatarMode(mode)}
+            >
+              <Text
+                style={[
+                  styles.modeButtonText,
+                  isSelected && styles.modeButtonTextSelected,
+                ]}
+              >
+                {avatarModes[mode].name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
       <View style={styles.hero}>
         <View style={styles.iconBubble}>
           <Ionicons name="leaf" size={56} color={Colors.leaf} />
@@ -111,9 +146,9 @@ export function TodayScreen() {
         <View style={styles.plantPanel}>
           <View style={styles.plantHeader}>
             <View>
-              <Text style={styles.sectionEyebrow}>我的植物</Text>
-              <Text style={styles.plantName}>{plant.name}</Text>
-              <Text style={styles.plantMeta}>植物第 {plant.level} 级</Text>
+              <Text style={styles.sectionEyebrow}>{avatarModeConfig.name}</Text>
+              <Text style={styles.plantName}>{avatarModeConfig.title}</Text>
+              <Text style={styles.plantMeta}>{avatarModeConfig.subtitle}</Text>
             </View>
             <View style={styles.plantIcon}>
               <Ionicons name="water" size={30} color={Colors.lightBlueText} />
@@ -124,11 +159,15 @@ export function TodayScreen() {
             <View style={{ flex: 1 - xpPercent }} />
           </View>
           <Text style={styles.plantMeta}>
-            植物成长值 {plant.xp}/100 · 浇水 {plant.waterCount} 次
+            {avatarModeConfig.growthLabel} {growthXp}/100 · 成长第{' '}
+            {growthLevel} 级
+          </Text>
+          <Text style={styles.plantMeta}>
+            {plant.name} · 植物第 {plant.level} 级 · 浇水 {plant.waterCount} 次
           </Text>
           <Pressable style={styles.waterButton} onPress={waterSelectedPlant}>
             <Ionicons name="water" size={24} color={Colors.headerText} />
-            <Text style={styles.waterButtonText}>浇水 +10 成长值</Text>
+            <Text style={styles.waterButtonText}>{avatarActionText}</Text>
           </Pressable>
         </View>
       ) : (
@@ -436,6 +475,34 @@ const styles = StyleSheet.create({
     color: Colors.headerText,
     fontSize: 17,
     fontWeight: '800',
+  },
+  modeSwitcher: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    justifyContent: 'center',
+  },
+  modeButton: {
+    alignItems: 'center',
+    borderRadius: 22,
+    backgroundColor: Colors.lightYellow,
+    minHeight: 48,
+    minWidth: 88,
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+  modeButtonSelected: {
+    backgroundColor: Colors.lightBlue,
+    borderColor: Colors.leaf,
+    borderWidth: 2,
+  },
+  modeButtonText: {
+    color: Colors.bodyText,
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  modeButtonTextSelected: {
+    color: Colors.headerText,
   },
   plantPanel: {
     gap: 16,

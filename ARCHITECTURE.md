@@ -20,6 +20,7 @@ The app is local-first. All MVP data is stored on the device through Zustand per
 - `src/screens`: Screen components.
 - `src/store`: Zustand state and actions.
 - `src/types`: Shared TypeScript types.
+- `src/data`: Local static configuration and content data.
 - `src/theme.ts`: Shared visual constants.
 
 ## State Direction
@@ -46,6 +47,8 @@ Plant unlocks in Step 11 use local coin costs on the Plant model. The store vali
 
 Step 17 adds a unified growth layer to prepare for later garden, pet, or sprite main-character modes. `growthXp` and `growthLevel` live in the same persisted Zustand store. Watering, daily tasks, and correct math answers add global growth while existing per-plant level and XP data remains in place for compatibility.
 
+Step 18 adds three avatar modes: garden, pet, and sprite. The mode is a persisted presentation preference in Zustand. Mode-specific labels live in local static configuration, and all modes continue to share growth, coins, fertilizers, badges, collection, daily tasks, and math game state.
+
 ## Boundaries
 
 - No backend in MVP V1.
@@ -59,4 +62,4 @@ Step 17 adds a unified growth layer to prepare for later garden, pet, or sprite 
 - No generated math question engine yet.
 - No advanced plant shop or unlock conditions yet.
 - No global growth badges yet.
-- No garden, pet, or sprite mode switching yet.
+- No dedicated garden, pet, or sprite gameplay screens yet.

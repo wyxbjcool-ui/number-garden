@@ -58,6 +58,16 @@
 - Confirm global growth keeps the remainder after leveling.
 - Restart the app and confirm growth level and growth value persist.
 
+## Avatar Mode Tests
+
+- Confirm the Today screen shows mode buttons for 花园, 宠物, and 精灵.
+- Tap 花园 and confirm the main character area shows 我的小花园, 养分, and 浇水 wording.
+- Tap 宠物 and confirm the main character area shows 我的成长伙伴, 亲密度, and 抚摸 wording.
+- Tap 精灵 and confirm the main character area shows 数字小精灵, 魔法值, and 施法 wording.
+- Confirm switching modes does not reset coins, fertilizers, growth, badges, collection, tasks, or math progress.
+- Tap the mode action button and confirm it still adds shared growth.
+- Restart the app and confirm the selected mode persists.
+
 ## Multi-Plant Tests
 
 - Confirm the 植物图鉴 section appears on the Today screen.
@@ -128,6 +138,7 @@
 - Restart the app.
 - Confirm coins and fertilizers persist.
 - Confirm growth level and growth value persist.
+- Confirm selected avatar mode persists.
 - Confirm plant level, XP, and water count persist.
 - Confirm completed task state persists for the same date.
 - Confirm unlocked badges persist.
@@ -145,5 +156,6 @@
 - Advanced plant shop and unlock conditions are not implemented yet.
 - The home screen is intentionally feature-dense for MVP and can later be split into tabs or separate screens.
 - Global growth badges are not implemented yet.
-- Garden, pet, and sprite main-character modes are not implemented yet.
+- Dedicated garden, pet, and sprite gameplay screens are not implemented yet.
+- Garden, pet, and sprite currently differ by presentation text only.
 - iOS Simulator and Android device preview depend on local machine/device availability.

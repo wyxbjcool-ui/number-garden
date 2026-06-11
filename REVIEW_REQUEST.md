@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 17 unified growth system.
+Please review the Step 18 three avatar mode switching.
 
 ## Focus Areas
 
@@ -68,6 +68,11 @@ Please review the Step 17 unified growth system.
 - Existing plant level and XP state is not removed or migrated away.
 - The Today screen displays growth level and growth value with child-friendly wording.
 - Existing plant badges still depend on plant level and water count.
+- AvatarMode is limited to garden, pet, and sprite.
+- `avatarMode` defaults to garden and persists through Zustand.
+- Mode switching changes only presentation text and does not create separate growth systems.
+- The main character area uses mode-specific title, subtitle, growth label, and action text.
+- Existing coins, fertilizers, badges, collection, daily tasks, and math game state remain shared across modes.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -88,6 +93,8 @@ Please review the Step 17 unified growth system.
 - Large navigation restructure.
 - Removing or migrating existing plant growth data.
 - Global growth badge logic.
+- Dedicated garden, pet, or sprite gameplay screens.
+- Separate pet or sprite XP systems.
 
 ## Manual Test Ideas
 
@@ -131,6 +138,10 @@ Please review the Step 17 unified growth system.
 - Confirm completing a daily task adds 10 global growth.
 - Confirm a correct math answer adds 10 global growth.
 - Confirm global growth levels up every 100 and keeps the remainder.
+- Switch between 花园, 宠物, and 精灵 and confirm the selected mode updates the main character wording.
+- Confirm mode switching does not reset coins, fertilizers, growth, badges, collection, tasks, or math progress.
+- Confirm the mode action button still increases shared growth.
+- Restart the app and confirm the selected avatar mode is retained.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

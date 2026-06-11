@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 17: Unified growth system.
+Step 18: Three avatar mode switching.
 
 ## Completed
 
@@ -70,6 +70,11 @@ Step 17: Unified growth system.
 - Watering, daily tasks, and correct math answers now add global growth.
 - Existing per-plant level and XP data is retained.
 - Home screen shows child-friendly growth level and growth value.
+- AvatarMode type with garden, pet, and sprite modes.
+- Persisted avatar mode selection.
+- Shared avatar mode configuration for title, subtitle, growth label, and action label.
+- Today screen mode switcher for 花园, 宠物, and 精灵.
+- Main character area adapts wording by mode while sharing the same growth system.
 
 ## Not Included Yet
 
@@ -87,4 +92,4 @@ Step 17: Unified growth system.
 - Advanced plant shop or unlock conditions.
 - Split-tab navigation for a less dense home screen.
 - Global growth badges.
-- Garden, pet, or sprite main-character mode switching.
+- Dedicated game interfaces for garden, pet, and sprite modes.

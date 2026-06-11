@@ -8,6 +8,7 @@ import { plants as initialPlants } from '../data/plants';
 import type { DailyTask } from '../types/dailyTask';
 import type { MathGame } from '../types/mathGame';
 import type { Plant } from '../types/plant';
+import type { AvatarMode } from '../types/avatarMode';
 
 const getLocalDateString = () => {
   const today = new Date();
@@ -102,6 +103,7 @@ type GardenState = {
   fertilizers: number;
   growthXp: number;
   growthLevel: number;
+  avatarMode: AvatarMode;
   currentTitle: string;
   currentTaskDate: string;
   selectedPlantId: string;
@@ -113,6 +115,7 @@ type GardenState = {
   answeredMathQuestionIds: string[];
   completeDailyTask: (task: DailyTask) => void;
   addGrowthXp: (amount: number) => void;
+  setAvatarMode: (mode: AvatarMode) => void;
   answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
   selectPlant: (plantId: string) => void;
   unlockPlant: (plantId: string) => void;
@@ -126,6 +129,7 @@ const initialState = {
   fertilizers: 0,
   growthXp: 0,
   growthLevel: 1,
+  avatarMode: 'garden' as AvatarMode,
   currentTitle: '成长小种子',
   currentTaskDate: '',
   selectedPlantId: 'succulent',
@@ -208,6 +212,10 @@ export const useGardenStore = create<GardenState>()(
         set((state) =>
           growGlobalByXp(state.growthLevel, state.growthXp, amount),
         ),
+      setAvatarMode: (mode) =>
+        set({
+          avatarMode: mode,
+        }),
       answerMathQuestion: (question, selectedOptionId) =>
         set((state) => {
           if (state.answeredMathQuestionIds.includes(question.id)) {
