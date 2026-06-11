@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Image,
   Pressable,
   ScrollView,
@@ -55,6 +56,7 @@ type FeatureOrb = {
 const gameAssets = {
   background: require('../../assets/garden_bg.png'),
   catHappy: require('../../assets/cat_happy.png'),
+  catPoop: require('../../assets/cat-poop.png'),
   resourceCoin: require('../../assets/resource_coin.png'),
   resourceFertilizer: require('../../assets/resource_fertilizer.png'),
   taskButton: require('../../assets/btn_task.png'),
@@ -71,6 +73,12 @@ const gameAssets = {
 
 export function TodayScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
+  const catBreathAnim = useRef(new Animated.Value(0)).current;
+  const giftPulseAnim = useRef(new Animated.Value(0)).current;
+  const poopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const featurePressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const sectionOffsetsRef = useRef<Record<SectionKey, number>>(
     {} as Record<SectionKey, number>,
   );
@@ -80,6 +88,10 @@ export function TodayScreen() {
   const [placeholderMessage, setPlaceholderMessage] = useState<string | null>(
     null,
   );
+  const [activeCatImage, setActiveCatImage] = useState<ImageSourcePropType>(
+    gameAssets.catHappy,
+  );
+  const [pressedFeatureId, setPressedFeatureId] = useState<string | null>(null);
   const coins = useGardenStore((state) => state.coins);
   const fertilizers = useGardenStore((state) => state.fertilizers);
   const growthLevel = useGardenStore((state) => state.growthLevel);
@@ -144,6 +156,65 @@ export function TodayScreen() {
     setPlaceholderMessage(message);
   };
 
+  const showPoopPlaceholder = () => {
+    setPlaceholderMessage('粑粑时间马上就来');
+    setActiveCatImage(gameAssets.catPoop);
+
+    if (poopTimeoutRef.current) {
+      clearTimeout(poopTimeoutRef.current);
+    }
+
+    poopTimeoutRef.current = setTimeout(() => {
+      setActiveCatImage(gameAssets.catHappy);
+      poopTimeoutRef.current = null;
+    }, 2000);
+  };
+
+  const holdFeaturePressFeedback = (featureId: string) => {
+    setPressedFeatureId(featureId);
+
+    if (featurePressTimeoutRef.current) {
+      clearTimeout(featurePressTimeoutRef.current);
+    }
+
+    featurePressTimeoutRef.current = setTimeout(() => {
+      setPressedFeatureId(null);
+      featurePressTimeoutRef.current = null;
+    }, 180);
+  };
+
+  const catAnimatedStyle = {
+    transform: [
+      {
+        translateY: catBreathAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, -8],
+        }),
+      },
+      {
+        scale: catBreathAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.035],
+        }),
+      },
+    ],
+  };
+
+  const giftAnimatedStyle = {
+    opacity: giftPulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.82, 1],
+    }),
+    transform: [
+      {
+        scale: giftPulseAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.18],
+        }),
+      },
+    ],
+  };
+
   const featureOrbs: FeatureOrb[] = [
     {
       id: 'tasks',
@@ -161,7 +232,7 @@ export function TodayScreen() {
       id: 'poop',
       title: '粑粑时间',
       imageSource: gameAssets.poopButton,
-      onPress: () => showPlaceholder('粑粑时间马上就来'),
+      onPress: showPoopPlaceholder,
     },
     {
       id: 'lottery',
@@ -193,6 +264,53 @@ export function TodayScreen() {
   useEffect(() => {
     setLastMathResult(null);
   }, [currentMathQuestion?.id]);
+
+  useEffect(() => {
+    const catLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(catBreathAnim, {
+          toValue: 1,
+          duration: 1600,
+          useNativeDriver: false,
+        }),
+        Animated.timing(catBreathAnim, {
+          toValue: 0,
+          duration: 1600,
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+    const giftLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(giftPulseAnim, {
+          toValue: 1,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(giftPulseAnim, {
+          toValue: 0,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+
+    catLoop.start();
+    giftLoop.start();
+
+    return () => {
+      catLoop.stop();
+      giftLoop.stop();
+
+      if (poopTimeoutRef.current) {
+        clearTimeout(poopTimeoutRef.current);
+      }
+
+      if (featurePressTimeoutRef.current) {
+        clearTimeout(featurePressTimeoutRef.current);
+      }
+    };
+  }, [catBreathAnim, giftPulseAnim]);
 
   return (
     <ScrollView
@@ -243,7 +361,13 @@ export function TodayScreen() {
             {leftFeatureOrbs.map((feature) => (
               <Pressable
                 key={feature.id}
-                style={styles.featureOrb}
+                style={({ pressed }) => [
+                  styles.featureOrb,
+                  (pressed || pressedFeatureId === feature.id) &&
+                    styles.featureOrbPressed,
+                ]}
+                onPressIn={() => holdFeaturePressFeedback(feature.id)}
+                onPressOut={() => setPressedFeatureId(null)}
                 onPress={feature.onPress}
               >
                 <Image
@@ -258,9 +382,9 @@ export function TodayScreen() {
 
           <View style={styles.avatarArtworkFrame}>
             <View style={styles.avatarArtworkPlaceholder}>
-              <Image
-                source={gameAssets.catHappy}
-                style={styles.avatarArtwork}
+              <Animated.Image
+                source={activeCatImage}
+                style={[styles.avatarArtwork, catAnimatedStyle]}
                 resizeMode="contain"
               />
             </View>
@@ -270,7 +394,13 @@ export function TodayScreen() {
             {rightFeatureOrbs.map((feature) => (
               <Pressable
                 key={feature.id}
-                style={styles.featureOrb}
+                style={({ pressed }) => [
+                  styles.featureOrb,
+                  (pressed || pressedFeatureId === feature.id) &&
+                    styles.featureOrbPressed,
+                ]}
+                onPressIn={() => holdFeaturePressFeedback(feature.id)}
+                onPressOut={() => setPressedFeatureId(null)}
                 onPress={feature.onPress}
               >
                 <Image
@@ -290,35 +420,49 @@ export function TodayScreen() {
             resizeMode="stretch"
             style={styles.growthPanelBackground}
           />
-          <Text style={styles.growthText}>成长进度</Text>
-          <Text style={styles.growthValue}>
-            第 {growthLevel} 级 · {growthXp}/100
-          </Text>
-          <View style={styles.progressTrack}>
-            <Image
-              source={gameAssets.progressTrack}
-              resizeMode="stretch"
-              style={styles.progressTrackImage}
-            />
-            <View
-              style={[
-                styles.progressFillMask,
-                { width: `${Math.min(growthXp, 100)}%` },
-              ]}
-            >
+          <View style={styles.growthPanelContent}>
+            <View style={styles.growthAvatarFrame}>
               <Image
-                source={gameAssets.progressFill}
-                resizeMode="stretch"
-                style={styles.progressFillImage}
+                source={gameAssets.catHappy}
+                resizeMode="contain"
+                style={styles.growthAvatar}
               />
             </View>
-          </View>
-          <View style={styles.rewardGiftFrame}>
-            <Image
-              source={gameAssets.rewardGift}
-              resizeMode="contain"
-              style={styles.rewardGift}
-            />
+            <View style={styles.growthCenter}>
+              <View style={styles.growthHeaderRow}>
+                <Text style={styles.growthText}>成长进度</Text>
+                <Text style={styles.growthValue}>
+                  第 {growthLevel} 级 · {growthXp}/100
+                </Text>
+              </View>
+              <View style={styles.progressTrack}>
+                <Image
+                  source={gameAssets.progressTrack}
+                  resizeMode="stretch"
+                  style={styles.progressTrackImage}
+                />
+                <View
+                  style={[
+                    styles.progressFillMask,
+                    { width: `${Math.min(growthXp, 100)}%` },
+                  ]}
+                >
+                  <Image
+                    source={gameAssets.progressFill}
+                    resizeMode="stretch"
+                    style={styles.progressFillImage}
+                  />
+                </View>
+              </View>
+            </View>
+            <View style={styles.rewardGiftFrame}>
+              <View style={styles.rewardGiftGlow} />
+              <Animated.Image
+                source={gameAssets.rewardGift}
+                resizeMode="contain"
+                style={[styles.rewardGift, giftAnimatedStyle]}
+              />
+            </View>
           </View>
         </View>
 
@@ -691,14 +835,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 128,
   },
+  featureOrbPressed: {
+    transform: [{ scale: 0.94 }],
+  },
   featureOrbImage: {
     height: 108,
     width: 108,
   },
   featureOrbText: {
     color: '#5B341B',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '800',
+    lineHeight: 22,
     textAlign: 'center',
   },
   avatarArtworkFrame: {
@@ -783,24 +931,16 @@ const styles = StyleSheet.create({
   },
   growthText: {
     color: '#5A3A1F',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '800',
-    left: '12%',
-    position: 'absolute',
-    top: 26,
-    zIndex: 3,
   },
   growthValue: {
     color: '#31515F',
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '800',
-    position: 'absolute',
-    right: '17%',
-    top: 27,
-    zIndex: 3,
   },
   homeGrowthBar: {
-    minHeight: 132,
+    minHeight: 142,
     overflow: 'hidden',
     position: 'relative',
     zIndex: 2,
@@ -813,23 +953,66 @@ const styles = StyleSheet.create({
     top: -112,
     width: '100%',
   },
+  growthPanelContent: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 18,
+    minHeight: 142,
+    paddingBottom: 22,
+    paddingHorizontal: 88,
+    paddingTop: 24,
+    position: 'relative',
+    zIndex: 3,
+  },
+  growthAvatarFrame: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 247, 211, 0.88)',
+    borderColor: 'rgba(255, 255, 255, 0.92)',
+    borderRadius: 34,
+    borderWidth: 3,
+    height: 68,
+    justifyContent: 'center',
+    width: 68,
+  },
+  growthAvatar: {
+    height: 78,
+    width: 78,
+  },
+  growthCenter: {
+    flex: 1,
+    gap: 10,
+    justifyContent: 'center',
+    minWidth: 220,
+  },
+  growthHeaderRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+  },
   rewardGiftFrame: {
     alignItems: 'center',
-    height: 92,
+    height: 104,
     justifyContent: 'center',
     overflow: 'hidden',
-    position: 'absolute',
-    right: '6%',
-    top: 34,
-    width: 92,
+    position: 'relative',
+    width: 104,
     zIndex: 4,
   },
-  rewardGift: {
-    height: 188,
-    left: -94,
+  rewardGiftGlow: {
+    backgroundColor: 'rgba(255, 245, 139, 0.46)',
+    borderRadius: 42,
+    height: 84,
     position: 'absolute',
-    top: -50,
-    width: 282,
+    width: 84,
+  },
+  rewardGift: {
+    height: 214,
+    left: -108,
+    position: 'absolute',
+    top: -56,
+    width: 320,
   },
   badge: {
     marginTop: 8,
@@ -1001,12 +1184,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   progressTrack: {
-    height: 40,
-    left: '18%',
+    height: 42,
     overflow: 'hidden',
-    position: 'absolute',
-    top: '58%',
-    width: '58%',
+    position: 'relative',
+    width: '100%',
     zIndex: 3,
   },
   progressTrackImage: {
