@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { ComponentProps } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import type { LayoutChangeEvent } from 'react-native';
 
 import { avatarModeIds, avatarModes } from '../data/avatarModes';
 import { badges } from '../data/badges';
@@ -35,11 +37,26 @@ const dailyTasks: DailyTask[] = [
   },
 ];
 
+type SectionKey = 'plants' | 'tasks' | 'math' | 'badges' | 'collection';
+
+type FeatureOrb = {
+  id: string;
+  title: string;
+  iconName: ComponentProps<typeof Ionicons>['name'];
+  onPress: () => void;
+};
+
 export function TodayScreen() {
+  const scrollViewRef = useRef<ScrollView>(null);
+  const sectionOffsetsRef = useRef<Record<SectionKey, number>>(
+    {} as Record<SectionKey, number>,
+  );
   const [lastMathResult, setLastMathResult] = useState<
     'correct' | 'incorrect' | null
   >(null);
-  const title = useGardenStore((state) => state.currentTitle);
+  const [placeholderMessage, setPlaceholderMessage] = useState<string | null>(
+    null,
+  );
   const coins = useGardenStore((state) => state.coins);
   const fertilizers = useGardenStore((state) => state.fertilizers);
   const growthLevel = useGardenStore((state) => state.growthLevel);
@@ -77,8 +94,89 @@ export function TodayScreen() {
       : avatarMode === 'pet'
         ? `${avatarModeConfig.actionLabel}，让它开心`
         : `${avatarModeConfig.actionLabel}，让魔法变亮`;
+  const sceneStyle =
+    avatarMode === 'garden'
+      ? styles.gardenScene
+      : avatarMode === 'pet'
+        ? styles.petScene
+        : styles.spriteScene;
+  const avatarIconName: ComponentProps<typeof Ionicons>['name'] =
+    avatarMode === 'garden'
+      ? 'leaf'
+      : avatarMode === 'pet'
+        ? 'paw'
+        : 'sparkles';
+  const avatarIconColor =
+    avatarMode === 'garden'
+      ? Colors.leaf
+      : avatarMode === 'pet'
+        ? Colors.lightBlueText
+        : Colors.headerText;
   const formatRarity = (rarity: 'common' | 'rare') =>
     rarity === 'rare' ? '稀有' : '普通';
+
+  const handleSectionLayout =
+    (sectionKey: SectionKey) => (event: LayoutChangeEvent) => {
+      sectionOffsetsRef.current[sectionKey] = event.nativeEvent.layout.y;
+    };
+
+  const scrollToSection = (sectionKey: SectionKey) => {
+    setPlaceholderMessage(null);
+
+    scrollViewRef.current?.scrollTo({
+      y: Math.max((sectionOffsetsRef.current[sectionKey] ?? 0) - 16, 0),
+      animated: true,
+    });
+  };
+
+  const showPlaceholder = (message: string) => {
+    setPlaceholderMessage(message);
+  };
+
+  const featureOrbs: FeatureOrb[] = [
+    {
+      id: 'tasks',
+      title: '今日任务',
+      iconName: 'checkbox',
+      onPress: () => scrollToSection('tasks'),
+    },
+    {
+      id: 'math',
+      title: '数字小游戏',
+      iconName: 'game-controller',
+      onPress: () => scrollToSection('math'),
+    },
+    {
+      id: 'poop',
+      title: '粑粑时间',
+      iconName: 'timer',
+      onPress: () => showPlaceholder('粑粑时间马上就来'),
+    },
+    {
+      id: 'lottery',
+      title: '抽奖机',
+      iconName: 'gift',
+      onPress: () => showPlaceholder('神秘抽奖机马上就来'),
+    },
+    {
+      id: 'collection',
+      title: '收集册',
+      iconName: 'albums',
+      onPress: () => scrollToSection('collection'),
+    },
+    {
+      id: 'badges',
+      title: '徽章',
+      iconName: 'ribbon',
+      onPress: () => scrollToSection('badges'),
+    },
+    {
+      id: 'plants',
+      title: '植物/伙伴',
+      iconName: 'leaf',
+      onPress: () => scrollToSection('plants'),
+    },
+  ];
 
   useEffect(() => {
     refreshDailyTasksForToday();
@@ -90,90 +188,123 @@ export function TodayScreen() {
 
   return (
     <ScrollView
+      ref={scrollViewRef}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       contentInsetAdjustmentBehavior="automatic"
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.resourceRow}>
-        <View style={styles.resourcePill}>
-          <Ionicons name="logo-bitcoin" size={22} color={Colors.headerText} />
-          <Text style={styles.resourceText}>金币 {coins}</Text>
+      <View style={[styles.gameHeroScene, sceneStyle]}>
+        <View style={styles.sceneTopBar}>
+          <View>
+            <Text style={styles.welcomeText}>欢迎回来</Text>
+            <Text style={styles.gameTitle}>数字花园 Number Garden</Text>
+          </View>
+          <View style={styles.resourceCluster}>
+            <View style={styles.resourcePill}>
+              <Ionicons
+                name="logo-bitcoin"
+                size={22}
+                color={Colors.headerText}
+              />
+              <Text style={styles.resourceText}>{coins}</Text>
+            </View>
+            <View style={styles.resourcePill}>
+              <Ionicons name="flower" size={22} color={Colors.headerText} />
+              <Text style={styles.resourceText}>{fertilizers}</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.resourcePill}>
-          <Ionicons name="flower" size={22} color={Colors.headerText} />
-          <Text style={styles.resourceText}>肥料 {fertilizers}</Text>
-        </View>
-      </View>
-      <View style={styles.modeSwitcher}>
-        {avatarModeIds.map((mode) => {
-          const isSelected = avatarMode === mode;
+        <View style={styles.modeSwitcher}>
+          {avatarModeIds.map((mode) => {
+            const isSelected = avatarMode === mode;
 
-          return (
-            <Pressable
-              key={mode}
-              style={[
-                styles.modeButton,
-                isSelected && styles.modeButtonSelected,
-              ]}
-              onPress={() => setAvatarMode(mode)}
-            >
-              <Text
+            return (
+              <Pressable
+                key={mode}
                 style={[
-                  styles.modeButtonText,
-                  isSelected && styles.modeButtonTextSelected,
+                  styles.modeButton,
+                  isSelected && styles.modeButtonSelected,
                 ]}
+                onPress={() => setAvatarMode(mode)}
               >
-                {avatarModes[mode].name}
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    isSelected && styles.modeButtonTextSelected,
+                  ]}
+                >
+                  {avatarModes[mode].name}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <View style={styles.sceneDecorationLayer}>
+          <View style={[styles.sceneDecoration, styles.sceneDecorationOne]} />
+          <View style={[styles.sceneDecoration, styles.sceneDecorationTwo]} />
+          <View style={[styles.sceneDecoration, styles.sceneDecorationThree]} />
+        </View>
+        <View style={styles.avatarStage}>
+          <View style={styles.featureOrbRing}>
+            {featureOrbs.map((feature) => (
+              <Pressable
+                key={feature.id}
+                style={styles.featureOrb}
+                onPress={feature.onPress}
+              >
+                <Ionicons
+                  name={feature.iconName}
+                  size={27}
+                  color={Colors.headerText}
+                />
+                <Text style={styles.featureOrbText}>{feature.title}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <View style={styles.avatarArtworkFrame}>
+            <View style={styles.avatarArtworkPlaceholder}>
+              <Ionicons name={avatarIconName} size={96} color={avatarIconColor} />
+            </View>
+            <Text style={styles.avatarTitle}>{avatarModeConfig.title}</Text>
+            <Text style={styles.avatarSubtitle}>
+              {avatarModeConfig.subtitle}
+            </Text>
+            <View style={styles.growthPanel}>
+              <Text style={styles.growthText}>
+                第 {growthLevel} 级 · {avatarModeConfig.growthLabel}{' '}
+                {growthXp}/100
               </Text>
+            </View>
+            <Pressable style={styles.waterButton} onPress={waterSelectedPlant}>
+              <Ionicons name={avatarIconName} size={24} color={Colors.headerText} />
+              <Text style={styles.waterButtonText}>{avatarActionText}</Text>
             </Pressable>
-          );
-        })}
-      </View>
-      <View style={styles.hero}>
-        <View style={styles.iconBubble}>
-          <Ionicons name="leaf" size={56} color={Colors.leaf} />
+          </View>
         </View>
-        <Text style={styles.title}>数字花园 Number Garden</Text>
-        <Text style={styles.subtitle}>帮助孩子养成好习惯的成长游戏</Text>
-        <View style={styles.growthPanel}>
-          <Text style={styles.growthText}>成长等级 第 {growthLevel} 级</Text>
-          <Text style={styles.growthText}>成长值 {growthXp}/100</Text>
-        </View>
-        <Text style={styles.badge}>{title}</Text>
+        {placeholderMessage ? (
+          <View style={styles.placeholderNotice}>
+            <Text style={styles.placeholderText}>{placeholderMessage}</Text>
+          </View>
+        ) : null}
       </View>
       {plant ? (
         <View style={styles.plantPanel}>
-          <View style={styles.plantHeader}>
-            <View>
-              <Text style={styles.sectionEyebrow}>{avatarModeConfig.name}</Text>
-              <Text style={styles.plantName}>{avatarModeConfig.title}</Text>
-              <Text style={styles.plantMeta}>{avatarModeConfig.subtitle}</Text>
-            </View>
-            <View style={styles.plantIcon}>
-              <Ionicons name="water" size={30} color={Colors.lightBlueText} />
-            </View>
-          </View>
+          <Text style={styles.sectionEyebrow}>当前伙伴</Text>
+          <Text style={styles.plantName}>{plant.name}</Text>
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { flex: xpPercent }]} />
             <View style={{ flex: 1 - xpPercent }} />
           </View>
           <Text style={styles.plantMeta}>
-            {avatarModeConfig.growthLabel} {growthXp}/100 · 成长第{' '}
-            {growthLevel} 级
+            植物成长值 {plant.xp}/100 · 植物第 {plant.level} 级 · 浇水{' '}
+            {plant.waterCount} 次
           </Text>
-          <Text style={styles.plantMeta}>
-            {plant.name} · 植物第 {plant.level} 级 · 浇水 {plant.waterCount} 次
-          </Text>
-          <Pressable style={styles.waterButton} onPress={waterSelectedPlant}>
-            <Ionicons name="water" size={24} color={Colors.headerText} />
-            <Text style={styles.waterButtonText}>{avatarActionText}</Text>
-          </Pressable>
         </View>
       ) : (
         <Text style={styles.plantMeta}>未找到植物：{selectedPlantId}</Text>
       )}
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={handleSectionLayout('plants')}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>植物图鉴</Text>
           <Text style={styles.sectionCount}>
@@ -232,7 +363,7 @@ export function TodayScreen() {
           })}
         </View>
       </View>
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={handleSectionLayout('tasks')}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>今日任务</Text>
           <Text style={styles.sectionCount}>
@@ -275,7 +406,7 @@ export function TodayScreen() {
           );
         })}
       </View>
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={handleSectionLayout('math')}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>数字小游戏</Text>
           <Text style={styles.sectionCount}>
@@ -319,7 +450,7 @@ export function TodayScreen() {
           </View>
         )}
       </View>
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={handleSectionLayout('badges')}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>徽章</Text>
           <Text style={styles.sectionCount}>
@@ -349,7 +480,7 @@ export function TodayScreen() {
           })}
         </View>
       </View>
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={handleSectionLayout('collection')}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>收集册</Text>
           <Text style={styles.sectionCount}>
@@ -397,8 +528,160 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     gap: 18,
-    padding: 24,
+    padding: 18,
     paddingBottom: 36,
+  },
+  gameHeroScene: {
+    borderRadius: 34,
+    gap: 18,
+    minHeight: 620,
+    overflow: 'hidden',
+    padding: 18,
+    position: 'relative',
+  },
+  gardenScene: {
+    backgroundColor: '#DFF5DE',
+  },
+  petScene: {
+    backgroundColor: '#FDE9C8',
+  },
+  spriteScene: {
+    backgroundColor: '#D9E7FF',
+  },
+  sceneTopBar: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'space-between',
+    zIndex: 2,
+  },
+  welcomeText: {
+    color: Colors.bodyText,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  gameTitle: {
+    color: Colors.headerText,
+    fontSize: 23,
+    fontWeight: '800',
+  },
+  resourceCluster: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'flex-end',
+  },
+  sceneDecorationLayer: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  sceneDecoration: {
+    position: 'absolute',
+    backgroundColor: 'rgba(255, 255, 255, 0.48)',
+  },
+  sceneDecorationOne: {
+    borderRadius: 80,
+    height: 118,
+    right: -26,
+    top: 86,
+    width: 118,
+  },
+  sceneDecorationTwo: {
+    borderRadius: 70,
+    bottom: 118,
+    height: 92,
+    left: -18,
+    width: 142,
+  },
+  sceneDecorationThree: {
+    borderRadius: 34,
+    bottom: 36,
+    height: 18,
+    left: 34,
+    right: 34,
+  },
+  avatarStage: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: 470,
+    zIndex: 2,
+  },
+  featureOrbRing: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  featureOrb: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    borderColor: 'rgba(255, 255, 255, 0.88)',
+    borderRadius: 32,
+    borderWidth: 2,
+    gap: 4,
+    height: 88,
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+    width: 88,
+  },
+  featureOrbText: {
+    color: Colors.headerText,
+    fontSize: 12,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  avatarArtworkFrame: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.66)',
+    borderColor: 'rgba(255, 255, 255, 0.92)',
+    borderRadius: 38,
+    borderWidth: 3,
+    gap: 12,
+    maxWidth: 430,
+    padding: 18,
+    width: '100%',
+  },
+  avatarArtworkPlaceholder: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightYellow,
+    borderColor: Colors.background,
+    borderRadius: 82,
+    borderWidth: 5,
+    height: 164,
+    justifyContent: 'center',
+    width: 164,
+  },
+  avatarTitle: {
+    color: Colors.headerText,
+    fontSize: 28,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  avatarSubtitle: {
+    color: Colors.bodyText,
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  placeholderNotice: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.78)',
+    borderRadius: 22,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    zIndex: 3,
+  },
+  placeholderText: {
+    color: Colors.headerText,
+    fontSize: 17,
+    fontWeight: '800',
+    textAlign: 'center',
   },
   hero: {
     alignItems: 'center',
@@ -466,9 +749,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     justifyContent: 'center',
-    minWidth: 128,
+    minWidth: 84,
     backgroundColor: Colors.lightBlue,
-    paddingHorizontal: 18,
+    paddingHorizontal: 14,
     paddingVertical: 12,
   },
   resourceText: {

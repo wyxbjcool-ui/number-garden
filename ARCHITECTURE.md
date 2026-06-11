@@ -49,6 +49,8 @@ Step 17 adds a unified growth layer to prepare for later garden, pet, or sprite 
 
 Step 18 adds three avatar modes: garden, pet, and sprite. The mode is a persisted presentation preference in Zustand. Mode-specific labels live in local static configuration, and all modes continue to share growth, coins, fertilizers, badges, collection, daily tasks, and math game state.
 
+Step 19 changes the Today screen presentation from a vertical feature list to a game-style home scene. The first viewport is a UI composition only: it uses local component state for scroll targets and temporary placeholder notices, while existing business state and actions remain in the Zustand store.
+
 ## Boundaries
 
 - No backend in MVP V1.
@@ -63,3 +65,4 @@ Step 18 adds three avatar modes: garden, pet, and sprite. The mode is a persiste
 - No advanced plant shop or unlock conditions yet.
 - No global growth badges yet.
 - No dedicated garden, pet, or sprite gameplay screens yet.
+- No final illustrated scene or avatar asset pipeline yet.

@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 18 three avatar mode switching.
+Please review the Step 19 first game-style home screen.
 
 ## Focus Areas
 
@@ -73,6 +73,12 @@ Please review the Step 18 three avatar mode switching.
 - Mode switching changes only presentation text and does not create separate growth systems.
 - The main character area uses mode-specific title, subtitle, growth label, and action text.
 - Existing coins, fertilizers, badges, collection, daily tasks, and math game state remain shared across modes.
+- The first viewport now reads as a game scene instead of a vertical feature list.
+- Feature orbs are large, circular, and easy to tap.
+- Feature orbs scroll to existing detailed sections where appropriate.
+- 粑粑时间 and 抽奖机 show gentle placeholder messages only.
+- Mode-specific scenes use separate garden, pet, and sprite styles without changing business logic.
+- Reserved style names exist for future artwork containers: `gameHeroScene`, `avatarArtworkFrame`, `avatarArtworkPlaceholder`, `featureOrb`, and `sceneDecoration`.
 - UI remains simple and child-friendly.
 
 ## Out of Scope
@@ -95,6 +101,8 @@ Please review the Step 18 three avatar mode switching.
 - Global growth badge logic.
 - Dedicated garden, pet, or sprite gameplay screens.
 - Separate pet or sprite XP systems.
+- New business logic for poop records or lottery.
+- New image assets.
 
 ## Manual Test Ideas
 
@@ -142,6 +150,12 @@ Please review the Step 18 three avatar mode switching.
 - Confirm mode switching does not reset coins, fertilizers, growth, badges, collection, tasks, or math progress.
 - Confirm the mode action button still increases shared growth.
 - Restart the app and confirm the selected avatar mode is retained.
+- Confirm the first screen looks like a game scene with a large central character area.
+- Confirm each feature orb is tappable and visually distinct.
+- Confirm 今日任务, 数字小游戏, 收集册, 徽章, and 植物/伙伴 scroll to their sections.
+- Confirm 粑粑时间 shows “粑粑时间马上就来”.
+- Confirm 抽奖机 shows “神秘抽奖机马上就来”.
+- Confirm switching avatar modes changes the scene styling without changing saved progress.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.

@@ -9,15 +9,30 @@
 
 ## Home UI Preview Tests
 
-- Confirm the Today screen scrolls from top resources through collection items.
-- Confirm the section order is understandable: resources, hero, current plant, plant catalog, tasks, math, badges, collection.
-- Confirm the top coins and fertilizers pills wrap instead of squeezing on small screens.
+- Confirm the Today screen opens on a game-style scene, not a plain feature list.
+- Confirm the first screen includes welcome text, coins, fertilizers, mode switcher, central avatar, and feature orbs.
+- Confirm the top coins and fertilizers pills remain readable on small screens.
+- Confirm the central avatar area is the largest visual element in the first viewport.
+- Confirm feature orbs wrap cleanly and remain easy to tap.
 - Confirm the plant card title, level, XP, and watering button are readable.
 - Confirm daily task buttons are large enough to tap comfortably.
 - Confirm completed tasks look visually weaker.
 - Confirm badge cards wrap when the screen is narrow.
 - Confirm collection cards wrap and do not overlap.
 - Confirm the screen respects safe area through the native navigation layout.
+
+## Game Home Entry Tests
+
+- Tap 今日任务 and confirm the screen scrolls to the daily task section.
+- Tap 数字小游戏 and confirm the screen scrolls to the math mini-game section.
+- Tap 收集册 and confirm the screen scrolls to the collection section.
+- Tap 徽章 and confirm the screen scrolls to the badge section.
+- Tap 植物/伙伴 and confirm the screen scrolls to the plant catalog section.
+- Tap 粑粑时间 and confirm the placeholder says 粑粑时间马上就来.
+- Tap 抽奖机 and confirm the placeholder says 神秘抽奖机马上就来.
+- Switch to 花园 and confirm the scene feels like a garden.
+- Switch to 宠物 and confirm the scene feels like a pet home.
+- Switch to 精灵 and confirm the scene feels like a magic scene.
 
 ## MVP Wrap-Up Checks
 
@@ -158,4 +173,5 @@
 - Global growth badges are not implemented yet.
 - Dedicated garden, pet, and sprite gameplay screens are not implemented yet.
 - Garden, pet, and sprite currently differ by presentation text only.
+- The main avatar and scene art are temporary icon-based placeholders.
 - iOS Simulator and Android device preview depend on local machine/device availability.

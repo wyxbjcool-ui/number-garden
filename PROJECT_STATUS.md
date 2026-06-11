@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 18: Three avatar mode switching.
+Step 19: First game-style home screen.
 
 ## Completed
 
@@ -75,6 +75,12 @@ Step 18: Three avatar mode switching.
 - Shared avatar mode configuration for title, subtitle, growth label, and action label.
 - Today screen mode switcher for 花园, 宠物, and 精灵.
 - Main character area adapts wording by mode while sharing the same growth system.
+- Game-style first screen on TodayScreen.
+- Central avatar scene with mode-specific garden, pet, and sprite backgrounds.
+- Feature orb entry buttons around the main character.
+- Entry buttons scroll to existing detailed sections.
+- Placeholder notices for 粑粑时间 and 抽奖机.
+- Reserved artwork container style names for future Canva or AI assets.
 
 ## Not Included Yet
 
@@ -93,3 +99,4 @@ Step 18: Three avatar mode switching.
 - Split-tab navigation for a less dense home screen.
 - Global growth badges.
 - Dedicated game interfaces for garden, pet, and sprite modes.
+- Final illustrated avatar and scene assets.

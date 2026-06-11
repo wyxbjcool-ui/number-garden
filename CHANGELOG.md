@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Reworked the Today screen first viewport into a game-style scene.
+- Added a central avatar artwork container with mode-specific scene styling.
+- Added circular feature orbs for tasks, math game, poop time, lottery, collection, badges, and plants.
+- Connected feature orbs to existing detailed sections or gentle placeholder messages.
+- Preserved existing business logic and detailed sections below the game scene.
 - Added three avatar modes: garden, pet, and sprite.
 - Added persisted `avatarMode` state and `setAvatarMode`.
 - Added shared `avatarModes` configuration for mode-specific display text.
