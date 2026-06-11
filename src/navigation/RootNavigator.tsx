@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { PoopScreen } from '../screens/PoopScreen';
 import { TodayScreen } from '../screens/TodayScreen';
 import { Colors } from '../theme';
 import type { RootStackParamList } from '../types/navigation';
@@ -24,6 +25,11 @@ export function RootNavigator() {
         name="Today"
         component={TodayScreen}
         options={{ title: '数字花园' }}
+      />
+      <Stack.Screen
+        name="Poop"
+        component={PoopScreen}
+        options={{ title: '粑粑时间' }}
       />
     </Stack.Navigator>
   );

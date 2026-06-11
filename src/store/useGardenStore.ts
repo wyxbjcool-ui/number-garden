@@ -106,6 +106,7 @@ type GardenState = {
   avatarMode: AvatarMode;
   currentTitle: string;
   currentTaskDate: string;
+  poopRecordDate: string;
   selectedPlantId: string;
   plants: Record<string, Plant>;
   ownedPlantIds: string[];
@@ -115,6 +116,7 @@ type GardenState = {
   answeredMathQuestionIds: string[];
   completeDailyTask: (task: DailyTask) => void;
   addGrowthXp: (amount: number) => void;
+  recordPoopToday: () => boolean;
   setAvatarMode: (mode: AvatarMode) => void;
   answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
   selectPlant: (plantId: string) => void;
@@ -132,6 +134,7 @@ const initialState = {
   avatarMode: 'garden' as AvatarMode,
   currentTitle: '成长小种子',
   currentTaskDate: '',
+  poopRecordDate: '',
   selectedPlantId: 'succulent',
   plants: initialPlants,
   ownedPlantIds: ['succulent'],
@@ -143,7 +146,7 @@ const initialState = {
 
 export const useGardenStore = create<GardenState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...initialState,
       completeDailyTask: (task) =>
         set((state) => {
@@ -212,6 +215,29 @@ export const useGardenStore = create<GardenState>()(
         set((state) =>
           growGlobalByXp(state.growthLevel, state.growthXp, amount),
         ),
+      recordPoopToday: () => {
+        const state = get();
+        const today = getLocalDateString();
+
+        if (state.poopRecordDate === today) {
+          return false;
+        }
+
+        const growthProgress = growGlobalByXp(
+          state.growthLevel,
+          state.growthXp,
+          10,
+        );
+
+        set({
+          coins: state.coins + 10,
+          fertilizers: state.fertilizers + 5,
+          ...growthProgress,
+          poopRecordDate: today,
+        });
+
+        return true;
+      },
       setAvatarMode: (mode) =>
         set({
           avatarMode: mode,

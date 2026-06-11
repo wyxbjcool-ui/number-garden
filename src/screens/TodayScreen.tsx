@@ -1,4 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -19,6 +21,7 @@ import { plantIds, plants as plantCatalog } from '../data/plants';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
 import type { DailyTask } from '../types/dailyTask';
+import type { RootStackParamList } from '../types/navigation';
 
 const dailyTasks: DailyTask[] = [
   {
@@ -56,7 +59,6 @@ type FeatureOrb = {
 const gameAssets = {
   background: require('../../assets/garden_bg.png'),
   catHappy: require('../../assets/cat_happy.png'),
-  catPoop: require('../../assets/cat-poop.png'),
   resourceCoin: require('../../assets/resource_coin.png'),
   resourceFertilizer: require('../../assets/resource_fertilizer.png'),
   taskButton: require('../../assets/btn_task.png'),
@@ -72,10 +74,11 @@ const gameAssets = {
 };
 
 export function TodayScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const scrollViewRef = useRef<ScrollView>(null);
   const catBreathAnim = useRef(new Animated.Value(0)).current;
   const giftPulseAnim = useRef(new Animated.Value(0)).current;
-  const poopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const featurePressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -87,9 +90,6 @@ export function TodayScreen() {
   >(null);
   const [placeholderMessage, setPlaceholderMessage] = useState<string | null>(
     null,
-  );
-  const [activeCatImage, setActiveCatImage] = useState<ImageSourcePropType>(
-    gameAssets.catHappy,
   );
   const [pressedFeatureId, setPressedFeatureId] = useState<string | null>(null);
   const coins = useGardenStore((state) => state.coins);
@@ -156,20 +156,6 @@ export function TodayScreen() {
     setPlaceholderMessage(message);
   };
 
-  const showPoopPlaceholder = () => {
-    setPlaceholderMessage('粑粑时间马上就来');
-    setActiveCatImage(gameAssets.catPoop);
-
-    if (poopTimeoutRef.current) {
-      clearTimeout(poopTimeoutRef.current);
-    }
-
-    poopTimeoutRef.current = setTimeout(() => {
-      setActiveCatImage(gameAssets.catHappy);
-      poopTimeoutRef.current = null;
-    }, 2000);
-  };
-
   const holdFeaturePressFeedback = (featureId: string) => {
     setPressedFeatureId(featureId);
 
@@ -232,7 +218,7 @@ export function TodayScreen() {
       id: 'poop',
       title: '粑粑时间',
       imageSource: gameAssets.poopButton,
-      onPress: showPoopPlaceholder,
+      onPress: () => navigation.navigate('Poop'),
     },
     {
       id: 'lottery',
@@ -301,10 +287,6 @@ export function TodayScreen() {
     return () => {
       catLoop.stop();
       giftLoop.stop();
-
-      if (poopTimeoutRef.current) {
-        clearTimeout(poopTimeoutRef.current);
-      }
 
       if (featurePressTimeoutRef.current) {
         clearTimeout(featurePressTimeoutRef.current);
@@ -383,7 +365,7 @@ export function TodayScreen() {
           <View style={styles.avatarArtworkFrame}>
             <View style={styles.avatarArtworkPlaceholder}>
               <Animated.Image
-                source={activeCatImage}
+                source={gameAssets.catHappy}
                 style={[styles.avatarArtwork, catAnimatedStyle]}
                 resizeMode="contain"
               />
