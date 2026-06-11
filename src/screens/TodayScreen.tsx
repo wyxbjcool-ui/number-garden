@@ -170,13 +170,10 @@ export function TodayScreen() {
       iconName: 'ribbon',
       onPress: () => scrollToSection('badges'),
     },
-    {
-      id: 'plants',
-      title: '植物/伙伴',
-      iconName: 'leaf',
-      onPress: () => scrollToSection('plants'),
-    },
   ];
+
+  const leftFeatureOrbs = featureOrbs.slice(0, 3);
+  const rightFeatureOrbs = featureOrbs.slice(3);
 
   useEffect(() => {
     refreshDailyTasksForToday();
@@ -195,10 +192,15 @@ export function TodayScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={[styles.gameHeroScene, sceneStyle]}>
+        <View style={styles.sceneDecorationLayer}>
+          <View style={[styles.sceneDecoration, styles.sceneDecorationOne]} />
+          <View style={[styles.sceneDecoration, styles.sceneDecorationTwo]} />
+          <View style={[styles.sceneDecoration, styles.sceneDecorationThree]} />
+        </View>
         <View style={styles.sceneTopBar}>
-          <View>
+          <View style={styles.welcomeBlock}>
             <Text style={styles.welcomeText}>欢迎回来</Text>
-            <Text style={styles.gameTitle}>数字花园 Number Garden</Text>
+            <Text style={styles.gameTitle}>数字花园</Text>
           </View>
           <View style={styles.resourceCluster}>
             <View style={styles.resourcePill}>
@@ -215,39 +217,10 @@ export function TodayScreen() {
             </View>
           </View>
         </View>
-        <View style={styles.modeSwitcher}>
-          {avatarModeIds.map((mode) => {
-            const isSelected = avatarMode === mode;
 
-            return (
-              <Pressable
-                key={mode}
-                style={[
-                  styles.modeButton,
-                  isSelected && styles.modeButtonSelected,
-                ]}
-                onPress={() => setAvatarMode(mode)}
-              >
-                <Text
-                  style={[
-                    styles.modeButtonText,
-                    isSelected && styles.modeButtonTextSelected,
-                  ]}
-                >
-                  {avatarModes[mode].name}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-        <View style={styles.sceneDecorationLayer}>
-          <View style={[styles.sceneDecoration, styles.sceneDecorationOne]} />
-          <View style={[styles.sceneDecoration, styles.sceneDecorationTwo]} />
-          <View style={[styles.sceneDecoration, styles.sceneDecorationThree]} />
-        </View>
-        <View style={styles.avatarStage}>
-          <View style={styles.featureOrbRing}>
-            {featureOrbs.map((feature) => (
+        <View style={styles.homePlayfield}>
+          <View style={styles.orbColumn}>
+            {leftFeatureOrbs.map((feature) => (
               <Pressable
                 key={feature.id}
                 style={styles.featureOrb}
@@ -255,55 +228,57 @@ export function TodayScreen() {
               >
                 <Ionicons
                   name={feature.iconName}
-                  size={27}
+                  size={30}
                   color={Colors.headerText}
                 />
                 <Text style={styles.featureOrbText}>{feature.title}</Text>
               </Pressable>
             ))}
           </View>
+
           <View style={styles.avatarArtworkFrame}>
             <View style={styles.avatarArtworkPlaceholder}>
               <Ionicons name={avatarIconName} size={96} color={avatarIconColor} />
             </View>
             <Text style={styles.avatarTitle}>{avatarModeConfig.title}</Text>
-            <Text style={styles.avatarSubtitle}>
-              {avatarModeConfig.subtitle}
-            </Text>
-            <View style={styles.growthPanel}>
-              <Text style={styles.growthText}>
-                第 {growthLevel} 级 · {avatarModeConfig.growthLabel}{' '}
-                {growthXp}/100
-              </Text>
-            </View>
-            <Pressable style={styles.waterButton} onPress={waterSelectedPlant}>
-              <Ionicons name={avatarIconName} size={24} color={Colors.headerText} />
-              <Text style={styles.waterButtonText}>{avatarActionText}</Text>
-            </Pressable>
+            <Text style={styles.avatarSubtitle}>主角图片预留位</Text>
+          </View>
+
+          <View style={styles.orbColumn}>
+            {rightFeatureOrbs.map((feature) => (
+              <Pressable
+                key={feature.id}
+                style={styles.featureOrb}
+                onPress={feature.onPress}
+              >
+                <Ionicons
+                  name={feature.iconName}
+                  size={30}
+                  color={Colors.headerText}
+                />
+                <Text style={styles.featureOrbText}>{feature.title}</Text>
+              </Pressable>
+            ))}
           </View>
         </View>
+
+        <View style={styles.homeGrowthBar}>
+          <View style={styles.growthHeader}>
+            <Text style={styles.growthText}>成长进度</Text>
+            <Text style={styles.growthValue}>第 {growthLevel} 级 · {growthXp}/100</Text>
+          </View>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { flex: growthXp / 100 }]} />
+            <View style={{ flex: 1 - growthXp / 100 }} />
+          </View>
+        </View>
+
         {placeholderMessage ? (
           <View style={styles.placeholderNotice}>
             <Text style={styles.placeholderText}>{placeholderMessage}</Text>
           </View>
         ) : null}
       </View>
-      {plant ? (
-        <View style={styles.plantPanel}>
-          <Text style={styles.sectionEyebrow}>当前伙伴</Text>
-          <Text style={styles.plantName}>{plant.name}</Text>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { flex: xpPercent }]} />
-            <View style={{ flex: 1 - xpPercent }} />
-          </View>
-          <Text style={styles.plantMeta}>
-            植物成长值 {plant.xp}/100 · 植物第 {plant.level} 级 · 浇水{' '}
-            {plant.waterCount} 次
-          </Text>
-        </View>
-      ) : (
-        <Text style={styles.plantMeta}>未找到植物：{selectedPlantId}</Text>
-      )}
       <View style={styles.section} onLayout={handleSectionLayout('plants')}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>植物图鉴</Text>
@@ -528,32 +503,35 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     gap: 18,
-    padding: 18,
+    padding: 12,
     paddingBottom: 36,
   },
   gameHeroScene: {
-    borderRadius: 34,
+    borderRadius: 28,
     gap: 18,
-    minHeight: 620,
+    minHeight: 720,
     overflow: 'hidden',
-    padding: 18,
+    padding: 16,
     position: 'relative',
   },
   gardenScene: {
-    backgroundColor: '#DFF5DE',
+    backgroundColor: '#BFEAC9',
   },
   petScene: {
-    backgroundColor: '#FDE9C8',
+    backgroundColor: '#FFE0AD',
   },
   spriteScene: {
-    backgroundColor: '#D9E7FF',
+    backgroundColor: '#C9E5FF',
   },
   sceneTopBar: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
     justifyContent: 'space-between',
     zIndex: 2,
+  },
+  welcomeBlock: {
+    flexShrink: 1,
   },
   welcomeText: {
     color: Colors.bodyText,
@@ -562,12 +540,12 @@ const styles = StyleSheet.create({
   },
   gameTitle: {
     color: Colors.headerText,
-    fontSize: 23,
+    fontSize: 28,
     fontWeight: '800',
   },
   resourceCluster: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexShrink: 0,
     gap: 8,
     justifyContent: 'flex-end',
   },
@@ -580,26 +558,26 @@ const styles = StyleSheet.create({
   },
   sceneDecoration: {
     position: 'absolute',
-    backgroundColor: 'rgba(255, 255, 255, 0.48)',
+    backgroundColor: 'rgba(255, 255, 255, 0.42)',
   },
   sceneDecorationOne: {
-    borderRadius: 80,
-    height: 118,
-    right: -26,
-    top: 86,
-    width: 118,
+    borderRadius: 110,
+    height: 190,
+    right: -60,
+    top: 84,
+    width: 190,
   },
   sceneDecorationTwo: {
-    borderRadius: 70,
-    bottom: 118,
-    height: 92,
-    left: -18,
-    width: 142,
+    borderRadius: 90,
+    bottom: 172,
+    height: 136,
+    left: -42,
+    width: 180,
   },
   sceneDecorationThree: {
-    borderRadius: 34,
-    bottom: 36,
-    height: 18,
+    borderRadius: 42,
+    bottom: 118,
+    height: 22,
     left: 34,
     right: 34,
   },
@@ -617,55 +595,65 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 16,
   },
+  homePlayfield: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'space-between',
+    minHeight: 500,
+    zIndex: 2,
+  },
+  orbColumn: {
+    gap: 16,
+    justifyContent: 'center',
+  },
   featureOrb: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.72)',
-    borderColor: 'rgba(255, 255, 255, 0.88)',
-    borderRadius: 32,
-    borderWidth: 2,
-    gap: 4,
-    height: 88,
+    backgroundColor: 'rgba(255, 255, 255, 0.82)',
+    borderColor: '#FFF4B8',
+    borderRadius: 35,
+    borderWidth: 3,
+    gap: 3,
+    height: 70,
     justifyContent: 'center',
-    paddingHorizontal: 8,
-    width: 88,
+    paddingHorizontal: 4,
+    width: 70,
   },
   featureOrbText: {
     color: Colors.headerText,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '800',
     textAlign: 'center',
   },
   avatarArtworkFrame: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.66)',
-    borderColor: 'rgba(255, 255, 255, 0.92)',
-    borderRadius: 38,
-    borderWidth: 3,
+    flexShrink: 1,
     gap: 12,
-    maxWidth: 430,
-    padding: 18,
-    width: '100%',
+    maxWidth: 190,
+    minWidth: 160,
+    paddingVertical: 10,
   },
   avatarArtworkPlaceholder: {
     alignItems: 'center',
-    backgroundColor: Colors.lightYellow,
-    borderColor: Colors.background,
-    borderRadius: 82,
-    borderWidth: 5,
-    height: 164,
+    backgroundColor: '#FFF2B7',
+    borderColor: '#FFFFFF',
+    borderRadius: 85,
+    borderWidth: 6,
+    height: 170,
     justifyContent: 'center',
-    width: 164,
+    width: 170,
   },
   avatarTitle: {
     color: Colors.headerText,
-    fontSize: 28,
+    fontSize: 25,
     fontWeight: '800',
     textAlign: 'center',
   },
   avatarSubtitle: {
     color: Colors.bodyText,
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     textAlign: 'center',
   },
   placeholderNotice: {
@@ -724,7 +712,25 @@ const styles = StyleSheet.create({
     color: Colors.headerText,
     fontSize: 18,
     fontWeight: '800',
-    textAlign: 'center',
+  },
+  growthValue: {
+    color: Colors.bodyText,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  homeGrowthBar: {
+    backgroundColor: 'rgba(255, 255, 255, 0.78)',
+    borderColor: '#FFF4B8',
+    borderRadius: 24,
+    borderWidth: 3,
+    gap: 10,
+    padding: 14,
+    zIndex: 2,
+  },
+  growthHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   badge: {
     marginTop: 8,
@@ -745,14 +751,16 @@ const styles = StyleSheet.create({
   },
   resourcePill: {
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 244, 184, 0.94)',
+    borderColor: '#FFFFFF',
     borderRadius: 24,
+    borderWidth: 2,
     flexDirection: 'row',
     gap: 8,
     justifyContent: 'center',
-    minWidth: 84,
-    backgroundColor: Colors.lightBlue,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    minWidth: 82,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   resourceText: {
     color: Colors.headerText,
@@ -871,14 +879,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   progressTrack: {
-    height: 18,
-    borderRadius: 9,
+    height: 20,
+    borderRadius: 10,
     flexDirection: 'row',
     overflow: 'hidden',
-    backgroundColor: Colors.background,
+    backgroundColor: '#8B5A2B',
   },
   progressFill: {
-    backgroundColor: Colors.leaf,
+    backgroundColor: '#96D94B',
   },
   waterButton: {
     alignItems: 'center',

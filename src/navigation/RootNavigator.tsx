@@ -17,6 +17,7 @@ export function RootNavigator() {
         headerStyle: { backgroundColor: Colors.background },
         headerTintColor: Colors.headerText,
         title: '数字花园',
+        headerShown: false,
       }}
     >
       <Stack.Screen
