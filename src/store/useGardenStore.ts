@@ -97,10 +97,42 @@ const growGlobalByXp = (
 ) => {
   const totalXp = growthXp + xpAmount;
   const levelGain = Math.floor(totalXp / 100);
+  const level = growthLevel + levelGain;
+  const xp = totalXp % 100;
 
   return {
-    growthLevel: growthLevel + levelGain,
-    growthXp: totalXp % 100,
+    level,
+    xp,
+    leveledUp: levelGain > 0,
+    levelGain,
+  };
+};
+
+const levelUpRewardCoins = 20;
+const levelUpRewardFertilizers = 10;
+
+type LevelUpRewards = {
+  fromLevel: number;
+  toLevel: number;
+  coins: number;
+  fertilizers: number;
+  levelGain: number;
+};
+
+const getLevelUpRewards = (
+  previousLevel: number,
+  growthResult: ReturnType<typeof growGlobalByXp>,
+) => {
+  if (!growthResult.leveledUp) {
+    return null;
+  }
+
+  return {
+    fromLevel: previousLevel,
+    toLevel: growthResult.level,
+    coins: levelUpRewardCoins * growthResult.levelGain,
+    fertilizers: levelUpRewardFertilizers * growthResult.levelGain,
+    levelGain: growthResult.levelGain,
   };
 };
 
@@ -109,6 +141,7 @@ type GardenState = {
   fertilizers: number;
   growthXp: number;
   growthLevel: number;
+  levelUpRewards: LevelUpRewards | null;
   avatarMode: AvatarMode;
   currentTitle: string;
   currentTaskDate: string;
@@ -123,6 +156,7 @@ type GardenState = {
   answeredMathQuestionIds: string[];
   completeDailyTask: (task: DailyTask) => void;
   addGrowthXp: (amount: number) => void;
+  dismissLevelUpRewards: () => void;
   drawGacha: () => GachaDrawResult;
   recordPoopToday: () => boolean;
   setAvatarMode: (mode: AvatarMode) => void;
@@ -139,6 +173,7 @@ const initialState = {
   fertilizers: 0,
   growthXp: 0,
   growthLevel: 1,
+  levelUpRewards: null,
   avatarMode: 'garden' as AvatarMode,
   currentTitle: '成长小种子',
   currentTaskDate: '',
@@ -169,6 +204,10 @@ export const useGardenStore = create<GardenState>()(
             state.growthXp,
             10,
           );
+          const levelUpRewards = getLevelUpRewards(
+            state.growthLevel,
+            growthProgress,
+          );
 
           if (!plant) {
             const completedTodayTaskIds = [
@@ -180,9 +219,15 @@ export const useGardenStore = create<GardenState>()(
             );
 
             return {
-              coins: state.coins + task.rewardCoins,
-              fertilizers: state.fertilizers + task.rewardFertilizers,
-              ...growthProgress,
+              coins:
+                state.coins + task.rewardCoins + (levelUpRewards?.coins ?? 0),
+              fertilizers:
+                state.fertilizers +
+                task.rewardFertilizers +
+                (levelUpRewards?.fertilizers ?? 0),
+              growthLevel: growthProgress.level,
+              growthXp: growthProgress.xp,
+              ...(levelUpRewards ? { levelUpRewards } : {}),
               completedTodayTaskIds,
               collectedItemIds,
               unlockedBadgeIds: getNextUnlockedBadgeIds({
@@ -207,9 +252,15 @@ export const useGardenStore = create<GardenState>()(
           );
 
           return {
-            coins: state.coins + task.rewardCoins,
-            fertilizers: state.fertilizers + task.rewardFertilizers,
-            ...growthProgress,
+            coins:
+              state.coins + task.rewardCoins + (levelUpRewards?.coins ?? 0),
+            fertilizers:
+              state.fertilizers +
+              task.rewardFertilizers +
+              (levelUpRewards?.fertilizers ?? 0),
+            growthLevel: growthProgress.level,
+            growthXp: growthProgress.xp,
+            ...(levelUpRewards ? { levelUpRewards } : {}),
             completedTodayTaskIds,
             collectedItemIds,
             plants,
@@ -221,9 +272,30 @@ export const useGardenStore = create<GardenState>()(
           };
         }),
       addGrowthXp: (amount) =>
-        set((state) =>
-          growGlobalByXp(state.growthLevel, state.growthXp, amount),
-        ),
+        set((state) => {
+          const growthProgress = growGlobalByXp(
+            state.growthLevel,
+            state.growthXp,
+            amount,
+          );
+          const levelUpRewards = getLevelUpRewards(
+            state.growthLevel,
+            growthProgress,
+          );
+
+          return {
+            coins: state.coins + (levelUpRewards?.coins ?? 0),
+            fertilizers:
+              state.fertilizers + (levelUpRewards?.fertilizers ?? 0),
+            growthLevel: growthProgress.level,
+            growthXp: growthProgress.xp,
+            ...(levelUpRewards ? { levelUpRewards } : {}),
+          };
+        }),
+      dismissLevelUpRewards: () =>
+        set({
+          levelUpRewards: null,
+        }),
       drawGacha: () => {
         const state = get();
 
@@ -265,11 +337,18 @@ export const useGardenStore = create<GardenState>()(
           state.growthXp,
           10,
         );
+        const levelUpRewards = getLevelUpRewards(
+          state.growthLevel,
+          growthProgress,
+        );
 
         set({
-          coins: state.coins + 10,
-          fertilizers: state.fertilizers + 5,
-          ...growthProgress,
+          coins: state.coins + 10 + (levelUpRewards?.coins ?? 0),
+          fertilizers:
+            state.fertilizers + 5 + (levelUpRewards?.fertilizers ?? 0),
+          growthLevel: growthProgress.level,
+          growthXp: growthProgress.xp,
+          ...(levelUpRewards ? { levelUpRewards } : {}),
           poopRecordDate: today,
         });
 
@@ -301,12 +380,19 @@ export const useGardenStore = create<GardenState>()(
             state.growthXp,
             10,
           );
+          const levelUpRewards = getLevelUpRewards(
+            state.growthLevel,
+            growthProgress,
+          );
 
           if (!plant) {
             return {
-              coins: state.coins + 3,
-              fertilizers: state.fertilizers + 1,
-              ...growthProgress,
+              coins: state.coins + 3 + (levelUpRewards?.coins ?? 0),
+              fertilizers:
+                state.fertilizers + 1 + (levelUpRewards?.fertilizers ?? 0),
+              growthLevel: growthProgress.level,
+              growthXp: growthProgress.xp,
+              ...(levelUpRewards ? { levelUpRewards } : {}),
               answeredMathQuestionIds,
             };
           }
@@ -318,9 +404,12 @@ export const useGardenStore = create<GardenState>()(
           };
 
           return {
-            coins: state.coins + 3,
-            fertilizers: state.fertilizers + 1,
-            ...growthProgress,
+            coins: state.coins + 3 + (levelUpRewards?.coins ?? 0),
+            fertilizers:
+              state.fertilizers + 1 + (levelUpRewards?.fertilizers ?? 0),
+            growthLevel: growthProgress.level,
+            growthXp: growthProgress.xp,
+            ...(levelUpRewards ? { levelUpRewards } : {}),
             answeredMathQuestionIds,
             plants,
             unlockedBadgeIds: getNextUnlockedBadgeIds({
@@ -384,6 +473,10 @@ export const useGardenStore = create<GardenState>()(
             state.growthXp,
             10,
           );
+          const levelUpRewards = getLevelUpRewards(
+            state.growthLevel,
+            growthProgress,
+          );
 
           const plants = {
             ...state.plants,
@@ -392,7 +485,12 @@ export const useGardenStore = create<GardenState>()(
 
           return {
             plants,
-            ...growthProgress,
+            coins: state.coins + (levelUpRewards?.coins ?? 0),
+            fertilizers:
+              state.fertilizers + (levelUpRewards?.fertilizers ?? 0),
+            growthLevel: growthProgress.level,
+            growthXp: growthProgress.xp,
+            ...(levelUpRewards ? { levelUpRewards } : {}),
             unlockedBadgeIds: getNextUnlockedBadgeIds({
               ...state,
               plants,

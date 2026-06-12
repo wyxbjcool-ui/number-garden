@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -79,6 +80,7 @@ export function TodayScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const catBreathAnim = useRef(new Animated.Value(0)).current;
   const giftPulseAnim = useRef(new Animated.Value(0)).current;
+  const levelRewardGiftAnim = useRef(new Animated.Value(0)).current;
   const featurePressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -93,6 +95,7 @@ export function TodayScreen() {
   const fertilizers = useGardenStore((state) => state.fertilizers);
   const growthLevel = useGardenStore((state) => state.growthLevel);
   const growthXp = useGardenStore((state) => state.growthXp);
+  const levelUpRewards = useGardenStore((state) => state.levelUpRewards);
   const avatarMode = useGardenStore((state) => state.avatarMode);
   const selectedPlantId = useGardenStore((state) => state.selectedPlantId);
   const plant = useGardenStore((state) => state.plants[state.selectedPlantId]);
@@ -115,6 +118,9 @@ export function TodayScreen() {
     (state) => state.refreshDailyTasksForToday,
   );
   const waterSelectedPlant = useGardenStore((state) => state.waterSelectedPlant);
+  const dismissLevelUpRewards = useGardenStore(
+    (state) => state.dismissLevelUpRewards,
+  );
   const xpPercent = plant ? plant.xp / 100 : 0;
   const currentMathQuestion = mathGames.find(
     (question) => !answeredMathQuestionIds.includes(question.id),
@@ -285,14 +291,54 @@ export function TodayScreen() {
     };
   }, [catBreathAnim, giftPulseAnim]);
 
+  useEffect(() => {
+    if (!levelUpRewards) {
+      levelRewardGiftAnim.setValue(0);
+      return;
+    }
+
+    const levelGiftLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(levelRewardGiftAnim, {
+          toValue: 1,
+          duration: 900,
+          useNativeDriver: false,
+        }),
+        Animated.timing(levelRewardGiftAnim, {
+          toValue: 0,
+          duration: 900,
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+
+    levelGiftLoop.start();
+
+    return () => {
+      levelGiftLoop.stop();
+    };
+  }, [levelRewardGiftAnim, levelUpRewards]);
+
+  const levelRewardGiftStyle = {
+    transform: [
+      {
+        scale: levelRewardGiftAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.14],
+        }),
+      },
+    ],
+  };
+
   return (
-    <ScrollView
-      ref={scrollViewRef}
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      contentInsetAdjustmentBehavior="automatic"
-      showsVerticalScrollIndicator={false}
-    >
+    <>
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+      >
       <View style={[styles.gameHeroScene, sceneStyle]}>
         <Image
           source={gameAssets.background}
@@ -653,7 +699,51 @@ export function TodayScreen() {
           })}
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+      <Modal
+        animationType="fade"
+        transparent
+        visible={Boolean(levelUpRewards)}
+        onRequestClose={dismissLevelUpRewards}
+      >
+        <View style={styles.levelRewardOverlay}>
+          <View style={styles.levelRewardModal}>
+            <Text style={styles.levelRewardTitle}>🎉 升级啦！</Text>
+            {levelUpRewards ? (
+              <>
+                <Animated.Image
+                  source={gameAssets.rewardGift}
+                  resizeMode="contain"
+                  style={[styles.levelRewardGift, levelRewardGiftStyle]}
+                />
+                <Text style={styles.levelRewardLevel}>
+                  等级：Lv.{levelUpRewards.fromLevel} → Lv.
+                  {levelUpRewards.toLevel}
+                </Text>
+                <View style={styles.levelRewardPrizeBox}>
+                  <Text style={styles.levelRewardPrizeTitle}>获得</Text>
+                  <Text style={styles.levelRewardPrizeText}>
+                    金币 +{levelUpRewards.coins}
+                  </Text>
+                  <Text style={styles.levelRewardPrizeText}>
+                    肥料 +{levelUpRewards.fertilizers}
+                  </Text>
+                </View>
+              </>
+            ) : null}
+            <Pressable
+              style={({ pressed }) => [
+                styles.levelRewardButton,
+                pressed && styles.levelRewardButtonPressed,
+              ]}
+              onPress={dismissLevelUpRewards}
+            >
+              <Text style={styles.levelRewardButtonText}>太棒啦</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -1371,5 +1461,80 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     textAlign: 'center',
+  },
+  levelRewardOverlay: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(49, 81, 95, 0.45)',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  levelRewardModal: {
+    alignItems: 'center',
+    backgroundColor: '#FFF8D7',
+    borderColor: '#FFFFFF',
+    borderRadius: 32,
+    borderWidth: 4,
+    gap: 14,
+    maxWidth: 420,
+    paddingHorizontal: 28,
+    paddingVertical: 24,
+    width: '100%',
+  },
+  levelRewardTitle: {
+    color: Colors.headerText,
+    fontSize: 32,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  levelRewardGift: {
+    height: 130,
+    width: 130,
+  },
+  levelRewardLevel: {
+    color: Colors.headerText,
+    fontSize: 22,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  levelRewardPrizeBox: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightGreen,
+    borderColor: '#FFFFFF',
+    borderRadius: 24,
+    borderWidth: 3,
+    gap: 4,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    width: '100%',
+  },
+  levelRewardPrizeTitle: {
+    color: Colors.bodyText,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  levelRewardPrizeText: {
+    color: Colors.headerText,
+    fontSize: 21,
+    fontWeight: '800',
+  },
+  levelRewardButton: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightBlue,
+    borderColor: '#FFFFFF',
+    borderRadius: 26,
+    borderWidth: 3,
+    justifyContent: 'center',
+    minHeight: 58,
+    minWidth: 180,
+    paddingHorizontal: 24,
+  },
+  levelRewardButtonPressed: {
+    transform: [{ scale: 0.94 }],
+  },
+  levelRewardButtonText: {
+    color: Colors.headerText,
+    fontSize: 21,
+    fontWeight: '800',
   },
 });
