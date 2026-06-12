@@ -27,6 +27,7 @@ const getLocalDateString = () => {
 
 type BadgeCheckState = {
   completedTodayTaskIds: string[];
+  ownedPlantIds: string[];
   plants: Record<string, Plant>;
   unlockedBadgeIds: string[];
 };
@@ -34,8 +35,12 @@ type BadgeCheckState = {
 const getNextUnlockedBadgeIds = (state: BadgeCheckState) => {
   const nextUnlockedBadgeIds = new Set(state.unlockedBadgeIds);
   const plantList = Object.values(state.plants);
+  const ownedPlantList = state.ownedPlantIds
+    .map((plantId) => state.plants[plantId])
+    .filter((plant): plant is Plant => Boolean(plant));
   const hasCompletedTask = state.completedTodayTaskIds.length > 0;
   const hasLevelTwoPlant = plantList.some((plant) => plant.level >= 2);
+  const hasMaturePlant = ownedPlantList.some((plant) => plant.level >= 5);
   const totalWaterCount = plantList.reduce(
     (sum, plant) => sum + plant.waterCount,
     0,
@@ -51,6 +56,10 @@ const getNextUnlockedBadgeIds = (state: BadgeCheckState) => {
     }
 
     if (badge.id === 'three-waters' && totalWaterCount >= 3) {
+      nextUnlockedBadgeIds.add(badge.id);
+    }
+
+    if (badge.id === 'first-mature-plant' && hasMaturePlant) {
       nextUnlockedBadgeIds.add(badge.id);
     }
   });
@@ -74,6 +83,17 @@ type GrowPlantOptions = {
   countAsWater?: boolean;
 };
 
+type MaturePlantReward = {
+  plantId: string;
+  coins: number;
+  fertilizers: number;
+};
+
+type FeedPlantResult = {
+  success: boolean;
+  matureReward?: MaturePlantReward;
+};
+
 const growPlantByXp = (
   plant: Plant,
   xpAmount: number,
@@ -87,6 +107,29 @@ const growPlantByXp = (
     level: plant.level + levelGain,
     xp: totalXp % 100,
     waterCount: plant.waterCount + (options?.countAsWater ? 1 : 0),
+  };
+};
+
+const matureRewardCoins = 20;
+const matureRewardFertilizers = 5;
+
+const getMaturePlantReward = (
+  previousPlant: Plant,
+  nextPlant: Plant,
+  matureRewardClaimedPlantIds: string[],
+): MaturePlantReward | null => {
+  const wasMature = previousPlant.level >= 5;
+  const isMature = nextPlant.level >= 5;
+  const hasClaimed = matureRewardClaimedPlantIds.includes(previousPlant.id);
+
+  if (wasMature || !isMature || hasClaimed) {
+    return null;
+  }
+
+  return {
+    plantId: previousPlant.id,
+    coins: matureRewardCoins,
+    fertilizers: matureRewardFertilizers,
   };
 };
 
@@ -149,6 +192,7 @@ type GardenState = {
   selectedPlantId: string;
   plants: Record<string, Plant>;
   ownedPlantIds: string[];
+  matureRewardClaimedPlantIds: string[];
   completedTodayTaskIds: string[];
   unlockedBadgeIds: string[];
   collectedItemIds: string[];
@@ -161,7 +205,7 @@ type GardenState = {
   recordPoopToday: () => boolean;
   setAvatarMode: (mode: AvatarMode) => void;
   answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
-  feedPlantWithFertilizer: (plantId: string) => boolean;
+  feedPlantWithFertilizer: (plantId: string) => FeedPlantResult;
   selectPlant: (plantId: string) => void;
   unlockPlant: (plantId: string) => void;
   refreshDailyTasksForToday: () => void;
@@ -182,6 +226,7 @@ const initialState = {
   selectedPlantId: 'succulent',
   plants: initialPlants,
   ownedPlantIds: ['succulent'],
+  matureRewardClaimedPlantIds: [],
   completedTodayTaskIds: [],
   unlockedBadgeIds: [],
   collectedItemIds: [],
@@ -239,6 +284,11 @@ export const useGardenStore = create<GardenState>()(
           }
 
           const nextPlant = growPlantByXp(plant, 10, { countAsWater: true });
+          const matureReward = getMaturePlantReward(
+            plant,
+            nextPlant,
+            state.matureRewardClaimedPlantIds,
+          );
 
           const completedTodayTaskIds = [
             ...state.completedTodayTaskIds,
@@ -254,14 +304,21 @@ export const useGardenStore = create<GardenState>()(
 
           return {
             coins:
-              state.coins + task.rewardCoins + (levelUpRewards?.coins ?? 0),
+              state.coins +
+              task.rewardCoins +
+              (levelUpRewards?.coins ?? 0) +
+              (matureReward?.coins ?? 0),
             fertilizers:
               state.fertilizers +
               task.rewardFertilizers +
-              (levelUpRewards?.fertilizers ?? 0),
+              (levelUpRewards?.fertilizers ?? 0) +
+              (matureReward?.fertilizers ?? 0),
             growthLevel: growthProgress.level,
             growthXp: growthProgress.xp,
             ...(levelUpRewards ? { levelUpRewards } : {}),
+            matureRewardClaimedPlantIds: matureReward
+              ? [...state.matureRewardClaimedPlantIds, matureReward.plantId]
+              : state.matureRewardClaimedPlantIds,
             completedTodayTaskIds,
             collectedItemIds,
             plants,
@@ -399,18 +456,33 @@ export const useGardenStore = create<GardenState>()(
           }
 
           const nextPlant = growPlantByXp(plant, 10, { countAsWater: false });
+          const matureReward = getMaturePlantReward(
+            plant,
+            nextPlant,
+            state.matureRewardClaimedPlantIds,
+          );
           const plants = {
             ...state.plants,
             [plant.id]: nextPlant,
           };
 
           return {
-            coins: state.coins + 3 + (levelUpRewards?.coins ?? 0),
+            coins:
+              state.coins +
+              3 +
+              (levelUpRewards?.coins ?? 0) +
+              (matureReward?.coins ?? 0),
             fertilizers:
-              state.fertilizers + 1 + (levelUpRewards?.fertilizers ?? 0),
+              state.fertilizers +
+              1 +
+              (levelUpRewards?.fertilizers ?? 0) +
+              (matureReward?.fertilizers ?? 0),
             growthLevel: growthProgress.level,
             growthXp: growthProgress.xp,
             ...(levelUpRewards ? { levelUpRewards } : {}),
+            matureRewardClaimedPlantIds: matureReward
+              ? [...state.matureRewardClaimedPlantIds, matureReward.plantId]
+              : state.matureRewardClaimedPlantIds,
             answeredMathQuestionIds,
             plants,
             unlockedBadgeIds: getNextUnlockedBadgeIds({
@@ -423,16 +495,21 @@ export const useGardenStore = create<GardenState>()(
         const state = get();
 
         if (state.fertilizers < 1 || !state.ownedPlantIds.includes(plantId)) {
-          return false;
+          return { success: false };
         }
 
         const plant = state.plants[plantId];
 
         if (!plant) {
-          return false;
+          return { success: false };
         }
 
         const nextPlant = growPlantByXp(plant, 10, { countAsWater: false });
+        const matureReward = getMaturePlantReward(
+          plant,
+          nextPlant,
+          state.matureRewardClaimedPlantIds,
+        );
         const growthProgress = growGlobalByXp(
           state.growthLevel,
           state.growthXp,
@@ -449,11 +526,20 @@ export const useGardenStore = create<GardenState>()(
 
         set({
           fertilizers:
-            state.fertilizers - 1 + (levelUpRewards?.fertilizers ?? 0),
-          coins: state.coins + (levelUpRewards?.coins ?? 0),
+            state.fertilizers -
+            1 +
+            (levelUpRewards?.fertilizers ?? 0) +
+            (matureReward?.fertilizers ?? 0),
+          coins:
+            state.coins +
+            (levelUpRewards?.coins ?? 0) +
+            (matureReward?.coins ?? 0),
           growthLevel: growthProgress.level,
           growthXp: growthProgress.xp,
           ...(levelUpRewards ? { levelUpRewards } : {}),
+          matureRewardClaimedPlantIds: matureReward
+            ? [...state.matureRewardClaimedPlantIds, matureReward.plantId]
+            : state.matureRewardClaimedPlantIds,
           plants,
           unlockedBadgeIds: getNextUnlockedBadgeIds({
             ...state,
@@ -461,7 +547,10 @@ export const useGardenStore = create<GardenState>()(
           }),
         });
 
-        return true;
+        return {
+          success: true,
+          ...(matureReward ? { matureReward } : {}),
+        };
       },
       selectPlant: (plantId) =>
         set((state) => {
@@ -513,6 +602,11 @@ export const useGardenStore = create<GardenState>()(
           }
 
           const nextPlant = growPlantByXp(plant, 10, { countAsWater: true });
+          const matureReward = getMaturePlantReward(
+            plant,
+            nextPlant,
+            state.matureRewardClaimedPlantIds,
+          );
           const growthProgress = growGlobalByXp(
             state.growthLevel,
             state.growthXp,
@@ -530,12 +624,20 @@ export const useGardenStore = create<GardenState>()(
 
           return {
             plants,
-            coins: state.coins + (levelUpRewards?.coins ?? 0),
+            coins:
+              state.coins +
+              (levelUpRewards?.coins ?? 0) +
+              (matureReward?.coins ?? 0),
             fertilizers:
-              state.fertilizers + (levelUpRewards?.fertilizers ?? 0),
+              state.fertilizers +
+              (levelUpRewards?.fertilizers ?? 0) +
+              (matureReward?.fertilizers ?? 0),
             growthLevel: growthProgress.level,
             growthXp: growthProgress.xp,
             ...(levelUpRewards ? { levelUpRewards } : {}),
+            matureRewardClaimedPlantIds: matureReward
+              ? [...state.matureRewardClaimedPlantIds, matureReward.plantId]
+              : state.matureRewardClaimedPlantIds,
             unlockedBadgeIds: getNextUnlockedBadgeIds({
               ...state,
               plants,

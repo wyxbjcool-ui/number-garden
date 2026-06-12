@@ -19,4 +19,10 @@ export const badges: Badge[] = [
     description: '累计浇水 3 次',
     iconName: 'water',
   },
+  {
+    id: 'first-mature-plant',
+    title: '第一株成熟植物',
+    description: '让任意植物成长到成熟阶段',
+    iconName: 'flower',
+  },
 ];

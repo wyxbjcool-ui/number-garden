@@ -22,7 +22,7 @@ export const plants: Record<string, Plant> = {
   caladium: {
     id: 'caladium',
     name: '彩叶芋',
-    matureIcon: '🌺',
+    matureIcon: '🍃',
     level: 1,
     xp: 0,
     waterCount: 0,
@@ -31,7 +31,7 @@ export const plants: Record<string, Plant> = {
   orchid: {
     id: 'orchid',
     name: '蝴蝶兰',
-    matureIcon: '🌺',
+    matureIcon: '🌸',
     level: 1,
     xp: 0,
     waterCount: 0,

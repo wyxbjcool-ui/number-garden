@@ -23,6 +23,7 @@ import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
 import type { DailyTask } from '../types/dailyTask';
 import type { RootStackParamList } from '../types/navigation';
+import type { Plant } from '../types/plant';
 
 const dailyTasks: DailyTask[] = [
   {
@@ -72,6 +73,44 @@ const gameAssets = {
   progressTrack: require('../../assets/progress_track.png'),
   progressFill: require('../../assets/progress_fill.png'),
   rewardGift: require('../../assets/reward_gift.png'),
+};
+
+type PlantStage = 'seed' | 'sprout' | 'mature';
+
+const getPlantStage = (level: number): PlantStage => {
+  if (level >= 5) {
+    return 'mature';
+  }
+
+  if (level >= 3) {
+    return 'sprout';
+  }
+
+  return 'seed';
+};
+
+const getPlantStageLabel = (stage: PlantStage) => {
+  if (stage === 'mature') {
+    return '成熟';
+  }
+
+  if (stage === 'sprout') {
+    return '幼苗';
+  }
+
+  return '种子';
+};
+
+const getPlantIcon = (currentPlant: Plant, stage: PlantStage) => {
+  if (stage === 'mature') {
+    return currentPlant.matureIcon;
+  }
+
+  if (stage === 'sprout') {
+    return '🌱';
+  }
+
+  return '🌰';
 };
 
 export function TodayScreen() {
@@ -126,6 +165,9 @@ export function TodayScreen() {
     (question) => !answeredMathQuestionIds.includes(question.id),
   );
   const avatarModeConfig = avatarModes[avatarMode];
+  const currentPlantStage = plant ? getPlantStage(plant.level) : 'seed';
+  const currentPlantStageLabel = getPlantStageLabel(currentPlantStage);
+  const currentPlantIcon = plant ? getPlantIcon(plant, currentPlantStage) : '🌰';
   const avatarActionText =
     avatarMode === 'garden'
       ? `${avatarModeConfig.actionLabel}，让它长大`
@@ -406,6 +448,16 @@ export function TodayScreen() {
                 style={[styles.avatarArtwork, catAnimatedStyle]}
                 resizeMode="contain"
               />
+              {plant ? (
+                <View style={styles.currentPlantBadge}>
+                  <Text style={styles.currentPlantTitle}>
+                    当前植物：{plant.name} {currentPlantIcon}
+                  </Text>
+                  <Text style={styles.currentPlantMeta}>
+                    Lv.{plant.level} · {currentPlantStageLabel}
+                  </Text>
+                </View>
+              ) : null}
             </View>
           </View>
 
@@ -928,6 +980,30 @@ const styles = StyleSheet.create({
   avatarArtwork: {
     height: 470,
     width: 392,
+  },
+  currentPlantBadge: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 248, 231, 0.9)',
+    borderColor: '#FFF0BA',
+    borderRadius: 22,
+    borderWidth: 3,
+    bottom: 4,
+    minWidth: 190,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    position: 'absolute',
+  },
+  currentPlantTitle: {
+    color: '#5B341B',
+    fontSize: 17,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  currentPlantMeta: {
+    color: Colors.bodyText,
+    fontSize: 14,
+    fontWeight: '800',
+    textAlign: 'center',
   },
   avatarTitle: {
     color: Colors.headerText,

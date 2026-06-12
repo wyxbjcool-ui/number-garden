@@ -95,9 +95,18 @@ export function PlantScreen() {
   );
 
   const handleFeedPlant = () => {
-    const didFeed = feedPlantWithFertilizer(selectedPlant.id);
+    const feedResult = feedPlantWithFertilizer(selectedPlant.id);
 
-    setMessage(didFeed ? '植物长大了一点点' : '肥料不够啦');
+    if (!feedResult.success) {
+      setMessage('肥料不够啦');
+      return;
+    }
+
+    setMessage(
+      feedResult.matureReward
+        ? '植物成熟啦！\n获得：金币 +20 · 肥料 +5'
+        : '植物长大了一点点',
+    );
   };
 
   const handlePlantPress = (plantId: string) => {
