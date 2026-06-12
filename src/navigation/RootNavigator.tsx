@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { CollectionScreen } from '../screens/CollectionScreen';
 import { GachaScreen } from '../screens/GachaScreen';
+import { PlantScreen } from '../screens/PlantScreen';
 import { PoopScreen } from '../screens/PoopScreen';
 import { TodayScreen } from '../screens/TodayScreen';
 import { Colors } from '../theme';
@@ -42,6 +43,11 @@ export function RootNavigator() {
         name="Collection"
         component={CollectionScreen}
         options={{ title: '收集册' }}
+      />
+      <Stack.Screen
+        name="Plant"
+        component={PlantScreen}
+        options={{ title: '植物图鉴' }}
       />
     </Stack.Navigator>
   );

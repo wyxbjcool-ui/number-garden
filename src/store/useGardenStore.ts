@@ -161,6 +161,7 @@ type GardenState = {
   recordPoopToday: () => boolean;
   setAvatarMode: (mode: AvatarMode) => void;
   answerMathQuestion: (question: MathGame, selectedOptionId: string) => void;
+  feedPlantWithFertilizer: (plantId: string) => boolean;
   selectPlant: (plantId: string) => void;
   unlockPlant: (plantId: string) => void;
   refreshDailyTasksForToday: () => void;
@@ -418,6 +419,50 @@ export const useGardenStore = create<GardenState>()(
             }),
           };
         }),
+      feedPlantWithFertilizer: (plantId) => {
+        const state = get();
+
+        if (state.fertilizers < 1 || !state.ownedPlantIds.includes(plantId)) {
+          return false;
+        }
+
+        const plant = state.plants[plantId];
+
+        if (!plant) {
+          return false;
+        }
+
+        const nextPlant = growPlantByXp(plant, 10, { countAsWater: false });
+        const growthProgress = growGlobalByXp(
+          state.growthLevel,
+          state.growthXp,
+          10,
+        );
+        const levelUpRewards = getLevelUpRewards(
+          state.growthLevel,
+          growthProgress,
+        );
+        const plants = {
+          ...state.plants,
+          [plant.id]: nextPlant,
+        };
+
+        set({
+          fertilizers:
+            state.fertilizers - 1 + (levelUpRewards?.fertilizers ?? 0),
+          coins: state.coins + (levelUpRewards?.coins ?? 0),
+          growthLevel: growthProgress.level,
+          growthXp: growthProgress.xp,
+          ...(levelUpRewards ? { levelUpRewards } : {}),
+          plants,
+          unlockedBadgeIds: getNextUnlockedBadgeIds({
+            ...state,
+            plants,
+          }),
+        });
+
+        return true;
+      },
       selectPlant: (plantId) =>
         set((state) => {
           if (!state.ownedPlantIds.includes(plantId)) {
@@ -527,6 +572,9 @@ export const useGardenStore = create<GardenState>()(
                 {
                   ...currentState.plants[plantId],
                   ...plant,
+                  matureIcon:
+                    currentState.plants[plantId]?.matureIcon ??
+                    plant.matureIcon,
                   unlockCost:
                     currentState.plants[plantId]?.unlockCost ??
                     plant.unlockCost,

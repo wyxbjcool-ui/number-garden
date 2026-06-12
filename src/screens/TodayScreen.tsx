@@ -433,7 +433,13 @@ export function TodayScreen() {
           </View>
         </View>
 
-        <View style={styles.homeGrowthBar}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.homeGrowthBar,
+            pressed && styles.homeGrowthBarPressed,
+          ]}
+          onPress={() => navigation.navigate('Plant')}
+        >
           <Image
             source={gameAssets.growthPanelBackground}
             resizeMode="stretch"
@@ -483,7 +489,7 @@ export function TodayScreen() {
               />
             </View>
           </View>
-        </View>
+        </Pressable>
 
       </View>
       <View style={styles.section} onLayout={handleSectionLayout('plants')}>
@@ -987,6 +993,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
     zIndex: 2,
+  },
+  homeGrowthBarPressed: {
+    transform: [{ scale: 0.99 }],
   },
   growthPanelBackground: {
     height: 340,

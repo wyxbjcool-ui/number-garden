@@ -3,4 +3,5 @@ export type RootStackParamList = {
   Poop: undefined;
   Gacha: undefined;
   Collection: undefined;
+  Plant: undefined;
 };
