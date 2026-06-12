@@ -160,14 +160,15 @@ export function TodayScreen() {
   const dismissLevelUpRewards = useGardenStore(
     (state) => state.dismissLevelUpRewards,
   );
-  const xpPercent = plant ? plant.xp / 100 : 0;
+  const currentPlant = plant ?? plantCatalog.succulent;
+  const xpPercent = currentPlant.xp / 100;
   const currentMathQuestion = mathGames.find(
     (question) => !answeredMathQuestionIds.includes(question.id),
   );
   const avatarModeConfig = avatarModes[avatarMode];
-  const currentPlantStage = plant ? getPlantStage(plant.level) : 'seed';
+  const currentPlantStage = getPlantStage(currentPlant.level);
   const currentPlantStageLabel = getPlantStageLabel(currentPlantStage);
-  const currentPlantIcon = plant ? getPlantIcon(plant, currentPlantStage) : '🌰';
+  const currentPlantIcon = getPlantIcon(currentPlant, currentPlantStage);
   const avatarActionText =
     avatarMode === 'garden'
       ? `${avatarModeConfig.actionLabel}，让它长大`
@@ -448,16 +449,25 @@ export function TodayScreen() {
                 style={[styles.avatarArtwork, catAnimatedStyle]}
                 resizeMode="contain"
               />
-              {plant ? (
-                <View style={styles.currentPlantBadge}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.currentPlantBadge,
+                  pressed && styles.currentPlantBadgePressed,
+                ]}
+                onPress={() => navigation.navigate('Plant')}
+              >
+                <View style={styles.currentPlantPot}>
+                  <Text style={styles.currentPlantIcon}>{currentPlantIcon}</Text>
+                </View>
+                <View style={styles.currentPlantCopy}>
                   <Text style={styles.currentPlantTitle}>
-                    当前植物：{plant.name} {currentPlantIcon}
+                    {currentPlant.name}
                   </Text>
                   <Text style={styles.currentPlantMeta}>
-                    Lv.{plant.level} · {currentPlantStageLabel}
+                    Lv.{currentPlant.level} · {currentPlantStageLabel}
                   </Text>
                 </View>
-              ) : null}
+              </Pressable>
             </View>
           </View>
 
@@ -983,27 +993,52 @@ const styles = StyleSheet.create({
   },
   currentPlantBadge: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 248, 231, 0.9)',
+    backgroundColor: 'rgba(255, 248, 231, 0.94)',
     borderColor: '#FFF0BA',
-    borderRadius: 22,
+    borderRadius: 24,
     borderWidth: 3,
-    bottom: 4,
-    minWidth: 190,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    bottom: 0,
+    flexDirection: 'row',
+    gap: 8,
+    minWidth: 174,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
     position: 'absolute',
+    shadowColor: '#7B512D',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.16,
+    shadowRadius: 8,
+  },
+  currentPlantBadgePressed: {
+    transform: [{ scale: 0.96 }],
+  },
+  currentPlantPot: {
+    alignItems: 'center',
+    backgroundColor: '#DFF5DE',
+    borderColor: '#FFFFFF',
+    borderRadius: 18,
+    borderWidth: 2,
+    height: 42,
+    justifyContent: 'center',
+    width: 42,
+  },
+  currentPlantIcon: {
+    fontSize: 25,
+    lineHeight: 30,
+  },
+  currentPlantCopy: {
+    gap: 1,
+    justifyContent: 'center',
   },
   currentPlantTitle: {
     color: '#5B341B',
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '800',
-    textAlign: 'center',
   },
   currentPlantMeta: {
     color: Colors.bodyText,
     fontSize: 14,
     fontWeight: '800',
-    textAlign: 'center',
   },
   avatarTitle: {
     color: Colors.headerText,
