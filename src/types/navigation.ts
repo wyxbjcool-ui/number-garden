@@ -4,4 +4,5 @@ export type RootStackParamList = {
   Gacha: undefined;
   Collection: undefined;
   Plant: undefined;
+  Badge: undefined;
 };

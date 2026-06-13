@@ -144,6 +144,9 @@ export function TodayScreen() {
     (state) => state.completedTodayTaskIds,
   );
   const unlockedBadgeIds = useGardenStore((state) => state.unlockedBadgeIds);
+  const latestUnlockedBadgeId = useGardenStore(
+    (state) => state.latestUnlockedBadgeId,
+  );
   const collectedItemIds = useGardenStore((state) => state.collectedItemIds);
   const answeredMathQuestionIds = useGardenStore(
     (state) => state.answeredMathQuestionIds,
@@ -157,6 +160,9 @@ export function TodayScreen() {
     (state) => state.refreshDailyTasksForToday,
   );
   const waterSelectedPlant = useGardenStore((state) => state.waterSelectedPlant);
+  const dismissBadgeNotice = useGardenStore(
+    (state) => state.dismissBadgeNotice,
+  );
   const dismissLevelUpRewards = useGardenStore(
     (state) => state.dismissLevelUpRewards,
   );
@@ -169,6 +175,19 @@ export function TodayScreen() {
   const currentPlantStage = getPlantStage(currentPlant.level);
   const currentPlantStageLabel = getPlantStageLabel(currentPlantStage);
   const currentPlantIcon = getPlantIcon(currentPlant, currentPlantStage);
+  const unlockedBadgeCount = badges.filter((badge) =>
+    unlockedBadgeIds.includes(badge.id),
+  ).length;
+  const badgeCompletionPercent = Math.round(
+    (unlockedBadgeCount / badges.length) * 100,
+  );
+  const latestUnlockedBadge = badges.find(
+    (badge) => badge.id === latestUnlockedBadgeId,
+  );
+  const recentUnlockedBadges = badges
+    .filter((badge) => unlockedBadgeIds.includes(badge.id))
+    .slice(-3)
+    .reverse();
   const avatarActionText =
     avatarMode === 'garden'
       ? `${avatarModeConfig.actionLabel}，让它长大`
@@ -276,7 +295,7 @@ export function TodayScreen() {
       id: 'badges',
       title: '徽章',
       imageSource: gameAssets.badgeButton,
-      onPress: () => scrollToSection('badges'),
+      onPress: () => navigation.navigate('Badge'),
     },
   ];
 
@@ -361,6 +380,20 @@ export function TodayScreen() {
       levelGiftLoop.stop();
     };
   }, [levelRewardGiftAnim, levelUpRewards]);
+
+  useEffect(() => {
+    if (!latestUnlockedBadge) {
+      return;
+    }
+
+    const badgeNoticeTimer = setTimeout(() => {
+      dismissBadgeNotice();
+    }, 2000);
+
+    return () => {
+      clearTimeout(badgeNoticeTimer);
+    };
+  }, [dismissBadgeNotice, latestUnlockedBadge]);
 
   const levelRewardGiftStyle = {
     transform: [
@@ -700,36 +733,47 @@ export function TodayScreen() {
           </View>
         )}
       </View>
-      <View style={styles.section} onLayout={handleSectionLayout('badges')}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.section,
+          styles.badgeSummarySection,
+          pressed && styles.badgeSummaryPressed,
+        ]}
+        onLayout={handleSectionLayout('badges')}
+        onPress={() => navigation.navigate('Badge')}
+      >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>徽章</Text>
           <Text style={styles.sectionCount}>
-            {unlockedBadgeIds.length}/{badges.length}
+            已获得 {unlockedBadgeCount}/{badges.length}
           </Text>
         </View>
-        <View style={styles.badgeList}>
-          {badges.map((badge) => {
-            const isUnlocked = unlockedBadgeIds.includes(badge.id);
-
-            return (
-              <View
-                key={badge.id}
-                style={[styles.badgeCard, !isUnlocked && styles.badgeLocked]}
-              >
-                <View style={styles.badgeIcon}>
+        <Text style={styles.badgeProgressText}>
+          完成度 {badgeCompletionPercent}%
+        </Text>
+        <View style={styles.recentBadgePanel}>
+          <Text style={styles.recentBadgeLabel}>最近获得徽章</Text>
+          {recentUnlockedBadges.length > 0 ? (
+            <View style={styles.recentBadgeList}>
+              {recentUnlockedBadges.map((badge) => (
+                <View key={badge.id} style={styles.recentBadgeChip}>
                   <Ionicons
                     name={badge.iconName}
-                    size={24}
-                    color={isUnlocked ? Colors.headerText : Colors.bodyText}
+                    size={20}
+                    color={Colors.headerText}
                   />
+                  <Text style={styles.recentBadgeName}>{badge.title}</Text>
                 </View>
-                <Text style={styles.badgeTitle}>{badge.title}</Text>
-                <Text style={styles.badgeDescription}>{badge.description}</Text>
-              </View>
-            );
-          })}
+              ))}
+            </View>
+          ) : (
+            <View style={styles.recentBadgeEmpty}>
+              <Ionicons name="lock-closed" size={20} color={Colors.bodyText} />
+              <Text style={styles.recentBadgeEmptyText}>还没有徽章</Text>
+            </View>
+          )}
         </View>
-      </View>
+      </Pressable>
       <View style={styles.section} onLayout={handleSectionLayout('collection')}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>收集册</Text>
@@ -768,6 +812,17 @@ export function TodayScreen() {
         </View>
       </View>
       </ScrollView>
+      {latestUnlockedBadge ? (
+        <View style={styles.badgeNotice}>
+          <Text style={styles.badgeNoticeIcon}>🏅</Text>
+          <View style={styles.badgeNoticeCopy}>
+            <Text style={styles.badgeNoticeTitle}>获得新徽章</Text>
+            <Text style={styles.badgeNoticeName}>
+              {latestUnlockedBadge.title}
+            </Text>
+          </View>
+        </View>
+      ) : null}
       <Modal
         animationType="fade"
         transparent
@@ -1508,6 +1563,92 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
+  badgeNotice: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 248, 231, 0.96)',
+    borderColor: '#FFF0BA',
+    borderRadius: 26,
+    borderWidth: 3,
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    position: 'absolute',
+    top: 54,
+    zIndex: 20,
+  },
+  badgeNoticeIcon: {
+    fontSize: 28,
+  },
+  badgeNoticeCopy: {
+    gap: 2,
+  },
+  badgeNoticeTitle: {
+    color: Colors.headerText,
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  badgeNoticeName: {
+    color: '#5B341B',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  badgeProgressText: {
+    color: Colors.bodyText,
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  badgeSummarySection: {
+    borderColor: 'rgba(255, 255, 255, 0.9)',
+    borderWidth: 3,
+  },
+  badgeSummaryPressed: {
+    transform: [{ scale: 0.99 }],
+  },
+  recentBadgePanel: {
+    gap: 10,
+  },
+  recentBadgeLabel: {
+    color: Colors.headerText,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  recentBadgeList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  recentBadgeChip: {
+    alignItems: 'center',
+    backgroundColor: Colors.lightBlue,
+    borderColor: '#FFFFFF',
+    borderRadius: 22,
+    borderWidth: 2,
+    flexDirection: 'row',
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 12,
+  },
+  recentBadgeName: {
+    color: Colors.headerText,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  recentBadgeEmpty: {
+    alignItems: 'center',
+    backgroundColor: '#E4E9E8',
+    borderRadius: 22,
+    flexDirection: 'row',
+    gap: 8,
+    minHeight: 44,
+    paddingHorizontal: 14,
+  },
+  recentBadgeEmptyText: {
+    color: Colors.bodyText,
+    fontSize: 15,
+    fontWeight: '800',
+  },
   badgeList: {
     flexWrap: 'wrap',
     flexDirection: 'row',
@@ -1523,7 +1664,8 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   badgeLocked: {
-    opacity: 0.45,
+    backgroundColor: '#E4E9E8',
+    opacity: 0.72,
   },
   badgeIcon: {
     alignItems: 'center',

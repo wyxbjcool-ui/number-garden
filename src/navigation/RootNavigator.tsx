@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { BadgeScreen } from '../screens/BadgeScreen';
 import { CollectionScreen } from '../screens/CollectionScreen';
 import { GachaScreen } from '../screens/GachaScreen';
 import { PlantScreen } from '../screens/PlantScreen';
@@ -48,6 +49,11 @@ export function RootNavigator() {
         name="Plant"
         component={PlantScreen}
         options={{ title: '植物图鉴' }}
+      />
+      <Stack.Screen
+        name="Badge"
+        component={BadgeScreen}
+        options={{ title: '徽章' }}
       />
     </Stack.Navigator>
   );

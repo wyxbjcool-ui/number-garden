@@ -26,45 +26,67 @@ const getLocalDateString = () => {
 };
 
 type BadgeCheckState = {
-  completedTodayTaskIds: string[];
+  poopRecordDate: string;
+  growthLevel: number;
   ownedPlantIds: string[];
   plants: Record<string, Plant>;
   unlockedBadgeIds: string[];
+  gachaRewardIds: string[];
 };
 
-const getNextUnlockedBadgeIds = (state: BadgeCheckState) => {
-  const nextUnlockedBadgeIds = new Set(state.unlockedBadgeIds);
-  const plantList = Object.values(state.plants);
+const getBadgeUpdate = (state: BadgeCheckState) => {
+  const validBadgeIds = new Set(badges.map((badge) => badge.id));
+  const currentUnlockedBadgeIds = state.unlockedBadgeIds.filter((badgeId) =>
+    validBadgeIds.has(badgeId),
+  );
+  const nextUnlockedBadgeIds = new Set(currentUnlockedBadgeIds);
   const ownedPlantList = state.ownedPlantIds
     .map((plantId) => state.plants[plantId])
     .filter((plant): plant is Plant => Boolean(plant));
-  const hasCompletedTask = state.completedTodayTaskIds.length > 0;
-  const hasLevelTwoPlant = plantList.some((plant) => plant.level >= 2);
   const hasMaturePlant = ownedPlantList.some((plant) => plant.level >= 5);
-  const totalWaterCount = plantList.reduce(
-    (sum, plant) => sum + plant.waterCount,
-    0,
-  );
 
   badges.forEach((badge) => {
-    if (badge.id === 'first-task' && hasCompletedTask) {
+    if (badge.id === 'badge_first_poop' && state.poopRecordDate) {
       nextUnlockedBadgeIds.add(badge.id);
     }
 
-    if (badge.id === 'level-2-plant' && hasLevelTwoPlant) {
+    if (badge.id === 'badge_first_gacha' && state.gachaRewardIds.length >= 1) {
       nextUnlockedBadgeIds.add(badge.id);
     }
 
-    if (badge.id === 'three-waters' && totalWaterCount >= 3) {
+    if (
+      badge.id === 'badge_first_collection' &&
+      state.gachaRewardIds.length >= 1
+    ) {
       nextUnlockedBadgeIds.add(badge.id);
     }
 
-    if (badge.id === 'first-mature-plant' && hasMaturePlant) {
+    if (badge.id === 'badge_level_2' && state.growthLevel >= 2) {
+      nextUnlockedBadgeIds.add(badge.id);
+    }
+
+    if (badge.id === 'badge_two_plants' && state.ownedPlantIds.length >= 2) {
+      nextUnlockedBadgeIds.add(badge.id);
+    }
+
+    if (badge.id === 'badge_first_mature_plant' && hasMaturePlant) {
+      nextUnlockedBadgeIds.add(badge.id);
+    }
+
+    if (badge.id === 'badge_collection_5' && state.gachaRewardIds.length >= 5) {
       nextUnlockedBadgeIds.add(badge.id);
     }
   });
 
-  return Array.from(nextUnlockedBadgeIds);
+  const unlockedBadgeIds = Array.from(nextUnlockedBadgeIds);
+  const latestUnlockedBadgeId = unlockedBadgeIds.find(
+    (badgeId) => !currentUnlockedBadgeIds.includes(badgeId),
+  );
+
+  return {
+    unlockedBadgeIds,
+    ...(latestUnlockedBadgeId ? { latestUnlockedBadgeId } : {}),
+  };
 };
 
 const getNextCollectedItemIds = (collectedItemIds: string[]) => {
@@ -195,11 +217,13 @@ type GardenState = {
   matureRewardClaimedPlantIds: string[];
   completedTodayTaskIds: string[];
   unlockedBadgeIds: string[];
+  latestUnlockedBadgeId: string | null;
   collectedItemIds: string[];
   gachaRewardIds: string[];
   answeredMathQuestionIds: string[];
   completeDailyTask: (task: DailyTask) => void;
   addGrowthXp: (amount: number) => void;
+  dismissBadgeNotice: () => void;
   dismissLevelUpRewards: () => void;
   drawGacha: () => GachaDrawResult;
   recordPoopToday: () => boolean;
@@ -229,6 +253,7 @@ const initialState = {
   matureRewardClaimedPlantIds: [],
   completedTodayTaskIds: [],
   unlockedBadgeIds: [],
+  latestUnlockedBadgeId: null,
   collectedItemIds: [],
   gachaRewardIds: [],
   answeredMathQuestionIds: [],
@@ -276,9 +301,9 @@ export const useGardenStore = create<GardenState>()(
               ...(levelUpRewards ? { levelUpRewards } : {}),
               completedTodayTaskIds,
               collectedItemIds,
-              unlockedBadgeIds: getNextUnlockedBadgeIds({
+              ...getBadgeUpdate({
                 ...state,
-                completedTodayTaskIds,
+                growthLevel: growthProgress.level,
               }),
             };
           }
@@ -322,9 +347,9 @@ export const useGardenStore = create<GardenState>()(
             completedTodayTaskIds,
             collectedItemIds,
             plants,
-            unlockedBadgeIds: getNextUnlockedBadgeIds({
+            ...getBadgeUpdate({
               ...state,
-              completedTodayTaskIds,
+              growthLevel: growthProgress.level,
               plants,
             }),
           };
@@ -348,7 +373,15 @@ export const useGardenStore = create<GardenState>()(
             growthLevel: growthProgress.level,
             growthXp: growthProgress.xp,
             ...(levelUpRewards ? { levelUpRewards } : {}),
+            ...getBadgeUpdate({
+              ...state,
+              growthLevel: growthProgress.level,
+            }),
           };
+        }),
+      dismissBadgeNotice: () =>
+        set({
+          latestUnlockedBadgeId: null,
         }),
       dismissLevelUpRewards: () =>
         set({
@@ -367,12 +400,17 @@ export const useGardenStore = create<GardenState>()(
         const reward = getRandomGachaReward();
         const isNew = !state.gachaRewardIds.includes(reward.id);
         const duplicateCoins = isNew ? 0 : gachaDuplicateCoins[reward.rarity];
+        const gachaRewardIds = isNew
+          ? [...state.gachaRewardIds, reward.id]
+          : state.gachaRewardIds;
 
         set({
           coins: state.coins - gachaCost + duplicateCoins,
-          gachaRewardIds: isNew
-            ? [...state.gachaRewardIds, reward.id]
-            : state.gachaRewardIds,
+          gachaRewardIds,
+          ...getBadgeUpdate({
+            ...state,
+            gachaRewardIds,
+          }),
         });
 
         return {
@@ -408,6 +446,11 @@ export const useGardenStore = create<GardenState>()(
           growthXp: growthProgress.xp,
           ...(levelUpRewards ? { levelUpRewards } : {}),
           poopRecordDate: today,
+          ...getBadgeUpdate({
+            ...state,
+            growthLevel: growthProgress.level,
+            poopRecordDate: today,
+          }),
         });
 
         return true;
@@ -452,6 +495,10 @@ export const useGardenStore = create<GardenState>()(
               growthXp: growthProgress.xp,
               ...(levelUpRewards ? { levelUpRewards } : {}),
               answeredMathQuestionIds,
+              ...getBadgeUpdate({
+                ...state,
+                growthLevel: growthProgress.level,
+              }),
             };
           }
 
@@ -485,8 +532,9 @@ export const useGardenStore = create<GardenState>()(
               : state.matureRewardClaimedPlantIds,
             answeredMathQuestionIds,
             plants,
-            unlockedBadgeIds: getNextUnlockedBadgeIds({
+            ...getBadgeUpdate({
               ...state,
+              growthLevel: growthProgress.level,
               plants,
             }),
           };
@@ -541,8 +589,9 @@ export const useGardenStore = create<GardenState>()(
             ? [...state.matureRewardClaimedPlantIds, matureReward.plantId]
             : state.matureRewardClaimedPlantIds,
           plants,
-          unlockedBadgeIds: getNextUnlockedBadgeIds({
+          ...getBadgeUpdate({
             ...state,
+            growthLevel: growthProgress.level,
             plants,
           }),
         });
@@ -574,10 +623,16 @@ export const useGardenStore = create<GardenState>()(
             return state;
           }
 
+          const ownedPlantIds = [...state.ownedPlantIds, plantId];
+
           return {
             coins: state.coins - plant.unlockCost,
-            ownedPlantIds: [...state.ownedPlantIds, plantId],
+            ownedPlantIds,
             selectedPlantId: plantId,
+            ...getBadgeUpdate({
+              ...state,
+              ownedPlantIds,
+            }),
           };
         }),
       refreshDailyTasksForToday: () =>
@@ -638,8 +693,9 @@ export const useGardenStore = create<GardenState>()(
             matureRewardClaimedPlantIds: matureReward
               ? [...state.matureRewardClaimedPlantIds, matureReward.plantId]
               : state.matureRewardClaimedPlantIds,
-            unlockedBadgeIds: getNextUnlockedBadgeIds({
+            ...getBadgeUpdate({
               ...state,
+              growthLevel: growthProgress.level,
               plants,
             }),
           };
