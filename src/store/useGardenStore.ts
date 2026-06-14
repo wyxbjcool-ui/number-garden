@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
+import { defaultDailyTasks } from '../data/dailyTasks';
 import {
   gachaCost,
   gachaDuplicateCoins,
@@ -210,6 +211,8 @@ type GardenState = {
   avatarMode: AvatarMode;
   currentTitle: string;
   currentTaskDate: string;
+  lastTaskRefreshDate: string;
+  todayTasks: DailyTask[];
   poopRecordDate: string;
   selectedPlantId: string;
   plants: Record<string, Plant>;
@@ -246,6 +249,8 @@ const initialState = {
   avatarMode: 'garden' as AvatarMode,
   currentTitle: '成长小种子',
   currentTaskDate: '',
+  lastTaskRefreshDate: '',
+  todayTasks: defaultDailyTasks,
   poopRecordDate: '',
   selectedPlantId: 'succulent',
   plants: initialPlants,
@@ -638,14 +643,20 @@ export const useGardenStore = create<GardenState>()(
       refreshDailyTasksForToday: () =>
         set((state) => {
           const today = getLocalDateString();
+          const lastTaskRefreshDate =
+            state.lastTaskRefreshDate || state.currentTaskDate;
 
-          if (state.currentTaskDate === today) {
+          if (lastTaskRefreshDate === today) {
             return state;
           }
 
           return {
             currentTaskDate: today,
+            lastTaskRefreshDate: today,
+            todayTasks: defaultDailyTasks,
             completedTodayTaskIds: [],
+            answeredMathQuestionIds: [],
+            poopRecordDate: '',
           };
         }),
       waterSelectedPlant: () =>
@@ -716,10 +727,20 @@ export const useGardenStore = create<GardenState>()(
           ownedPlantIds.includes(persisted.selectedPlantId)
             ? persisted.selectedPlantId
             : currentState.selectedPlantId;
+        const lastTaskRefreshDate =
+          persisted?.lastTaskRefreshDate ??
+          persisted?.currentTaskDate ??
+          currentState.lastTaskRefreshDate;
+        const todayTasks =
+          persisted?.todayTasks && persisted.todayTasks.length > 0
+            ? persisted.todayTasks
+            : currentState.todayTasks;
 
         return {
           ...currentState,
           ...persisted,
+          lastTaskRefreshDate,
+          todayTasks,
           ownedPlantIds,
           selectedPlantId,
           plants: {
@@ -756,6 +777,8 @@ export const useGardenStore = create<GardenState>()(
           if (__DEV__) {
             console.log('Number Garden storage hydration finished.', state);
           }
+
+          state?.refreshDailyTasksForToday();
         };
       },
     },

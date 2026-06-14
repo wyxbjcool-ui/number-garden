@@ -21,33 +21,8 @@ import { mathGames } from '../data/mathGames';
 import { plantIds, plants as plantCatalog } from '../data/plants';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
-import type { DailyTask } from '../types/dailyTask';
 import type { RootStackParamList } from '../types/navigation';
 import type { Plant } from '../types/plant';
-
-const dailyTasks: DailyTask[] = [
-  {
-    id: 'pack-school-bag',
-    title: '整理书包',
-    description: '把明天要用的东西放好',
-    rewardCoins: 5,
-    rewardFertilizers: 1,
-  },
-  {
-    id: 'read-10-minutes',
-    title: '阅读 10 分钟',
-    description: '安静读一本喜欢的书',
-    rewardCoins: 5,
-    rewardFertilizers: 1,
-  },
-  {
-    id: 'early-bedtime',
-    title: '早睡打卡',
-    description: '睡前准备完成啦',
-    rewardCoins: 5,
-    rewardFertilizers: 1,
-  },
-];
 
 type SectionKey = 'plants' | 'tasks' | 'math' | 'badges' | 'collection';
 
@@ -140,6 +115,7 @@ export function TodayScreen() {
   const plant = useGardenStore((state) => state.plants[state.selectedPlantId]);
   const plants = useGardenStore((state) => state.plants);
   const ownedPlantIds = useGardenStore((state) => state.ownedPlantIds);
+  const todayTasks = useGardenStore((state) => state.todayTasks);
   const completedTodayTaskIds = useGardenStore(
     (state) => state.completedTodayTaskIds,
   );
@@ -650,10 +626,10 @@ export function TodayScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>今日任务</Text>
           <Text style={styles.sectionCount}>
-            {completedTodayTaskIds.length}/{dailyTasks.length}
+            {completedTodayTaskIds.length}/{todayTasks.length}
           </Text>
         </View>
-        {dailyTasks.map((task) => {
+        {todayTasks.map((task) => {
           const isCompleted = completedTodayTaskIds.includes(task.id);
 
           return (
