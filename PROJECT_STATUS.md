@@ -6,7 +6,7 @@ Number Garden is a local-first Expo React Native app for children ages 4-8. The 
 
 ## Current Step
 
-Step 19: First game-style home screen.
+Step 32: Data persistence acceptance check.
 
 ## Completed
 
@@ -81,6 +81,18 @@ Step 19: First game-style home screen.
 - Entry buttons scroll to existing detailed sections.
 - Placeholder notices for 粑粑时间 and 抽奖机.
 - Reserved artwork container style names for future Canva or AI assets.
+- Game home screen art assets integrated.
+- Home screen light animations and button press feedback.
+- Poop time MVP screen with once-per-day rewards.
+- Game-style poop time screen art.
+- Gacha machine MVP with rarity pool, duplicate conversion, and coin cost.
+- Gacha collection screen with rarity groups and completion stats.
+- Level-up reward system for global growth.
+- Plant almanac MVP with five plants, unlock costs, fertilizer feeding, stages, and maturity rewards.
+- Home screen current plant display.
+- Badge system V1 with seven badges, automatic unlock checks, home toast, and dedicated BadgeScreen.
+- Collection screen displays gacha rewards.
+- Persistence acceptance check completed for coins, fertilizers, growth, plants, gacha records, collection, badges, and poop record.
 
 ## Not Included Yet
 
@@ -88,9 +100,7 @@ Step 19: First game-style home screen.
 - Backend or cloud sync.
 - Payment, ads, or store features.
 - Complex animation.
-- Multi-plant collection UI.
 - Server-time daily reset.
-- Badge reward payouts.
 - Random collection drops.
 - Advanced animations.
 - Automated test suite.
@@ -99,4 +109,6 @@ Step 19: First game-style home screen.
 - Split-tab navigation for a less dense home screen.
 - Global growth badges.
 - Dedicated game interfaces for garden, pet, and sprite modes.
-- Final illustrated avatar and scene assets.
+- Final illustrated assets for every plant stage and every character state.
+- Full poop record details such as color, amount, smell, and comfort.
+- Ten-pull gacha, pity rules, payment, ads, or online sync.

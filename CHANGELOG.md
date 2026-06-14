@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Completed data persistence acceptance for coins, fertilizers, growth, plants, collection, gacha records, badges, and poop record.
+- Added Badge System V1 with seven persisted badges and automatic unlock checks.
+- Added a dedicated BadgeScreen and changed the home badge area into a compact summary.
+- Added current plant display on the home screen.
+- Added plant growth loop V1 with plant stages, maturity rewards, and first mature plant badge support.
+- Added PlantScreen MVP with five plants, coin unlocks, fertilizer feeding, and stage display.
+- Added level-up rewards for global growth.
+- Added gacha collection screen grouped by rarity.
+- Added gacha machine MVP with public rarity odds, 10-coin draw cost, and duplicate coin conversion.
+- Added game-style PoopScreen MVP with once-per-day rewards and persisted completion.
+- Added home screen light animations, press feedback, and art assets.
+- Integrated game home screen art assets for background, feature buttons, resources, avatar, growth panel, progress bar, and reward gift.
 - Reworked the Today screen first viewport into a game-style scene.
 - Added a central avatar artwork container with mode-specific scene styling.
 - Added circular feature orbs for tasks, math game, poop time, lottery, collection, badges, and plants.

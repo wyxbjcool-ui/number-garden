@@ -25,11 +25,11 @@
 
 - Tap 今日任务 and confirm the screen scrolls to the daily task section.
 - Tap 数字小游戏 and confirm the screen scrolls to the math mini-game section.
-- Tap 收集册 and confirm the screen scrolls to the collection section.
-- Tap 徽章 and confirm the screen scrolls to the badge section.
-- Tap 植物/伙伴 and confirm the screen scrolls to the plant catalog section.
-- Tap 粑粑时间 and confirm the placeholder says 粑粑时间马上就来.
-- Tap 抽奖机 and confirm the placeholder says 神秘抽奖机马上就来.
+- Tap 收集册 and confirm it opens CollectionScreen.
+- Tap 徽章 and confirm it opens BadgeScreen.
+- Tap 植物/伙伴 or the current plant tag and confirm it opens PlantScreen.
+- Tap 粑粑时间 and confirm it opens PoopScreen.
+- Tap 抽奖机 and confirm it opens GachaScreen.
 - Switch to 花园 and confirm the scene feels like a garden.
 - Switch to 宠物 and confirm the scene feels like a pet home.
 - Switch to 精灵 and confirm the scene feels like a magic scene.
@@ -53,14 +53,20 @@
 
 ## Plant Growth Tests
 
-- Tap 浇水 +10 成长值.
+- Open PlantScreen.
+- Confirm five plants appear: 多肉, 碰碰香, 彩叶芋, 蝴蝶兰, 向日葵.
+- Confirm 多肉 is owned by default.
+- Confirm locked plants show unlock prices.
+- With enough coins, unlock a plant and confirm coins decrease once.
+- Tap 喂肥料 +10 成长值.
 - Confirm plant XP increases by 10.
-- Confirm water count increases by 1.
+- Confirm fertilizers decrease by 1.
 - Water until XP reaches 100 total.
 - Confirm the plant level increases by 1.
 - Confirm XP keeps the remainder after leveling.
 - Complete a daily task and confirm it also waters the selected plant once.
 - Answer a math question correctly and confirm it adds 10 plant XP without increasing water count.
+- Grow a plant from Level 4 to Level 5 and confirm the maturity reward appears once.
 
 ## Global Growth Tests
 
@@ -110,11 +116,16 @@
 
 ## Badge Tests
 
-- Complete the first daily task and confirm the first-task badge unlocks.
-- Water until the plant reaches Level 2 and confirm the level-2-plant badge unlocks.
-- Water 3 total times and confirm the three-waters badge unlocks.
-- Confirm math rewards alone do not unlock the three-waters badge.
+- Complete the first poop record and confirm badge_first_poop unlocks.
+- Draw gacha once and confirm badge_first_gacha unlocks.
+- Gain the first gacha collection reward and confirm badge_first_collection unlocks.
+- Reach growth Lv.2 and confirm badge_level_2 unlocks.
+- Own 2 plants and confirm badge_two_plants unlocks.
+- Mature a plant and confirm badge_first_mature_plant unlocks.
+- Collect 5 gacha rewards and confirm badge_collection_5 unlocks.
 - Confirm unlocked badges do not duplicate.
+- Confirm the home badge area shows summary stats and up to 3 recent badges.
+- Open BadgeScreen and confirm locked badges show lock icon, ？？？, and 未获得.
 
 ## Collection Tests
 
@@ -123,6 +134,27 @@
 - Confirm collected items do not duplicate.
 - Confirm uncollected items display as ？？？.
 - Confirm common items show 普通 and rare items show 稀有.
+- Draw gacha and confirm CollectionScreen displays new gacha rewards grouped by rarity.
+- Confirm gacha collection completion count and percentage are correct.
+
+## Poop Time Tests
+
+- Open PoopScreen from the home screen.
+- Confirm the incomplete state shows cat-poop art and the button 我今天已经粑粑啦.
+- Tap the button once and confirm rewards: +10 coins, +5 fertilizers, +10 growth value.
+- Confirm the completed state shows cat_happy art and 今天已经记录过啦.
+- Close and reopen the app on the same local date.
+- Confirm PoopScreen still shows the completed state and does not grant rewards again.
+
+## Gacha Tests
+
+- Open GachaScreen from the home screen.
+- Confirm the rarity odds are visible: 普通 60%, 蓝色 25%, 紫色 10%, 橙色 4%, 红色 1%.
+- With fewer than 10 coins, tap draw and confirm 金币不足，再完成任务赚金币吧.
+- With at least 10 coins, draw once and confirm coins decrease by 10.
+- Confirm a new reward is shown with rarity, icon, and name.
+- Draw a duplicate reward and confirm duplicate coins are returned according to rarity.
+- Restart the app and confirm gachaRewardIds persist through CollectionScreen and badges.
 
 ## Math Mini-Game Tests
 
@@ -150,6 +182,8 @@
 ## Persistence Tests
 
 - Complete a task, water the plant, unlock a badge, and collect an item.
+- Record poop time once.
+- Draw gacha once.
 - Restart the app.
 - Confirm coins and fertilizers persist.
 - Confirm growth level and growth value persist.
@@ -158,6 +192,8 @@
 - Confirm completed task state persists for the same date.
 - Confirm unlocked badges persist.
 - Confirm collected items persist.
+- Confirm gacha collection rewards persist.
+- Confirm poopRecordDate persists and blocks repeat reward on the same day.
 - Confirm answered math question IDs persist.
 
 ## Known Limits
@@ -173,5 +209,7 @@
 - Global growth badges are not implemented yet.
 - Dedicated garden, pet, and sprite gameplay screens are not implemented yet.
 - Garden, pet, and sprite currently differ by presentation text only.
-- The main avatar and scene art are temporary icon-based placeholders.
+- Some art is still placeholder-level and not final for every state.
+- Poop record details such as color, amount, smell, and comfort are not implemented yet.
+- Gacha has no ten-pull, pity, payments, ads, or network sync.
 - iOS Simulator and Android device preview depend on local machine/device availability.

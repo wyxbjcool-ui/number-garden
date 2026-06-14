@@ -6,13 +6,16 @@ The app is built with Expo, React Native, TypeScript, Zustand, AsyncStorage, Rea
 
 ## Current Features
 
-- Home screen for the MVP experience.
+- Game-style home screen with illustrated background, central character, feature buttons, and light animations.
 - Coins and fertilizers.
 - Daily tasks with local date reset.
 - Plant growth with XP, levels, and watering count.
-- Multiple plants with selection and coin-based unlocking.
-- Badge achievement display.
-- Collection item display.
+- Global growth level with level-up rewards.
+- Plant almanac with five plants, selection, coin-based unlocking, fertilizer feeding, stages, and maturity rewards.
+- Poop time once-per-day check-in with rewards.
+- Gacha machine with rarity odds, coin cost, duplicate conversion, and collection rewards.
+- Gacha collection screen grouped by rarity.
+- Badge achievement system with dedicated badge screen and home unlock notice.
 - Math mini-game with retryable incorrect answers.
 - Local persistence through AsyncStorage.
 

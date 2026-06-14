@@ -2,7 +2,7 @@
 
 ## Scope
 
-Please review the Step 19 first game-style home screen.
+Please review the current Alpha MVP through Step 32, with emphasis on local persistence, badge flow, gacha collection, poop time, plant growth, and the game-style home screen.
 
 ## Focus Areas
 
@@ -80,17 +80,24 @@ Please review the Step 19 first game-style home screen.
 - Mode-specific scenes use separate garden, pet, and sprite styles without changing business logic.
 - Reserved style names exist for future artwork containers: `gameHeroScene`, `avatarArtworkFrame`, `avatarArtworkPlaceholder`, `featureOrb`, and `sceneDecoration`.
 - UI remains simple and child-friendly.
+- Home screen art assets render correctly and remain tappable.
+- Light animations and press feedback do not interfere with navigation.
+- PoopScreen rewards can be claimed only once per local day and persist after restart.
+- GachaScreen charges 10 coins, handles insufficient coins, displays odds, and persists gachaRewardIds.
+- CollectionScreen displays gacha rewards by rarity and keeps completion stats correct.
+- PlantScreen supports five plants, unlock costs, fertilizer feeding, stages, and one-time maturity rewards.
+- Home screen current plant tag opens PlantScreen and reflects selected plant stage.
+- BadgeScreen displays all badges, locked badges, summary count, and completion percentage.
+- Home badge summary shows count, completion percentage, and up to 3 recent badges.
+- Badge unlock notice appears briefly without blocking play.
+- Zustand persist with AsyncStorage keeps coins, fertilizers, growth, plants, collection, gacha records, badges, and poop record after restart.
 
 ## Out of Scope
 
-- Animation.
 - Networking.
 - Store or payment flow.
-- Multi-plant management UI.
 - Server-time validation.
-- Badge reward payouts.
 - Random collection drops.
-- Complex animations.
 - Automated test suite.
 - Business logic changes.
 - Generated or randomized math questions.
@@ -103,6 +110,9 @@ Please review the Step 19 first game-style home screen.
 - Separate pet or sprite XP systems.
 - New business logic for poop records or lottery.
 - New image assets.
+- Ten-pull gacha, pity, payment, ads, or cloud sync.
+- Full poop detail tracking.
+- Large UI restructure or new tabs.
 
 ## Manual Test Ideas
 
@@ -156,7 +166,13 @@ Please review the Step 19 first game-style home screen.
 - Confirm 粑粑时间 shows “粑粑时间马上就来”.
 - Confirm 抽奖机 shows “神秘抽奖机马上就来”.
 - Confirm switching avatar modes changes the scene styling without changing saved progress.
+- Confirm 粑粑时间 now opens PoopScreen and persists today's completion.
+- Confirm 抽奖机 now opens GachaScreen and persists gacha rewards.
+- Confirm 收集册 opens CollectionScreen and displays gacha rewards.
+- Confirm 徽章 opens BadgeScreen and displays all seven badges.
+- Confirm current plant display opens PlantScreen.
 - Restart the app and confirm plant state is retained.
 - Restart the app and confirm completed task state is retained.
 - Restart the app and confirm unlocked badges are retained.
 - Restart the app and confirm collected items are retained.
+- Restart the app and confirm coins, fertilizers, growth level, gacha records, and poop record are retained.
