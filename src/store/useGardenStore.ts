@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
-import { defaultDailyTasks } from '../data/dailyTasks';
+import { defaultDailyTasks, getRandomDailyTasks } from '../data/dailyTasks';
 import {
   gachaCost,
   gachaDuplicateCoins,
@@ -653,7 +653,7 @@ export const useGardenStore = create<GardenState>()(
           return {
             currentTaskDate: today,
             lastTaskRefreshDate: today,
-            todayTasks: defaultDailyTasks,
+            todayTasks: getRandomDailyTasks(),
             completedTodayTaskIds: [],
             answeredMathQuestionIds: [],
             poopRecordDate: '',
