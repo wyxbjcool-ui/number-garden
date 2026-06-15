@@ -96,6 +96,11 @@ export function TodayScreen() {
   const catBreathAnim = useRef(new Animated.Value(0)).current;
   const giftPulseAnim = useRef(new Animated.Value(0)).current;
   const levelRewardGiftAnim = useRef(new Animated.Value(0)).current;
+  const badgeNoticeSlideAnim = useRef(new Animated.Value(0)).current;
+  const badgeNoticeIconAnim = useRef(new Animated.Value(0)).current;
+  const badgeNoticeSparkleAnim = useRef(new Animated.Value(0)).current;
+  const badgeNoticeSparkleLoopRef =
+    useRef<Animated.CompositeAnimation | null>(null);
   const featurePressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -390,10 +395,69 @@ export function TodayScreen() {
 
   useEffect(() => {
     if (!latestUnlockedBadge) {
+      badgeNoticeSlideAnim.setValue(0);
+      badgeNoticeIconAnim.setValue(0);
+      badgeNoticeSparkleAnim.setValue(0);
       return;
     }
 
     void playSound('badgeUnlock');
+
+    badgeNoticeSlideAnim.setValue(0);
+    badgeNoticeIconAnim.setValue(0);
+    badgeNoticeSparkleAnim.setValue(0);
+
+    badgeNoticeSparkleLoopRef.current?.stop();
+    badgeNoticeSparkleLoopRef.current = Animated.loop(
+      Animated.sequence([
+        Animated.timing(badgeNoticeSparkleAnim, {
+          toValue: 1,
+          duration: 950,
+          useNativeDriver: true,
+        }),
+        Animated.timing(badgeNoticeSparkleAnim, {
+          toValue: 0,
+          duration: 950,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    Animated.parallel([
+      Animated.sequence([
+        Animated.timing(badgeNoticeSlideAnim, {
+          toValue: 1,
+          duration: 360,
+          useNativeDriver: true,
+        }),
+        Animated.spring(badgeNoticeSlideAnim, {
+          toValue: 1.08,
+          friction: 5,
+          tension: 160,
+          useNativeDriver: true,
+        }),
+        Animated.spring(badgeNoticeSlideAnim, {
+          toValue: 1,
+          friction: 6,
+          tension: 140,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.sequence([
+        Animated.timing(badgeNoticeIconAnim, {
+          toValue: 1,
+          duration: 260,
+          useNativeDriver: true,
+        }),
+        Animated.timing(badgeNoticeIconAnim, {
+          toValue: 2,
+          duration: 240,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+
+    badgeNoticeSparkleLoopRef.current.start();
 
     const badgeNoticeTimer = setTimeout(() => {
       dismissBadgeNotice();
@@ -401,6 +465,8 @@ export function TodayScreen() {
 
     return () => {
       clearTimeout(badgeNoticeTimer);
+      badgeNoticeSparkleLoopRef.current?.stop();
+      badgeNoticeSparkleLoopRef.current = null;
     };
   }, [dismissBadgeNotice, latestUnlockedBadge]);
 
@@ -410,6 +476,119 @@ export function TodayScreen() {
         scale: levelRewardGiftAnim.interpolate({
           inputRange: [0, 1],
           outputRange: [1, 1.14],
+        }),
+      },
+    ],
+  };
+
+  const badgeNoticeAnimatedStyle = {
+    opacity: badgeNoticeSlideAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 1],
+    }),
+    transform: [
+      {
+        translateY: badgeNoticeSlideAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [-28, 0],
+        }),
+      },
+      {
+        scale: badgeNoticeSlideAnim.interpolate({
+          inputRange: [0, 1, 1.08],
+          outputRange: [0.94, 1, 1.03],
+        }),
+      },
+    ],
+  };
+
+  const badgeIconAnimatedStyle = {
+    transform: [
+      {
+        scale: badgeNoticeIconAnim.interpolate({
+          inputRange: [0, 1, 2],
+          outputRange: [0.6, 1.15, 1],
+        }),
+      },
+    ],
+  };
+
+  const badgeSparkleOneStyle = {
+    opacity: badgeNoticeSparkleAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.22, 1],
+    }),
+    transform: [
+      {
+        translateY: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [4, -10],
+        }),
+      },
+      {
+        translateX: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, -6],
+        }),
+      },
+      {
+        scale: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.84, 1.12],
+        }),
+      },
+    ],
+  };
+
+  const badgeSparkleTwoStyle = {
+    opacity: badgeNoticeSparkleAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.18, 0.9],
+    }),
+    transform: [
+      {
+        translateY: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [10, -8],
+        }),
+      },
+      {
+        translateX: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 10],
+        }),
+      },
+      {
+        scale: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.78, 1.06],
+        }),
+      },
+    ],
+  };
+
+  const badgeSparkleThreeStyle = {
+    opacity: badgeNoticeSparkleAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.14, 0.82],
+    }),
+    transform: [
+      {
+        translateY: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [6, -12],
+        }),
+      },
+      {
+        translateX: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 4],
+        }),
+      },
+      {
+        scale: badgeNoticeSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.74, 1],
         }),
       },
     ],
@@ -832,15 +1011,38 @@ export function TodayScreen() {
       </View>
       </ScrollView>
       {latestUnlockedBadge ? (
-        <View style={styles.badgeNotice}>
-          <Text style={styles.badgeNoticeIcon}>🏅</Text>
+        <Animated.View style={[styles.badgeNotice, badgeNoticeAnimatedStyle]}>
+          <Animated.Text
+            style={[styles.badgeNoticeSparkle, styles.badgeSparkleOne, badgeSparkleOneStyle]}
+          >
+            ✨
+          </Animated.Text>
+          <Animated.Text
+            style={[styles.badgeNoticeSparkle, styles.badgeSparkleTwo, badgeSparkleTwoStyle]}
+          >
+            ⭐
+          </Animated.Text>
+          <Animated.Text
+            style={[
+              styles.badgeNoticeSparkle,
+              styles.badgeSparkleThree,
+              badgeSparkleThreeStyle,
+            ]}
+          >
+            ✨
+          </Animated.Text>
+          <Animated.Text
+            style={[styles.badgeNoticeIcon, badgeIconAnimatedStyle]}
+          >
+            🏅
+          </Animated.Text>
           <View style={styles.badgeNoticeCopy}>
             <Text style={styles.badgeNoticeTitle}>获得新徽章</Text>
             <Text style={styles.badgeNoticeName}>
               {latestUnlockedBadge.title}
             </Text>
           </View>
-        </View>
+        </Animated.View>
       ) : null}
       <Modal
         animationType="fade"
@@ -1594,11 +1796,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 12,
     position: 'absolute',
+    overflow: 'visible',
     top: 54,
     zIndex: 20,
   },
   badgeNoticeIcon: {
     fontSize: 28,
+  },
+  badgeNoticeSparkle: {
+    position: 'absolute',
+  },
+  badgeSparkleOne: {
+    left: 8,
+    top: -8,
+  },
+  badgeSparkleTwo: {
+    right: 18,
+    top: -12,
+  },
+  badgeSparkleThree: {
+    bottom: -6,
+    left: 44,
   },
   badgeNoticeCopy: {
     gap: 2,

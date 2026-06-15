@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useEffect, useRef } from 'react';
+import { Animated } from 'react-native';
 import {
   ImageBackground,
   Pressable,
@@ -21,6 +23,7 @@ const backgroundImage = require('../../assets/garden_bg.png');
 export function BadgeScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const unlockedBadgePulseAnim = useRef(new Animated.Value(0)).current;
   const unlockedBadgeIds = useGardenStore((state) => state.unlockedBadgeIds);
   const unlockedBadgeCount = badges.filter((badge) =>
     unlockedBadgeIds.includes(badge.id),
@@ -28,6 +31,40 @@ export function BadgeScreen() {
   const completionPercent = Math.round(
     (unlockedBadgeCount / badges.length) * 100,
   );
+
+  useEffect(() => {
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(unlockedBadgePulseAnim, {
+          toValue: 1,
+          duration: 1100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(unlockedBadgePulseAnim, {
+          toValue: 0,
+          duration: 1100,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+
+    pulseLoop.start();
+
+    return () => {
+      pulseLoop.stop();
+    };
+  }, [unlockedBadgePulseAnim]);
+
+  const unlockedBadgeAnimatedStyle = {
+    transform: [
+      {
+        scale: unlockedBadgePulseAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.03],
+        }),
+      },
+    ],
+  };
 
   return (
     <ImageBackground
@@ -72,9 +109,13 @@ export function BadgeScreen() {
             const isUnlocked = unlockedBadgeIds.includes(badge.id);
 
             return (
-              <View
+              <Animated.View
                 key={badge.id}
-                style={[styles.badgeCard, !isUnlocked && styles.badgeLocked]}
+                style={[
+                  styles.badgeCard,
+                  !isUnlocked && styles.badgeLocked,
+                  isUnlocked && unlockedBadgeAnimatedStyle,
+                ]}
               >
                 <View style={styles.badgeIcon}>
                   <Ionicons
@@ -89,7 +130,7 @@ export function BadgeScreen() {
                 <Text style={styles.badgeDescription}>
                   {isUnlocked ? badge.description : '未获得'}
                 </Text>
-              </View>
+              </Animated.View>
             );
           })}
         </View>
