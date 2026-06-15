@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Image,
   ImageBackground,
   Pressable,
@@ -35,18 +36,219 @@ export function GachaScreen() {
   const coins = useGardenStore((state) => state.coins);
   const drawGacha = useGardenStore((state) => state.drawGacha);
   const [drawResult, setDrawResult] = useState<GachaDrawResult | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const drawButtonScale = useRef(new Animated.Value(1)).current;
+  const loadingPulse = useRef(new Animated.Value(0)).current;
+  const rewardScale = useRef(new Animated.Value(1)).current;
+  const rarityAura = useRef(new Animated.Value(0)).current;
+  const loadingLoopRef = useRef<Animated.CompositeAnimation | null>(null);
+  const rarityLoopRef = useRef<Animated.CompositeAnimation | null>(null);
+  const revealTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mythicTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleDraw = () => {
-    void playSound('buttonTap');
+  const stopRarityEffects = () => {
+    rarityLoopRef.current?.stop();
+    rarityLoopRef.current = null;
+    rarityAura.stopAnimation();
+    rarityAura.setValue(0);
 
-    const nextDrawResult = drawGacha();
-    setDrawResult(nextDrawResult);
+    if (mythicTimeoutRef.current) {
+      clearTimeout(mythicTimeoutRef.current);
+      mythicTimeoutRef.current = null;
+    }
+  };
 
-    if (!nextDrawResult.success) {
+  const playRarityAnimation = (nextDrawResult: GachaDrawResult) => {
+    if (!nextDrawResult.success || !nextDrawResult.reward) {
+      stopRarityEffects();
       return;
     }
 
-    void playSound(nextDrawResult.isNew ? 'taskComplete' : 'coinGain');
+    stopRarityEffects();
+    rewardScale.setValue(nextDrawResult.reward.rarity === 'epic' ? 0.45 : 0.5);
+
+    Animated.sequence([
+      Animated.timing(rewardScale, {
+        toValue: nextDrawResult.reward.rarity === 'epic' ? 1.16 : 1.1,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.spring(rewardScale, {
+        toValue: 1,
+        friction: nextDrawResult.reward.rarity === 'epic' ? 4 : 5,
+        tension: nextDrawResult.reward.rarity === 'epic' ? 165 : 145,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    if (nextDrawResult.reward.rarity === 'rare') {
+      Animated.timing(rarityAura, {
+        toValue: 1,
+        duration: 260,
+        useNativeDriver: false,
+      }).start();
+      return;
+    }
+
+    if (nextDrawResult.reward.rarity === 'legendary') {
+      rarityAura.setValue(0.25);
+      rarityLoopRef.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(rarityAura, {
+            toValue: 1,
+            duration: 420,
+            useNativeDriver: false,
+          }),
+          Animated.timing(rarityAura, {
+            toValue: 0.25,
+            duration: 420,
+            useNativeDriver: false,
+          }),
+        ]),
+      );
+      rarityLoopRef.current.start();
+      return;
+    }
+
+    if (nextDrawResult.reward.rarity === 'mythic') {
+      rarityAura.setValue(0.45);
+      rarityLoopRef.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(rarityAura, {
+            toValue: 1,
+            duration: 280,
+            useNativeDriver: false,
+          }),
+          Animated.timing(rarityAura, {
+            toValue: 0.45,
+            duration: 280,
+            useNativeDriver: false,
+          }),
+        ]),
+      );
+      rarityLoopRef.current.start();
+
+      mythicTimeoutRef.current = setTimeout(() => {
+        rarityLoopRef.current?.stop();
+        rarityLoopRef.current = null;
+      }, 2000);
+    }
+  };
+
+  const handleDraw = () => {
+    if (isDrawing) {
+      return;
+    }
+
+    void playSound('buttonTap');
+    setDrawResult(null);
+    setIsDrawing(true);
+
+    Animated.sequence([
+      Animated.timing(drawButtonScale, {
+        toValue: 0.92,
+        duration: 110,
+        useNativeDriver: true,
+      }),
+      Animated.spring(drawButtonScale, {
+        toValue: 1,
+        friction: 5,
+        tension: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    loadingPulse.setValue(0);
+    loadingLoopRef.current?.stop();
+    loadingLoopRef.current = Animated.loop(
+      Animated.sequence([
+        Animated.timing(loadingPulse, {
+          toValue: 1,
+          duration: 420,
+          useNativeDriver: true,
+        }),
+        Animated.timing(loadingPulse, {
+          toValue: 0,
+          duration: 420,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loadingLoopRef.current.start();
+
+    revealTimeoutRef.current = setTimeout(() => {
+      loadingLoopRef.current?.stop();
+      loadingLoopRef.current = null;
+      setIsDrawing(false);
+
+      const nextDrawResult = drawGacha();
+      setDrawResult(nextDrawResult);
+
+      if (!nextDrawResult.success) {
+        stopRarityEffects();
+        return;
+      }
+
+      playRarityAnimation(nextDrawResult);
+      void playSound(nextDrawResult.isNew ? 'taskComplete' : 'coinGain');
+    }, 1200);
+  };
+
+  useEffect(() => {
+    return () => {
+      loadingLoopRef.current?.stop();
+      stopRarityEffects();
+
+      if (revealTimeoutRef.current) {
+        clearTimeout(revealTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const loadingGiftStyle = {
+    transform: [
+      {
+        scale: loadingPulse.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.12],
+        }),
+      },
+    ],
+  };
+
+  const rewardCardStyle = {
+    transform: [{ scale: rewardScale }],
+  };
+
+  const rewardBadgeStyle = {
+    shadowColor:
+      drawResult?.success && drawResult.reward
+        ? gachaRarityColors[drawResult.reward.rarity]
+        : '#FFFFFF',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: rarityAura.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 0.55],
+    }),
+    shadowRadius: rarityAura.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 26],
+    }),
+    transform: [
+      {
+        scale: rarityAura.interpolate({
+          inputRange: [0, 1],
+          outputRange: [
+            1,
+            drawResult?.success && drawResult.reward?.rarity === 'legendary'
+              ? 1.05
+              : drawResult?.success && drawResult.reward?.rarity === 'mythic'
+                ? 1.08
+                : 1.03,
+          ],
+        }),
+      },
+    ],
   };
 
   return (
@@ -92,18 +294,31 @@ export function GachaScreen() {
             style={styles.gachaMachine}
           />
 
-          <Pressable
-            style={({ pressed }) => [
-              styles.drawButton,
-              pressed && styles.pressedButton,
-            ]}
-            onPress={handleDraw}
-          >
-            <Text style={styles.drawButtonText}>抽一次（10金币）</Text>
-          </Pressable>
+          <Animated.View style={{ transform: [{ scale: drawButtonScale }] }}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.drawButton,
+                pressed && styles.pressedButton,
+                isDrawing && styles.drawButtonDisabled,
+              ]}
+              disabled={isDrawing}
+              onPress={handleDraw}
+            >
+              <Text style={styles.drawButtonText}>
+                {isDrawing ? '正在抽奖…' : '抽一次（10金币）'}
+              </Text>
+            </Pressable>
+          </Animated.View>
 
-          {drawResult ? (
+          {isDrawing ? (
             <View style={styles.resultCard}>
+              <Animated.Text style={[styles.loadingGift, loadingGiftStyle]}>
+                🎁
+              </Animated.Text>
+              <Text style={styles.loadingText}>正在抽奖…</Text>
+            </View>
+          ) : drawResult ? (
+            <Animated.View style={[styles.resultCard, rewardCardStyle]}>
               {!drawResult.success ? (
                 <Text style={styles.noCoinsText}>
                   {drawResult.reason === 'not-enough-coins'
@@ -115,12 +330,19 @@ export function GachaScreen() {
                   <Text style={styles.resultTitle}>
                     {drawResult.isNew ? '恭喜获得' : '又抽到啦'}
                   </Text>
-                  <View
+                  <Animated.View
                     style={[
                       styles.rewardBadge,
+                      rewardBadgeStyle,
                       {
                         borderColor:
                           gachaRarityColors[drawResult.reward.rarity],
+                        backgroundColor:
+                          drawResult.reward.rarity === 'mythic'
+                            ? 'rgba(255, 239, 242, 0.96)'
+                            : drawResult.reward.rarity === 'legendary'
+                              ? 'rgba(255, 248, 228, 0.96)'
+                              : '#FFF8D7',
                       },
                     ]}
                   >
@@ -138,7 +360,7 @@ export function GachaScreen() {
                     <Text style={styles.rewardName}>
                       {drawResult.reward.name}
                     </Text>
-                  </View>
+                  </Animated.View>
                   {!drawResult.isNew ? (
                     <Text style={styles.duplicateText}>
                       已转化金币 +{drawResult.duplicateCoins}
@@ -146,7 +368,7 @@ export function GachaScreen() {
                   ) : null}
                 </>
               ) : null}
-            </View>
+            </Animated.View>
           ) : (
             <View style={styles.resultCard}>
               <Text style={styles.readyText}>放入金币，看看会出现什么</Text>
@@ -286,6 +508,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 26,
     zIndex: 3,
   },
+  drawButtonDisabled: {
+    opacity: 0.9,
+  },
   drawButtonText: {
     color: Colors.headerText,
     fontSize: 23,
@@ -309,6 +534,17 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: '800',
     marginTop: 30,
+    textAlign: 'center',
+  },
+  loadingGift: {
+    fontSize: 54,
+    marginTop: 6,
+  },
+  loadingText: {
+    color: Colors.headerText,
+    fontSize: 24,
+    fontWeight: '800',
+    marginTop: 8,
     textAlign: 'center',
   },
   noCoinsText: {
