@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import type { ImageSourcePropType, LayoutChangeEvent } from 'react-native';
 
+import { playSound } from '../audio/AudioManager';
 import { avatarModeIds, avatarModes } from '../data/avatarModes';
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
@@ -179,6 +180,34 @@ export function TodayScreen() {
   const formatRarity = (rarity: 'common' | 'rare') =>
     rarity === 'rare' ? '稀有' : '普通';
 
+  const playButtonTap = () => {
+    void playSound('buttonTap');
+  };
+
+  const handleTaskComplete = async (task: (typeof todayTasks)[number]) => {
+    if (completedTodayTaskIds.includes(task.id)) {
+      return;
+    }
+
+    completeDailyTask(task);
+    await playSound('taskComplete');
+    await playSound('coinGain');
+  };
+
+  const handleMathAnswer = async (
+    selectedQuestion: (typeof mathGames)[number],
+    selectedOptionId: string,
+  ) => {
+    const isCorrect = selectedOptionId === selectedQuestion.correctOptionId;
+
+    answerMathQuestion(selectedQuestion, selectedOptionId);
+    setLastMathResult(isCorrect ? 'correct' : 'incorrect');
+
+    if (isCorrect) {
+      await playSound('coinGain');
+    }
+  };
+
   const handleSectionLayout =
     (sectionKey: SectionKey) => (event: LayoutChangeEvent) => {
       sectionOffsetsRef.current[sectionKey] = event.nativeEvent.layout.y;
@@ -335,6 +364,8 @@ export function TodayScreen() {
       return;
     }
 
+    void playSound('levelUp');
+
     const levelGiftLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(levelRewardGiftAnim, {
@@ -361,6 +392,8 @@ export function TodayScreen() {
     if (!latestUnlockedBadge) {
       return;
     }
+
+    void playSound('badgeUnlock');
 
     const badgeNoticeTimer = setTimeout(() => {
       dismissBadgeNotice();
@@ -439,7 +472,10 @@ export function TodayScreen() {
                 ]}
                 onPressIn={() => holdFeaturePressFeedback(feature.id)}
                 onPressOut={() => setPressedFeatureId(null)}
-                onPress={feature.onPress}
+                onPress={() => {
+                  playButtonTap();
+                  feature.onPress();
+                }}
               >
                 <Image
                   source={feature.imageSource}
@@ -463,7 +499,10 @@ export function TodayScreen() {
                   styles.currentPlantBadge,
                   pressed && styles.currentPlantBadgePressed,
                 ]}
-                onPress={() => navigation.navigate('Plant')}
+                onPress={() => {
+                  playButtonTap();
+                  navigation.navigate('Plant');
+                }}
               >
                 <View style={styles.currentPlantPot}>
                   <Text style={styles.currentPlantIcon}>{currentPlantIcon}</Text>
@@ -509,7 +548,10 @@ export function TodayScreen() {
             styles.homeGrowthBar,
             pressed && styles.homeGrowthBarPressed,
           ]}
-          onPress={() => navigation.navigate('Plant')}
+          onPress={() => {
+            playButtonTap();
+            navigation.navigate('Plant');
+          }}
         >
           <Image
             source={gameAssets.growthPanelBackground}
@@ -650,7 +692,9 @@ export function TodayScreen() {
                   isCompleted && styles.taskButtonCompleted,
                 ]}
                 disabled={isCompleted}
-                onPress={() => completeDailyTask(task)}
+                onPress={() => {
+                  void handleTaskComplete(task);
+                }}
               >
                 <Text
                   style={[
@@ -683,11 +727,7 @@ export function TodayScreen() {
                   key={option.id}
                   style={styles.mathOptionButton}
                   onPress={() => {
-                    const isCorrect =
-                      option.id === currentMathQuestion.correctOptionId;
-
-                    answerMathQuestion(currentMathQuestion, option.id);
-                    setLastMathResult(isCorrect ? 'correct' : 'incorrect');
+                    void handleMathAnswer(currentMathQuestion, option.id);
                   }}
                 >
                   <Text style={styles.mathOptionText}>{option.label}</Text>
@@ -716,7 +756,10 @@ export function TodayScreen() {
           pressed && styles.badgeSummaryPressed,
         ]}
         onLayout={handleSectionLayout('badges')}
-        onPress={() => navigation.navigate('Badge')}
+        onPress={() => {
+          playButtonTap();
+          navigation.navigate('Badge');
+        }}
       >
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>徽章</Text>

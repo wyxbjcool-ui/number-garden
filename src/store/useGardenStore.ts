@@ -214,6 +214,7 @@ type GardenState = {
   lastTaskRefreshDate: string;
   todayTasks: DailyTask[];
   poopRecordDate: string;
+  lastWaterDate: string;
   selectedPlantId: string;
   plants: Record<string, Plant>;
   ownedPlantIds: string[];
@@ -252,6 +253,7 @@ const initialState = {
   lastTaskRefreshDate: '',
   todayTasks: defaultDailyTasks,
   poopRecordDate: '',
+  lastWaterDate: '',
   selectedPlantId: 'succulent',
   plants: initialPlants,
   ownedPlantIds: ['succulent'],
@@ -563,15 +565,6 @@ export const useGardenStore = create<GardenState>()(
           nextPlant,
           state.matureRewardClaimedPlantIds,
         );
-        const growthProgress = growGlobalByXp(
-          state.growthLevel,
-          state.growthXp,
-          10,
-        );
-        const levelUpRewards = getLevelUpRewards(
-          state.growthLevel,
-          growthProgress,
-        );
         const plants = {
           ...state.plants,
           [plant.id]: nextPlant,
@@ -579,24 +572,14 @@ export const useGardenStore = create<GardenState>()(
 
         set({
           fertilizers:
-            state.fertilizers -
-            1 +
-            (levelUpRewards?.fertilizers ?? 0) +
-            (matureReward?.fertilizers ?? 0),
-          coins:
-            state.coins +
-            (levelUpRewards?.coins ?? 0) +
-            (matureReward?.coins ?? 0),
-          growthLevel: growthProgress.level,
-          growthXp: growthProgress.xp,
-          ...(levelUpRewards ? { levelUpRewards } : {}),
+            state.fertilizers - 1 + (matureReward?.fertilizers ?? 0),
+          coins: state.coins + (matureReward?.coins ?? 0),
           matureRewardClaimedPlantIds: matureReward
             ? [...state.matureRewardClaimedPlantIds, matureReward.plantId]
             : state.matureRewardClaimedPlantIds,
           plants,
           ...getBadgeUpdate({
             ...state,
-            growthLevel: growthProgress.level,
             plants,
           }),
         });
@@ -661,6 +644,12 @@ export const useGardenStore = create<GardenState>()(
         }),
       waterSelectedPlant: () =>
         set((state) => {
+          const today = getLocalDateString();
+
+          if (state.lastWaterDate === today) {
+            return state;
+          }
+
           const plant = state.plants[state.selectedPlantId];
 
           if (!plant) {
@@ -701,6 +690,7 @@ export const useGardenStore = create<GardenState>()(
             growthLevel: growthProgress.level,
             growthXp: growthProgress.xp,
             ...(levelUpRewards ? { levelUpRewards } : {}),
+            lastWaterDate: today,
             matureRewardClaimedPlantIds: matureReward
               ? [...state.matureRewardClaimedPlantIds, matureReward.plantId]
               : state.matureRewardClaimedPlantIds,

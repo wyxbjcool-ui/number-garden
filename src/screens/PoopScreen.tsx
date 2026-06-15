@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 
+import { playSound } from '../audio/AudioManager';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
 import type { RootStackParamList } from '../types/navigation';
@@ -75,10 +76,14 @@ export function PoopScreen() {
     ],
   };
 
-  const handleRecordPoop = () => {
+  const handleRecordPoop = async () => {
     const didRecord = recordPoopToday();
 
     setMessage(didRecord ? '获得奖励' : '今天已经记录过啦');
+
+    if (didRecord) {
+      await playSound('coinGain');
+    }
   };
 
   useEffect(() => {
