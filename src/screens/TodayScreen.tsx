@@ -34,6 +34,8 @@ type FeatureOrb = {
   onPress: () => void;
 };
 
+const featureOrbIdleDelays = [0, 150, 300, 450, 600, 750] as const;
+
 const gameAssets = {
   background: require('../../assets/garden_bg.png'),
   catHappy: require('../../assets/cat_happy.png'),
@@ -95,6 +97,12 @@ export function TodayScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const catBreathAnim = useRef(new Animated.Value(0)).current;
   const catBreathLoopRef = useRef<Animated.CompositeAnimation | null>(null);
+  const featureOrbFloatAnimsRef = useRef(
+    featureOrbIdleDelays.map(() => new Animated.Value(0)),
+  );
+  const featureOrbFloatLoopsRef = useRef<
+    Array<Animated.CompositeAnimation | null>
+  >(featureOrbIdleDelays.map(() => null));
   const giftPulseAnim = useRef(new Animated.Value(0)).current;
   const levelRewardGiftAnim = useRef(new Animated.Value(0)).current;
   const coinBarPulseAnim = useRef(new Animated.Value(0)).current;
@@ -317,6 +325,25 @@ export function TodayScreen() {
   const leftFeatureOrbs = featureOrbs.slice(0, 3);
   const rightFeatureOrbs = featureOrbs.slice(3);
 
+  const featureOrbAnimatedStyles = featureOrbFloatAnimsRef.current.map(
+    (featureOrbAnim) => ({
+      transform: [
+        {
+          translateY: featureOrbAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, -3],
+          }),
+        },
+        {
+          scale: featureOrbAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [1, 1.015],
+          }),
+        },
+      ],
+    }),
+  );
+
   useEffect(() => {
     refreshDailyTasksForToday();
   }, [refreshDailyTasksForToday]);
@@ -351,6 +378,40 @@ export function TodayScreen() {
       catBreathAnim.stopAnimation();
     };
   }, [catBreathAnim]);
+
+  useEffect(() => {
+    featureOrbFloatLoopsRef.current.forEach((featureOrbLoop, index) => {
+      featureOrbLoop?.stop();
+      featureOrbFloatAnimsRef.current[index]?.setValue(0);
+
+      const idleLoop = Animated.loop(
+        Animated.sequence([
+          Animated.delay(featureOrbIdleDelays[index]),
+          Animated.timing(featureOrbFloatAnimsRef.current[index], {
+            toValue: 1,
+            duration: 1300,
+            useNativeDriver: true,
+          }),
+          Animated.timing(featureOrbFloatAnimsRef.current[index], {
+            toValue: 0,
+            duration: 1300,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+
+      featureOrbFloatLoopsRef.current[index] = idleLoop;
+      idleLoop.start();
+    });
+
+    return () => {
+      featureOrbFloatLoopsRef.current.forEach((featureOrbLoop, index) => {
+        featureOrbLoop?.stop();
+        featureOrbFloatLoopsRef.current[index] = null;
+        featureOrbFloatAnimsRef.current[index]?.stopAnimation();
+      });
+    };
+  }, []);
 
   useEffect(() => {
     const giftLoop = Animated.loop(
@@ -778,27 +839,31 @@ export function TodayScreen() {
         <View style={styles.homePlayfield}>
           <View style={[styles.orbColumn, styles.leftOrbColumn]}>
             {leftFeatureOrbs.map((feature) => (
-              <Pressable
+              <Animated.View
                 key={feature.id}
-                style={({ pressed }) => [
-                  styles.featureOrb,
-                  (pressed || pressedFeatureId === feature.id) &&
-                    styles.featureOrbPressed,
-                ]}
-                onPressIn={() => holdFeaturePressFeedback(feature.id)}
-                onPressOut={() => setPressedFeatureId(null)}
-                onPress={() => {
-                  playButtonTap();
-                  feature.onPress();
-                }}
+                style={featureOrbAnimatedStyles[featureOrbs.indexOf(feature)]}
               >
-                <Image
-                  source={feature.imageSource}
-                  style={styles.featureOrbImage}
-                  resizeMode="contain"
-                />
-                <Text style={styles.featureOrbText}>{feature.title}</Text>
-              </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.featureOrb,
+                    (pressed || pressedFeatureId === feature.id) &&
+                      styles.featureOrbPressed,
+                  ]}
+                  onPressIn={() => holdFeaturePressFeedback(feature.id)}
+                  onPressOut={() => setPressedFeatureId(null)}
+                  onPress={() => {
+                    playButtonTap();
+                    feature.onPress();
+                  }}
+                >
+                  <Image
+                    source={feature.imageSource}
+                    style={styles.featureOrbImage}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.featureOrbText}>{feature.title}</Text>
+                </Pressable>
+              </Animated.View>
             ))}
           </View>
 
@@ -836,24 +901,28 @@ export function TodayScreen() {
 
           <View style={[styles.orbColumn, styles.rightOrbColumn]}>
             {rightFeatureOrbs.map((feature) => (
-              <Pressable
+              <Animated.View
                 key={feature.id}
-                style={({ pressed }) => [
-                  styles.featureOrb,
-                  (pressed || pressedFeatureId === feature.id) &&
-                    styles.featureOrbPressed,
-                ]}
-                onPressIn={() => holdFeaturePressFeedback(feature.id)}
-                onPressOut={() => setPressedFeatureId(null)}
-                onPress={feature.onPress}
+                style={featureOrbAnimatedStyles[featureOrbs.indexOf(feature)]}
               >
-                <Image
-                  source={feature.imageSource}
-                  style={styles.featureOrbImage}
-                  resizeMode="contain"
-                />
-                <Text style={styles.featureOrbText}>{feature.title}</Text>
-              </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.featureOrb,
+                    (pressed || pressedFeatureId === feature.id) &&
+                      styles.featureOrbPressed,
+                  ]}
+                  onPressIn={() => holdFeaturePressFeedback(feature.id)}
+                  onPressOut={() => setPressedFeatureId(null)}
+                  onPress={feature.onPress}
+                >
+                  <Image
+                    source={feature.imageSource}
+                    style={styles.featureOrbImage}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.featureOrbText}>{feature.title}</Text>
+                </Pressable>
+              </Animated.View>
             ))}
           </View>
         </View>
