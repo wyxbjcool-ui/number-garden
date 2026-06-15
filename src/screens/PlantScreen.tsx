@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 
+import { playSound } from '../audio/AudioManager';
 import { plantIds, plants as plantCatalog } from '../data/plants';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
@@ -95,11 +96,19 @@ export function PlantScreen() {
   );
 
   const handleFeedPlant = () => {
+    void playSound('buttonTap');
+
     const feedResult = feedPlantWithFertilizer(selectedPlant.id);
 
     if (!feedResult.success) {
       setMessage('肥料不够啦');
       return;
+    }
+
+    void playSound('taskComplete');
+
+    if (feedResult.matureReward) {
+      void playSound('levelUp');
     }
 
     setMessage(
@@ -110,6 +119,8 @@ export function PlantScreen() {
   };
 
   const handlePlantPress = (plantId: string) => {
+    void playSound('buttonTap');
+
     const isOwned = ownedPlantIds.includes(plantId);
     const catalogPlant = plantCatalog[plantId];
 
@@ -125,6 +136,7 @@ export function PlantScreen() {
     }
 
     unlockPlant(plantId);
+    void playSound('taskComplete');
     setMessage('新植物住进花园啦');
   };
 
@@ -144,7 +156,10 @@ export function PlantScreen() {
               styles.backButton,
               pressed && styles.pressedButton,
             ]}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              void playSound('buttonTap');
+              navigation.goBack();
+            }}
           >
             <Ionicons name="chevron-back" size={26} color="#FFF8D7" />
             <Text style={styles.backButtonText}>返回</Text>

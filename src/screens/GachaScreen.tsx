@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 
+import { playSound } from '../audio/AudioManager';
 import {
   gachaCost,
   gachaRarityColors,
@@ -36,7 +37,16 @@ export function GachaScreen() {
   const [drawResult, setDrawResult] = useState<GachaDrawResult | null>(null);
 
   const handleDraw = () => {
-    setDrawResult(drawGacha());
+    void playSound('buttonTap');
+
+    const nextDrawResult = drawGacha();
+    setDrawResult(nextDrawResult);
+
+    if (!nextDrawResult.success) {
+      return;
+    }
+
+    void playSound(nextDrawResult.isNew ? 'taskComplete' : 'coinGain');
   };
 
   return (
@@ -52,7 +62,10 @@ export function GachaScreen() {
               styles.backButton,
               pressed && styles.pressedButton,
             ]}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              void playSound('buttonTap');
+              navigation.goBack();
+            }}
           >
             <Ionicons name="chevron-back" size={26} color="#FFF8D7" />
             <Text style={styles.backButtonText}>返回</Text>

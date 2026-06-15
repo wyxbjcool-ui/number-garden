@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 
+import { playSound } from '../audio/AudioManager';
 import { badges } from '../data/badges';
 import { useGardenStore } from '../store/useGardenStore';
 import { Colors } from '../theme';
@@ -44,7 +45,10 @@ export function BadgeScreen() {
               styles.backButton,
               pressed && styles.pressedButton,
             ]}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              void playSound('buttonTap');
+              navigation.goBack();
+            }}
           >
             <Ionicons name="chevron-back" size={26} color="#FFF8D7" />
             <Text style={styles.backButtonText}>返回</Text>
