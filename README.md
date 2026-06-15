@@ -1,55 +1,91 @@
 # Number Garden
 
-数字花园 Number Garden is a local-first habit and growth game for children ages 4-8.
+数字花园 Number Garden 是一个面向 4-8 岁儿童的本地习惯养成游戏 App。  
+项目以“奖励、成长、收集”为核心，不做惩罚、不做失败反馈，当前版本以**可试玩 Beta**为目标。
 
-The app is built with Expo, React Native, TypeScript, Zustand, AsyncStorage, React Navigation, and Expo Vector Icons. The MVP runs locally only. There is no login, backend, cloud sync, payment, or advertising.
+## 项目简介
 
-## Current Features
+- 技术栈：Expo、React Native、TypeScript、Zustand、AsyncStorage、React Navigation、Expo Vector Icons
+- 运行方式：本地运行
+- 当前不包含：登录、注册、云同步、支付、广告、后端服务
 
-- Game-style home screen with illustrated background, central character, feature buttons, and light animations.
-- Coins and fertilizers.
-- Daily tasks with local date reset.
-- Plant growth with XP, levels, and watering count.
-- Global growth level with level-up rewards.
-- Plant almanac with five plants, selection, coin-based unlocking, fertilizer feeding, stages, and maturity rewards.
-- Poop time once-per-day check-in with rewards.
-- Gacha machine with rarity odds, coin cost, duplicate conversion, and collection rewards.
-- Gacha collection screen grouped by rarity.
-- Badge achievement system with dedicated badge screen and home unlock notice.
-- Math mini-game with retryable incorrect answers.
-- Local persistence through AsyncStorage.
+## 当前核心玩法
 
-## Start
+- 首页游戏大厅：中央小胖猫、六个功能入口、成长面板、资源栏
+- 今日任务：完成任务获得金币、肥料、成长推进
+- 数字小游戏：答对获得奖励，答错可重试
+- 粑粑时间：每日一次记录与奖励
+- 植物系统：解锁植物、喂肥料、成长到成熟、领取成熟奖励
+- 抽奖机：消耗金币抽取奖励，重复奖励返还部分金币
+- 收集册：查看抽奖获得的收集物
+- 徽章系统：根据行为自动解锁徽章
+- 成长等级：全局成长值升级并发放升级奖励
+- 数据持久化：重启 App 后保留主要进度
 
-Install dependencies:
+## 主要页面
+
+- 首页 `TodayScreen`
+- 粑粑时间 `PoopScreen`
+- 抽奖机 `GachaScreen`
+- 收集册 `CollectionScreen`
+- 徽章页 `BadgeScreen`
+- 植物页 `PlantScreen`
+
+## 如何运行
+
+安装依赖：
 
 ```sh
 npm install
 ```
 
-Start Expo:
+启动项目：
 
 ```sh
 npx expo start
 ```
 
-## Preview
+常用预览方式：
 
-- Expo Go: scan the QR code shown by `npx expo start`.
-- iOS Simulator: press `i` in the Expo terminal, or run `npx expo start --ios`.
-- Android Emulator: press `a` in the Expo terminal, or run `npx expo start --android`.
+- Expo Go：扫描终端中的二维码
+- iOS Simulator：在 Expo 终端中按 `i`
+- Android Emulator：在 Expo 终端中按 `a`
 
-More details are in `PREVIEW_GUIDE.md`.
+更多说明见 [PREVIEW_GUIDE.md](/Users/fine/Documents/宝宝花园/number-garden/PREVIEW_GUIDE.md:1)。
 
-## Checks
+## 当前 Beta 试玩路线
 
-Run TypeScript validation:
+建议按下面顺序试玩：
+
+1. 进入首页
+2. 完成今日任务
+3. 做数字小游戏
+4. 记录一次粑粑时间
+5. 查看金币 / 肥料 / 成长变化
+6. 去抽奖机抽一次
+7. 查看收集册
+8. 去植物页喂肥料
+9. 查看徽章页
+10. 重启 App，检查数据是否保留
+
+## 收集册说明
+
+当前 Beta 中有两个相关概念：
+
+- 首页摘要区：偏“成长 / 收集进度展示”
+- 独立收集册页：主要展示**抽奖获得物**
+
+后续正式版建议统一命名或合并，避免儿童和测试者混淆。
+
+## 检查命令
+
+TypeScript 检查：
 
 ```sh
 npx tsc --noEmit
 ```
 
-Show Expo start options:
+查看 Expo 启动参数：
 
 ```sh
 npx expo start --help

@@ -2,113 +2,70 @@
 
 ## Product
 
-Number Garden is a local-first Expo React Native app for children ages 4-8. The app focuses on gentle habit building through rewards, growth, and collection.
+Number Garden（数字花园）是一个面向 4-8 岁儿童的本地习惯养成游戏 App。项目基于 Expo、React Native、TypeScript、Zustand、AsyncStorage 和 React Navigation，当前以 iPad / 手机本地试玩为主，不依赖账号、后端或云同步。
 
 ## Current Step
 
-Step 32: Data persistence acceptance check.
+Step 49 前：Beta 文档同步与试玩准备。
+
+## Current Status
+
+当前项目已进入**可试玩 Beta 前状态**。  
+核心玩法、奖励循环、成长系统、抽奖与收集、植物成长、徽章反馈、音效与数据持久化都已经接通，可以进行完整试玩。
 
 ## Completed
 
-- Expo TypeScript project foundation.
-- React Navigation root stack.
-- Zustand store with AsyncStorage persistence.
-- Shared color theme.
-- Initial home screen shell.
-- GitHub remote connected.
-- Single-plant growth system.
-- Plant XP and level rules.
-- Watering action persisted through Zustand.
-- DailyTask model.
-- Built-in daily task list.
-- Daily task completion rewards coins, fertilizers, and plant XP.
-- Completed daily task IDs persisted through Zustand.
-- Local-date daily task reset.
-- Badge model.
-- Three built-in badges.
-- Automatic badge unlock checks after daily tasks and watering.
-- Unlocked badge IDs persisted through Zustand.
-- Home screen badge count and badge list.
-- CollectionItem model.
-- Five built-in collection items.
-- Daily task completion grants the next uncollected item.
-- Collected item IDs persisted through Zustand.
-- Home screen collection progress and item list.
-- Scrollable Today screen.
-- Clearer home sections for plant, tasks, badges, and collection.
-- Softer completed task presentation.
-- Localized collection rarity labels.
-- Manual test plan.
-- TypeScript stability check.
-- Expo startup check.
-- Ionicons icon typing cleanup.
-- MathGame model.
-- Five built-in math questions for early elementary level.
-- Math answer state persisted through Zustand.
-- Correct math answers reward coins, fertilizer, and plant XP.
-- Home screen math mini-game section.
-- Incorrect math answers can be retried without consuming the question.
-- Four built-in plants.
-- Owned plant list defaults to succulent.
-- Home screen plant catalog and selected plant switching.
-- Locked display for unowned plants.
-- Persisted plant merge keeps existing succulent growth data.
-- Plant unlock costs.
-- Coin-based plant unlock action.
-- Unlocked plants join ownedPlantIds and become selectable.
-- Plant catalog unlock price and affordability states.
-- Shared plant growth helper.
-- Plant growth semantics separated XP gain from water count.
-- Manual watering and daily task watering count toward water count.
-- Math XP rewards do not count as watering.
-- MVP documentation review.
-- TypeScript check.
-- Expo CLI availability check.
-- Home screen readability review.
-- Global growth XP and level state.
-- Shared `addGrowthXp` action.
-- Watering, daily tasks, and correct math answers now add global growth.
-- Existing per-plant level and XP data is retained.
-- Home screen shows child-friendly growth level and growth value.
-- AvatarMode type with garden, pet, and sprite modes.
-- Persisted avatar mode selection.
-- Shared avatar mode configuration for title, subtitle, growth label, and action label.
-- Today screen mode switcher for 花园, 宠物, and 精灵.
-- Main character area adapts wording by mode while sharing the same growth system.
-- Game-style first screen on TodayScreen.
-- Central avatar scene with mode-specific garden, pet, and sprite backgrounds.
-- Feature orb entry buttons around the main character.
-- Entry buttons scroll to existing detailed sections.
-- Placeholder notices for 粑粑时间 and 抽奖机.
-- Reserved artwork container style names for future Canva or AI assets.
-- Game home screen art assets integrated.
-- Home screen light animations and button press feedback.
-- Poop time MVP screen with once-per-day rewards.
-- Game-style poop time screen art.
-- Gacha machine MVP with rarity pool, duplicate conversion, and coin cost.
-- Gacha collection screen with rarity groups and completion stats.
-- Level-up reward system for global growth.
-- Plant almanac MVP with five plants, unlock costs, fertilizer feeding, stages, and maturity rewards.
-- Home screen current plant display.
-- Badge system V1 with seven badges, automatic unlock checks, home toast, and dedicated BadgeScreen.
-- Collection screen displays gacha rewards.
-- Persistence acceptance check completed for coins, fertilizers, growth, plants, gacha records, collection, badges, and poop record.
+- Expo TypeScript 项目基础搭建。
+- React Navigation 根导航。
+- Zustand + AsyncStorage 本地持久化。
+- 统一主题色 `theme.ts`。
+- 首页游戏大厅。
+- 小胖猫首页待机动画。
+- 首页功能按钮悬浮动画。
+- 首页进入动画。
+- 资源栏金币 / 肥料反馈动画。
+- 今日任务系统。
+- 随机每日任务刷新。
+- 数字小游戏。
+- 粑粑时间 `PoopScreen`。
+- 抽奖机 `GachaScreen`。
+- 抽奖动画。
+- 收集册摘要区与独立抽奖收集册页。
+- 植物系统 `PlantScreen`。
+- 植物成长反馈动画。
+- 徽章系统 `BadgeScreen`。
+- 徽章解锁提示动画。
+- 成长等级系统与升级奖励。
+- 音效系统 `AudioManager`。
+- 数据持久化与启动恢复。
+- 平衡性修复（限制无限刷成长/资源闭环）。
+- TodayScreen 未使用 styles 清理。
+
+## Core Playable Loop
+
+1. 进入首页
+2. 完成今日任务 / 做数字小游戏 / 记录粑粑时间
+3. 获得金币、肥料、成长值
+4. 去植物页喂肥料、升级植物
+5. 去抽奖机消耗金币抽奖励
+6. 查看收集册与徽章变化
+7. 重启 App 后确认数据保留
+
+## Known Issues
+
+- 首页 [TodayScreen.tsx](/Users/fine/Documents/宝宝花园/number-garden/src/screens/TodayScreen.tsx:1) 仍然较大，后续需要做轻量拆分。
+- 首页“收集册摘要”和独立抽奖收集册页面的概念还没有完全统一，后续正式版建议统一命名或合并。
+- 每日限制依赖本地日期，手动修改系统时间理论上可以绕过，Beta 阶段可接受。
+- `assets/` 目录中存在历史残留资源，后续需要整理正式资源路径。
 
 ## Not Included Yet
 
-- Login or account system.
-- Backend or cloud sync.
-- Payment, ads, or store features.
-- Complex animation.
-- Server-time daily reset.
-- Random collection drops.
-- Advanced animations.
-- Automated test suite.
-- Randomized math question generation.
-- Advanced plant shop or unlock conditions.
-- Split-tab navigation for a less dense home screen.
-- Global growth badges.
-- Dedicated game interfaces for garden, pet, and sprite modes.
-- Final illustrated assets for every plant stage and every character state.
-- Full poop record details such as color, amount, smell, and comfort.
-- Ten-pull gacha, pity rules, payment, ads, or online sync.
+- 完整家长模式。
+- 账号系统。
+- 云同步。
+- 后端服务。
+- 支付 / 广告。
+- 家长视角数据统计页。
+- 粑粑详细记录（颜色、数量、气味、顺利程度）。
+- 正式版统一收集册体系。
+- 自动化测试套件。

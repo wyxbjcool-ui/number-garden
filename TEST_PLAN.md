@@ -1,215 +1,62 @@
 # Test Plan
 
-## Startup Tests
+## P0 核心测试
 
-- Run `npm run` and confirm the project scripts are listed.
-- Run `npx tsc --noEmit` and confirm there are no TypeScript errors.
-- Run `npx expo start --localhost --port 8082` and confirm Metro starts.
-- Stop the Expo server after confirming it starts.
+- App 能启动。
+- 首页 `TodayScreen` 能正常显示。
+- 首页 6 个入口都能进入对应功能页。
+- 今日任务完成后奖励正确发放。
+- 粑粑时间每日只能领取一次奖励。
+- 数字答题答对发奖励，答错不发奖励且可重试。
+- 抽奖会扣金币，奖励会进入独立收集册。
+- 金币不足时不能抽奖。
+- 植物喂肥料会消耗肥料。
+- 植物成熟奖励只发一次。
+- 徽章条件达成后能正常解锁。
+- App 重启后主要数据仍然保留。
+- `npx tsc --noEmit` 通过。
 
-## Home UI Preview Tests
+## P1 体验测试
 
-- Confirm the Today screen opens on a game-style scene, not a plain feature list.
-- Confirm the first screen includes welcome text, coins, fertilizers, mode switcher, central avatar, and feature orbs.
-- Confirm the top coins and fertilizers pills remain readable on small screens.
-- Confirm the central avatar area is the largest visual element in the first viewport.
-- Confirm feature orbs wrap cleanly and remain easy to tap.
-- Confirm the plant card title, level, XP, and watering button are readable.
-- Confirm daily task buttons are large enough to tap comfortably.
-- Confirm completed tasks look visually weaker.
-- Confirm badge cards wrap when the screen is narrow.
-- Confirm collection cards wrap and do not overlap.
-- Confirm the screen respects safe area through the native navigation layout.
+- 首页动画没有明显卡顿。
+- 小胖猫待机动画表现正常。
+- 首页功能按钮悬浮动画表现正常。
+- 首页进入动画表现正常。
+- 音效播放正常。
+- 金币 / 肥料反馈动画正常。
+- 徽章解锁提示正常。
+- 植物成长反馈正常。
+- 抽奖动画正常。
+- 儿童文案整体温和、可理解。
 
-## Game Home Entry Tests
+## P2 已知限制
 
-- Tap 今日任务 and confirm the screen scrolls to the daily task section.
-- Tap 数字小游戏 and confirm the screen scrolls to the math mini-game section.
-- Tap 收集册 and confirm it opens CollectionScreen.
-- Tap 徽章 and confirm it opens BadgeScreen.
-- Tap 植物/伙伴 or the current plant tag and confirm it opens PlantScreen.
-- Tap 粑粑时间 and confirm it opens PoopScreen.
-- Tap 抽奖机 and confirm it opens GachaScreen.
-- Switch to 花园 and confirm the scene feels like a garden.
-- Switch to 宠物 and confirm the scene feels like a pet home.
-- Switch to 精灵 and confirm the scene feels like a magic scene.
+- 没有完整家长模式。
+- 没有真实账号系统。
+- 没有云同步。
+- 每日限制依赖本地日期。
+- 首页收集摘要与独立抽奖收集册概念后续还要统一。
 
-## MVP Wrap-Up Checks
+## Beta 关键流程测试
 
-- Confirm the home screen is readable even though several MVP systems share one page.
-- Confirm repeated visual patterns still feel consistent across plant, task, badge, collection, and math sections.
-- Confirm docs describe the current MVP scope.
-- Confirm no new business behavior was added during wrap-up cleanup.
+建议按下面路径跑一轮完整试玩：
 
-## Daily Task Tests
+1. 打开 App，确认首页可见。
+2. 完成一个今日任务。
+3. 做一道数字小游戏。
+4. 进入粑粑时间并记录一次。
+5. 返回首页，确认金币 / 肥料 / 成长值变化。
+6. 进入抽奖机，尝试抽一次。
+7. 进入收集册，确认抽奖物已出现。
+8. 进入植物页，喂肥料一次。
+9. 进入徽章页，确认已解锁徽章状态。
+10. 重启 App，确认主要数据仍然保留。
 
-- Open the Today screen.
-- Confirm the three tasks appear: 整理书包, 阅读 10 分钟, 早睡打卡.
-- Tap one incomplete task.
-- Confirm coins increase by 5.
-- Confirm fertilizers increase by 1.
-- Confirm the task button changes to 已完成.
-- Tap the completed task again and confirm it cannot be claimed twice.
+## 收集册双轨说明
 
-## Plant Growth Tests
+当前 Beta 中有两个相关概念：
 
-- Open PlantScreen.
-- Confirm five plants appear: 多肉, 碰碰香, 彩叶芋, 蝴蝶兰, 向日葵.
-- Confirm 多肉 is owned by default.
-- Confirm locked plants show unlock prices.
-- With enough coins, unlock a plant and confirm coins decrease once.
-- Tap 喂肥料 +10 成长值.
-- Confirm plant XP increases by 10.
-- Confirm fertilizers decrease by 1.
-- Water until XP reaches 100 total.
-- Confirm the plant level increases by 1.
-- Confirm XP keeps the remainder after leveling.
-- Complete a daily task and confirm it also waters the selected plant once.
-- Answer a math question correctly and confirm it adds 10 plant XP without increasing water count.
-- Grow a plant from Level 4 to Level 5 and confirm the maturity reward appears once.
+- 首页摘要区：更偏向成长过程里的“收集进度展示”
+- 独立收集册页：主要展示抽奖获得物
 
-## Global Growth Tests
-
-- On a fresh install, confirm growth starts at 第 1 级 and 成长值 0/100.
-- Tap 浇水 +10 成长值 and confirm global growth value increases by 10.
-- Complete a daily task and confirm global growth value increases by 10.
-- Answer a math question correctly and confirm global growth value increases by 10.
-- Answer a math question incorrectly and confirm global growth does not change.
-- Reach 100 total global growth and confirm growth level increases by 1.
-- Confirm global growth keeps the remainder after leveling.
-- Restart the app and confirm growth level and growth value persist.
-
-## Avatar Mode Tests
-
-- Confirm the Today screen shows mode buttons for 花园, 宠物, and 精灵.
-- Tap 花园 and confirm the main character area shows 我的小花园, 养分, and 浇水 wording.
-- Tap 宠物 and confirm the main character area shows 我的成长伙伴, 亲密度, and 抚摸 wording.
-- Tap 精灵 and confirm the main character area shows 数字小精灵, 魔法值, and 施法 wording.
-- Confirm switching modes does not reset coins, fertilizers, growth, badges, collection, tasks, or math progress.
-- Tap the mode action button and confirm it still adds shared growth.
-- Restart the app and confirm the selected mode persists.
-
-## Multi-Plant Tests
-
-- Confirm the 植物图鉴 section appears on the Today screen.
-- Confirm four plants appear: 多肉, 彩叶芋, 碰碰草, 蝴蝶兰.
-- Confirm 多肉 is owned by default.
-- Confirm 彩叶芋, 碰碰草, and 蝴蝶兰 show 未拥有.
-- Tap 多肉 and confirm it remains selected.
-- Tap a locked plant and confirm selectedPlantId does not change.
-- Confirm watering applies XP to the selected plant.
-- Confirm daily task rewards apply plant XP to the selected plant.
-- Confirm math rewards apply plant XP to the selected plant.
-- Restart the app and confirm existing 多肉 growth data is retained.
-
-## Plant Unlock Tests
-
-- Confirm 多肉 shows cost 0 through default ownership.
-- Confirm 彩叶芋 costs 20 coins.
-- Confirm 碰碰草 costs 30 coins.
-- Confirm 蝴蝶兰 costs 50 coins.
-- With insufficient coins, confirm locked plant cards show 金币不足 and do not unlock.
-- With enough coins, tap 解锁 and confirm coins decrease by the plant cost.
-- Confirm the unlocked plant is added to ownedPlantIds and selected immediately.
-- Tap an already owned plant and confirm coins are not charged again.
-- Restart the app and confirm unlocked plant ownership persists.
-
-## Badge Tests
-
-- Complete the first poop record and confirm badge_first_poop unlocks.
-- Draw gacha once and confirm badge_first_gacha unlocks.
-- Gain the first gacha collection reward and confirm badge_first_collection unlocks.
-- Reach growth Lv.2 and confirm badge_level_2 unlocks.
-- Own 2 plants and confirm badge_two_plants unlocks.
-- Mature a plant and confirm badge_first_mature_plant unlocks.
-- Collect 5 gacha rewards and confirm badge_collection_5 unlocks.
-- Confirm unlocked badges do not duplicate.
-- Confirm the home badge area shows summary stats and up to 3 recent badges.
-- Open BadgeScreen and confirm locked badges show lock icon, ？？？, and 未获得.
-
-## Collection Tests
-
-- Complete one daily task and confirm the first collection item unlocks.
-- Complete more daily tasks and confirm items unlock in list order.
-- Confirm collected items do not duplicate.
-- Confirm uncollected items display as ？？？.
-- Confirm common items show 普通 and rare items show 稀有.
-- Draw gacha and confirm CollectionScreen displays new gacha rewards grouped by rarity.
-- Confirm gacha collection completion count and percentage are correct.
-
-## Poop Time Tests
-
-- Open PoopScreen from the home screen.
-- Confirm the incomplete state shows cat-poop art and the button 我今天已经粑粑啦.
-- Tap the button once and confirm rewards: +10 coins, +5 fertilizers, +10 growth value.
-- Confirm the completed state shows cat_happy art and 今天已经记录过啦.
-- Close and reopen the app on the same local date.
-- Confirm PoopScreen still shows the completed state and does not grant rewards again.
-
-## Gacha Tests
-
-- Open GachaScreen from the home screen.
-- Confirm the rarity odds are visible: 普通 60%, 蓝色 25%, 紫色 10%, 橙色 4%, 红色 1%.
-- With fewer than 10 coins, tap draw and confirm 金币不足，再完成任务赚金币吧.
-- With at least 10 coins, draw once and confirm coins decrease by 10.
-- Confirm a new reward is shown with rarity, icon, and name.
-- Draw a duplicate reward and confirm duplicate coins are returned according to rarity.
-- Restart the app and confirm gachaRewardIds persist through CollectionScreen and badges.
-
-## Math Mini-Game Tests
-
-- Confirm the 数字小游戏 section appears on the Today screen.
-- Confirm one unanswered question is shown at a time.
-- Tap the correct answer and confirm the feedback says 答对了.
-- Confirm a correct answer gives +3 coins.
-- Confirm a correct answer gives +1 fertilizer.
-- Confirm a correct answer adds +10 plant XP.
-- Confirm a correct answer does not increase plant water count.
-- Tap an incorrect answer on another question and confirm the feedback says 再试试.
-- Confirm an incorrect answer gives no reward.
-- Confirm an incorrect answer does not advance to the next question.
-- Try the same question again after an incorrect answer and confirm a correct answer can still complete it.
-- Confirm answered questions do not appear again.
-
-## Date Reset Tests
-
-- Confirm `currentTaskDate` uses local `YYYY-MM-DD` format.
-- Simulate a new local day.
-- Open the Today screen.
-- Confirm `completedTodayTaskIds` clears.
-- Confirm coins, fertilizers, plants, badges, and collection items are not cleared.
-
-## Persistence Tests
-
-- Complete a task, water the plant, unlock a badge, and collect an item.
-- Record poop time once.
-- Draw gacha once.
-- Restart the app.
-- Confirm coins and fertilizers persist.
-- Confirm growth level and growth value persist.
-- Confirm selected avatar mode persists.
-- Confirm plant level, XP, and water count persist.
-- Confirm completed task state persists for the same date.
-- Confirm unlocked badges persist.
-- Confirm collected items persist.
-- Confirm gacha collection rewards persist.
-- Confirm poopRecordDate persists and blocks repeat reward on the same day.
-- Confirm answered math question IDs persist.
-
-## Known Limits
-
-- Daily reset uses device local date, not server time.
-- Collection rewards are ordered, not random.
-- There is no backend, login, or cloud sync.
-- There are no complex animations.
-- There is no automated test suite yet.
-- Math questions are built in and not randomly generated yet.
-- Advanced plant shop and unlock conditions are not implemented yet.
-- The home screen is intentionally feature-dense for MVP and can later be split into tabs or separate screens.
-- Global growth badges are not implemented yet.
-- Dedicated garden, pet, and sprite gameplay screens are not implemented yet.
-- Garden, pet, and sprite currently differ by presentation text only.
-- Some art is still placeholder-level and not final for every state.
-- Poop record details such as color, amount, smell, and comfort are not implemented yet.
-- Gacha has no ten-pull, pity, payments, ads, or network sync.
-- iOS Simulator and Android device preview depend on local machine/device availability.
+本次测试需要接受这两个概念暂时并存，正式版建议统一命名或合并。

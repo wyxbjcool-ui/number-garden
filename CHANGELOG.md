@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Updated Beta-facing documentation to match the current playable build.
+- Refreshed PROJECT_STATUS.md for the pre-Beta Step 49 state.
+- Rewrote README.md with current gameplay overview, page list, run steps, and Beta试玩路线.
+- Reworked TEST_PLAN.md into P0 / P1 / P2 Beta validation format.
+- Documented the current dual collection concepts:
+  - home summary for growth/collection progress
+  - dedicated collection screen for gacha rewards
+- Clarified current known limitations for local-date reset, leftover assets, and large TodayScreen maintenance risk.
+
 - Completed data persistence acceptance for coins, fertilizers, growth, plants, collection, gacha records, badges, and poop record.
 - Added Badge System V1 with seven persisted badges and automatic unlock checks.
 - Added a dedicated BadgeScreen and changed the home badge area into a compact summary.
