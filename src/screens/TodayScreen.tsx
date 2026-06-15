@@ -15,7 +15,7 @@ import {
 import type { ImageSourcePropType, LayoutChangeEvent } from 'react-native';
 
 import { playSound } from '../audio/AudioManager';
-import { avatarModeIds, avatarModes } from '../data/avatarModes';
+import { avatarModes } from '../data/avatarModes';
 import { badges } from '../data/badges';
 import { collectionItems } from '../data/collectionItems';
 import { mathGames } from '../data/mathGames';
@@ -97,6 +97,17 @@ export function TodayScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const catBreathAnim = useRef(new Animated.Value(0)).current;
   const catBreathLoopRef = useRef<Animated.CompositeAnimation | null>(null);
+  const homeEntryCatAnim = useRef(new Animated.Value(0)).current;
+  const homeEntryCatSequenceRef = useRef<Animated.CompositeAnimation | null>(
+    null,
+  );
+  const homeEntryResourceAnim = useRef(new Animated.Value(0)).current;
+  const homeEntryGrowthAnim = useRef(new Animated.Value(0)).current;
+  const homeEntryFeatureAnimsRef = useRef(
+    featureOrbIdleDelays.map(() => new Animated.Value(0)),
+  );
+  const homeEntryFeatureSequenceRef =
+    useRef<Animated.CompositeAnimation | null>(null);
   const featureOrbFloatAnimsRef = useRef(
     featureOrbIdleDelays.map(() => new Animated.Value(0)),
   );
@@ -154,7 +165,6 @@ export function TodayScreen() {
   const refreshDailyTasksForToday = useGardenStore(
     (state) => state.refreshDailyTasksForToday,
   );
-  const waterSelectedPlant = useGardenStore((state) => state.waterSelectedPlant);
   const dismissBadgeNotice = useGardenStore(
     (state) => state.dismissBadgeNotice,
   );
@@ -162,7 +172,6 @@ export function TodayScreen() {
     (state) => state.dismissLevelUpRewards,
   );
   const currentPlant = plant ?? plantCatalog.succulent;
-  const xpPercent = currentPlant.xp / 100;
   const currentMathQuestion = mathGames.find(
     (question) => !answeredMathQuestionIds.includes(question.id),
   );
@@ -268,6 +277,48 @@ export function TodayScreen() {
     ],
   };
 
+  const catEntryAnimatedStyle = {
+    opacity: homeEntryCatAnim,
+    transform: [
+      {
+        translateY: homeEntryCatAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [16, 0],
+        }),
+      },
+      {
+        scale: homeEntryCatAnim.interpolate({
+          inputRange: [0, 0.72, 1],
+          outputRange: [0.92, 1.04, 1],
+        }),
+      },
+    ],
+  };
+
+  const resourceEntryAnimatedStyle = {
+    opacity: homeEntryResourceAnim,
+    transform: [
+      {
+        translateY: homeEntryResourceAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [-8, 0],
+        }),
+      },
+    ],
+  };
+
+  const growthEntryAnimatedStyle = {
+    opacity: homeEntryGrowthAnim,
+    transform: [
+      {
+        translateY: homeEntryGrowthAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [10, 0],
+        }),
+      },
+    ],
+  };
+
   const giftAnimatedStyle = {
     opacity: giftPulseAnim.interpolate({
       inputRange: [0, 1],
@@ -344,6 +395,20 @@ export function TodayScreen() {
     }),
   );
 
+  const featureOrbEntryAnimatedStyles = homeEntryFeatureAnimsRef.current.map(
+    (featureOrbAnim) => ({
+      opacity: featureOrbAnim,
+      transform: [
+        {
+          translateY: featureOrbAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [12, 0],
+          }),
+        },
+      ],
+    }),
+  );
+
   useEffect(() => {
     refreshDailyTasksForToday();
   }, [refreshDailyTasksForToday]);
@@ -351,6 +416,77 @@ export function TodayScreen() {
   useEffect(() => {
     setLastMathResult(null);
   }, [currentMathQuestion?.id]);
+
+  useEffect(() => {
+    homeEntryCatSequenceRef.current?.stop();
+    homeEntryFeatureSequenceRef.current?.stop();
+
+    homeEntryResourceAnim.setValue(0);
+    homeEntryCatAnim.setValue(0);
+    homeEntryGrowthAnim.setValue(0);
+    homeEntryFeatureAnimsRef.current.forEach((featureAnim) => {
+      featureAnim.setValue(0);
+    });
+
+    homeEntryCatSequenceRef.current = Animated.sequence([
+      Animated.delay(80),
+      Animated.timing(homeEntryCatAnim, {
+        toValue: 0.72,
+        duration: 280,
+        useNativeDriver: true,
+      }),
+      Animated.timing(homeEntryCatAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+    ]);
+
+    homeEntryFeatureSequenceRef.current = Animated.stagger(
+      100,
+      homeEntryFeatureAnimsRef.current.map((featureAnim) =>
+        Animated.timing(featureAnim, {
+          toValue: 1,
+          duration: 260,
+          useNativeDriver: true,
+        }),
+      ),
+    );
+
+    Animated.parallel([
+      Animated.timing(homeEntryResourceAnim, {
+        toValue: 1,
+        duration: 260,
+        useNativeDriver: true,
+      }),
+      homeEntryCatSequenceRef.current,
+      Animated.sequence([
+        Animated.delay(140),
+        homeEntryFeatureSequenceRef.current,
+      ]),
+      Animated.sequence([
+        Animated.delay(360),
+        Animated.timing(homeEntryGrowthAnim, {
+          toValue: 1,
+          duration: 280,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+
+    return () => {
+      homeEntryCatSequenceRef.current?.stop();
+      homeEntryCatSequenceRef.current = null;
+      homeEntryFeatureSequenceRef.current?.stop();
+      homeEntryFeatureSequenceRef.current = null;
+      homeEntryCatAnim.stopAnimation();
+      homeEntryResourceAnim.stopAnimation();
+      homeEntryGrowthAnim.stopAnimation();
+      homeEntryFeatureAnimsRef.current.forEach((featureAnim) => {
+        featureAnim.stopAnimation();
+      });
+    };
+  }, [homeEntryCatAnim, homeEntryGrowthAnim, homeEntryResourceAnim]);
 
   useEffect(() => {
     catBreathLoopRef.current?.stop();
@@ -806,7 +942,9 @@ export function TodayScreen() {
             <Text style={styles.welcomeText}>欢迎回来</Text>
             <Text style={styles.gameTitle}>数字花园</Text>
           </View>
-          <View style={styles.resourceCluster}>
+          <Animated.View
+            style={[styles.resourceCluster, resourceEntryAnimatedStyle]}
+          >
             <Animated.View style={[styles.resourceBar, coinBarAnimatedStyle]}>
               <Image
                 source={gameAssets.resourceCoin}
@@ -833,47 +971,53 @@ export function TodayScreen() {
                 {fertilizers}
               </Animated.Text>
             </Animated.View>
-          </View>
+          </Animated.View>
         </View>
 
         <View style={styles.homePlayfield}>
           <View style={[styles.orbColumn, styles.leftOrbColumn]}>
-            {leftFeatureOrbs.map((feature) => (
+            {leftFeatureOrbs.map((feature, index) => (
               <Animated.View
                 key={feature.id}
-                style={featureOrbAnimatedStyles[featureOrbs.indexOf(feature)]}
+                style={featureOrbEntryAnimatedStyles[index]}
               >
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.featureOrb,
-                    (pressed || pressedFeatureId === feature.id) &&
-                      styles.featureOrbPressed,
-                  ]}
-                  onPressIn={() => holdFeaturePressFeedback(feature.id)}
-                  onPressOut={() => setPressedFeatureId(null)}
-                  onPress={() => {
-                    playButtonTap();
-                    feature.onPress();
-                  }}
+                <Animated.View
+                  style={featureOrbAnimatedStyles[index]}
                 >
-                  <Image
-                    source={feature.imageSource}
-                    style={styles.featureOrbImage}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.featureOrbText}>{feature.title}</Text>
-                </Pressable>
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.featureOrb,
+                      (pressed || pressedFeatureId === feature.id) &&
+                        styles.featureOrbPressed,
+                    ]}
+                    onPressIn={() => holdFeaturePressFeedback(feature.id)}
+                    onPressOut={() => setPressedFeatureId(null)}
+                    onPress={() => {
+                      playButtonTap();
+                      feature.onPress();
+                    }}
+                  >
+                    <Image
+                      source={feature.imageSource}
+                      style={styles.featureOrbImage}
+                      resizeMode="contain"
+                    />
+                    <Text style={styles.featureOrbText}>{feature.title}</Text>
+                  </Pressable>
+                </Animated.View>
               </Animated.View>
             ))}
           </View>
 
           <View style={styles.avatarArtworkFrame}>
             <View style={styles.avatarArtworkPlaceholder}>
-              <Animated.Image
-                source={gameAssets.catHappy}
-                style={[styles.avatarArtwork, catAnimatedStyle]}
-                resizeMode="contain"
-              />
+              <Animated.View style={catEntryAnimatedStyle}>
+                <Animated.Image
+                  source={gameAssets.catHappy}
+                  style={[styles.avatarArtwork, catAnimatedStyle]}
+                  resizeMode="contain"
+                />
+              </Animated.View>
               <Pressable
                 style={({ pressed }) => [
                   styles.currentPlantBadge,
@@ -900,80 +1044,86 @@ export function TodayScreen() {
           </View>
 
           <View style={[styles.orbColumn, styles.rightOrbColumn]}>
-            {rightFeatureOrbs.map((feature) => (
+            {rightFeatureOrbs.map((feature, index) => (
               <Animated.View
                 key={feature.id}
-                style={featureOrbAnimatedStyles[featureOrbs.indexOf(feature)]}
+                style={featureOrbEntryAnimatedStyles[index + leftFeatureOrbs.length]}
               >
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.featureOrb,
-                    (pressed || pressedFeatureId === feature.id) &&
-                      styles.featureOrbPressed,
-                  ]}
-                  onPressIn={() => holdFeaturePressFeedback(feature.id)}
-                  onPressOut={() => setPressedFeatureId(null)}
-                  onPress={feature.onPress}
+                <Animated.View
+                  style={featureOrbAnimatedStyles[index + leftFeatureOrbs.length]}
                 >
-                  <Image
-                    source={feature.imageSource}
-                    style={styles.featureOrbImage}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.featureOrbText}>{feature.title}</Text>
-                </Pressable>
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.featureOrb,
+                      (pressed || pressedFeatureId === feature.id) &&
+                        styles.featureOrbPressed,
+                    ]}
+                    onPressIn={() => holdFeaturePressFeedback(feature.id)}
+                    onPressOut={() => setPressedFeatureId(null)}
+                    onPress={feature.onPress}
+                  >
+                    <Image
+                      source={feature.imageSource}
+                      style={styles.featureOrbImage}
+                      resizeMode="contain"
+                    />
+                    <Text style={styles.featureOrbText}>{feature.title}</Text>
+                  </Pressable>
+                </Animated.View>
               </Animated.View>
             ))}
           </View>
         </View>
 
-        <Pressable
-          style={({ pressed }) => [
-            styles.homeGrowthBar,
-            pressed && styles.homeGrowthBarPressed,
-          ]}
-          onPress={() => {
-            playButtonTap();
-            navigation.navigate('Plant');
-          }}
-        >
-          <Image
-            source={gameAssets.growthPanelBackground}
-            resizeMode="stretch"
-            style={styles.growthPanelBackground}
-          />
-          <View style={styles.growthPanelContent}>
-            <View style={styles.growthAvatarFrame}>
-              <Image
-                source={gameAssets.catHappy}
-                resizeMode="contain"
-                style={styles.growthAvatar}
-              />
-            </View>
-            <View style={styles.growthCenter}>
-              <View style={styles.growthHeaderRow}>
-                <Text style={styles.growthText}>成长进度</Text>
-                <Text style={styles.growthValue}>
-                  第 {growthLevel} 级 · {growthXp}/100
-                </Text>
-              </View>
-              <View style={styles.progressTrack}>
+        <Animated.View style={growthEntryAnimatedStyle}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.homeGrowthBar,
+              pressed && styles.homeGrowthBarPressed,
+            ]}
+            onPress={() => {
+              playButtonTap();
+              navigation.navigate('Plant');
+            }}
+          >
+            <Image
+              source={gameAssets.growthPanelBackground}
+              resizeMode="stretch"
+              style={styles.growthPanelBackground}
+            />
+            <View style={styles.growthPanelContent}>
+              <View style={styles.growthAvatarFrame}>
                 <Image
-                  source={gameAssets.progressTrack}
-                  resizeMode="stretch"
-                  style={styles.progressTrackImage}
+                  source={gameAssets.catHappy}
+                  resizeMode="contain"
+                  style={styles.growthAvatar}
                 />
-                <View
-                  style={[
-                    styles.progressFillMask,
-                    { width: `${Math.min(growthXp, 100)}%` },
-                  ]}
-                >
+              </View>
+              <View style={styles.growthCenter}>
+                <View style={styles.growthHeaderRow}>
+                  <Text style={styles.growthText}>成长进度</Text>
+                  <Text style={styles.growthValue}>
+                    第 {growthLevel} 级 · {growthXp}/100
+                  </Text>
+                </View>
+                <View style={styles.progressTrack}>
                   <Image
-                    source={gameAssets.progressFill}
+                    source={gameAssets.progressTrack}
                     resizeMode="stretch"
-                    style={styles.progressFillImage}
+                    style={styles.progressTrackImage}
                   />
+                  <View
+                    style={[
+                      styles.progressFillMask,
+                      { width: `${Math.min(growthXp, 100)}%` },
+                    ]}
+                  >
+                    <Image
+                      source={gameAssets.progressFill}
+                      resizeMode="stretch"
+                      style={styles.progressFillImage}
+                    />
+                  </View>
                 </View>
               </View>
             </View>
@@ -985,8 +1135,8 @@ export function TodayScreen() {
                 style={[styles.rewardGift, giftAnimatedStyle]}
               />
             </View>
-          </View>
-        </Pressable>
+          </Pressable>
+        </Animated.View>
 
       </View>
       <View style={styles.section} onLayout={handleSectionLayout('plants')}>
