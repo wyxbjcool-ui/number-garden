@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Animated,
   ImageBackground,
   Pressable,
   ScrollView,
@@ -62,6 +63,17 @@ export function PlantScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [message, setMessage] = useState<string | null>(null);
+  const [showMatureSparkles, setShowMatureSparkles] = useState(false);
+  const [highlightedPlantId, setHighlightedPlantId] = useState<string | null>(
+    null,
+  );
+  const selectedPlantAnim = useRef(new Animated.Value(0)).current;
+  const unlockPlantAnim = useRef(new Animated.Value(0)).current;
+  const matureSparkleAnim = useRef(new Animated.Value(0)).current;
+  const matureSparkleLoopRef = useRef<Animated.CompositeAnimation | null>(null);
+  const matureSparkleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const coins = useGardenStore((state) => state.coins);
   const fertilizers = useGardenStore((state) => state.fertilizers);
   const selectedPlantId = useGardenStore((state) => state.selectedPlantId);
@@ -79,6 +91,19 @@ export function PlantScreen() {
   const ownedCount = ownedPlantIds.length;
   const totalCount = plantIds.length;
   const xpPercent = Math.min(selectedPlant.xp, 100);
+
+  useEffect(() => {
+    return () => {
+      if (matureSparkleTimeoutRef.current) {
+        clearTimeout(matureSparkleTimeoutRef.current);
+      }
+
+      matureSparkleLoopRef.current?.stop();
+      selectedPlantAnim.stopAnimation();
+      unlockPlantAnim.stopAnimation();
+      matureSparkleAnim.stopAnimation();
+    };
+  }, [matureSparkleAnim, selectedPlantAnim, unlockPlantAnim]);
 
   const sortedPlantIds = useMemo(
     () =>
@@ -105,10 +130,58 @@ export function PlantScreen() {
       return;
     }
 
+    selectedPlantAnim.stopAnimation();
+    selectedPlantAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(selectedPlantAnim, {
+        toValue: feedResult.matureReward ? 1 : 0.75,
+        duration: feedResult.matureReward ? 210 : 180,
+        useNativeDriver: true,
+      }),
+      Animated.spring(selectedPlantAnim, {
+        toValue: 0,
+        friction: 5,
+        tension: feedResult.matureReward ? 170 : 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     void playSound('taskComplete');
 
     if (feedResult.matureReward) {
       void playSound('levelUp');
+      setShowMatureSparkles(true);
+      matureSparkleAnim.setValue(0);
+      matureSparkleLoopRef.current?.stop();
+      matureSparkleLoopRef.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(matureSparkleAnim, {
+            toValue: 1,
+            duration: 450,
+            useNativeDriver: true,
+          }),
+          Animated.timing(matureSparkleAnim, {
+            toValue: 0,
+            duration: 450,
+            useNativeDriver: true,
+          }),
+        ]),
+        { iterations: 2 },
+      );
+      matureSparkleLoopRef.current.start(() => {
+        matureSparkleLoopRef.current = null;
+      });
+
+      if (matureSparkleTimeoutRef.current) {
+        clearTimeout(matureSparkleTimeoutRef.current);
+      }
+
+      matureSparkleTimeoutRef.current = setTimeout(() => {
+        setShowMatureSparkles(false);
+        matureSparkleTimeoutRef.current = null;
+        matureSparkleLoopRef.current?.stop();
+        matureSparkleLoopRef.current = null;
+      }, 1200);
     }
 
     setMessage(
@@ -137,7 +210,128 @@ export function PlantScreen() {
 
     unlockPlant(plantId);
     void playSound('taskComplete');
+    setHighlightedPlantId(plantId);
+    unlockPlantAnim.stopAnimation();
+    unlockPlantAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(unlockPlantAnim, {
+        toValue: 1,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.spring(unlockPlantAnim, {
+        toValue: 0,
+        friction: 5,
+        tension: 165,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setHighlightedPlantId(null);
+    });
     setMessage('新植物住进花园啦');
+  };
+
+  const selectedPlantAnimatedStyle = {
+    transform: [
+      {
+        translateY: selectedPlantAnim.interpolate({
+          inputRange: [0, 0.75, 1],
+          outputRange: [0, -8, -12],
+        }),
+      },
+      {
+        scale: selectedPlantAnim.interpolate({
+          inputRange: [0, 0.75, 1],
+          outputRange: [1, 1.18, 1.3],
+        }),
+      },
+    ],
+  };
+
+  const matureSparkleOneStyle = {
+    opacity: matureSparkleAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.2, 1],
+    }),
+    transform: [
+      {
+        translateY: matureSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [6, -10],
+        }),
+      },
+      {
+        scale: matureSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.85, 1.15],
+        }),
+      },
+    ],
+  };
+
+  const matureSparkleTwoStyle = {
+    opacity: matureSparkleAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.15, 0.95],
+    }),
+    transform: [
+      {
+        translateY: matureSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [8, -12],
+        }),
+      },
+      {
+        translateX: matureSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 4],
+        }),
+      },
+      {
+        scale: matureSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.8, 1.12],
+        }),
+      },
+    ],
+  };
+
+  const matureSparkleThreeStyle = {
+    opacity: matureSparkleAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.18, 0.9],
+    }),
+    transform: [
+      {
+        translateY: matureSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [10, -8],
+        }),
+      },
+      {
+        translateX: matureSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, -5],
+        }),
+      },
+      {
+        scale: matureSparkleAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.82, 1.08],
+        }),
+      },
+    ],
+  };
+
+  const unlockedPlantCardAnimatedStyle = {
+    transform: [
+      {
+        scale: unlockPlantAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.08],
+        }),
+      },
+    ],
   };
 
   return (
@@ -189,8 +383,43 @@ export function PlantScreen() {
 
         <View style={styles.selectedPlantCard}>
           <View style={styles.selectedPlantTop}>
-            <View style={styles.plantIconBubble}>
-              <Text style={styles.selectedPlantIcon}>{selectedIcon}</Text>
+            <View style={styles.plantIconFrame}>
+              {showMatureSparkles ? (
+                <>
+                  <Animated.Text
+                    style={[
+                      styles.matureSparkle,
+                      styles.matureSparkleOne,
+                      matureSparkleOneStyle,
+                    ]}
+                  >
+                    ✨
+                  </Animated.Text>
+                  <Animated.Text
+                    style={[
+                      styles.matureSparkle,
+                      styles.matureSparkleTwo,
+                      matureSparkleTwoStyle,
+                    ]}
+                  >
+                    🌟
+                  </Animated.Text>
+                  <Animated.Text
+                    style={[
+                      styles.matureSparkle,
+                      styles.matureSparkleThree,
+                      matureSparkleThreeStyle,
+                    ]}
+                  >
+                    ✨
+                  </Animated.Text>
+                </>
+              ) : null}
+              <Animated.View
+                style={[styles.plantIconBubble, selectedPlantAnimatedStyle]}
+              >
+                <Text style={styles.selectedPlantIcon}>{selectedIcon}</Text>
+              </Animated.View>
             </View>
             <View style={styles.selectedPlantInfo}>
               <Text style={styles.selectedPlantName}>{selectedPlant.name}</Text>
@@ -238,42 +467,50 @@ export function PlantScreen() {
               const icon = getPlantIcon(gardenPlant, stage);
 
               return (
-                <Pressable
+                <Animated.View
                   key={plantId}
-                  style={({ pressed }) => [
-                    styles.plantCard,
-                    isSelected && styles.plantCardSelected,
-                    !isOwned && styles.plantCardLocked,
-                    pressed && styles.pressedButton,
-                  ]}
-                  onPress={() => handlePlantPress(plantId)}
+                  style={
+                    highlightedPlantId === plantId
+                      ? unlockedPlantCardAnimatedStyle
+                      : undefined
+                  }
                 >
-                  <Text style={styles.plantCardIcon}>
-                    {isOwned ? icon : '🔒'}
-                  </Text>
-                  <Text style={styles.plantCardName}>{catalogPlant.name}</Text>
-                  <Text style={styles.plantCardMeta}>
-                    {isOwned
-                      ? `第 ${gardenPlant.level} 级`
-                      : `${catalogPlant.unlockCost} 金币`}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.plantCardAction,
-                      !isOwned && coins < catalogPlant.unlockCost
-                        ? styles.plantCardActionMuted
-                        : null,
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.plantCard,
+                      isSelected && styles.plantCardSelected,
+                      !isOwned && styles.plantCardLocked,
+                      pressed && styles.pressedButton,
                     ]}
+                    onPress={() => handlePlantPress(plantId)}
                   >
-                    {isOwned
-                      ? isSelected
-                        ? '照顾中'
-                        : '切换'
-                      : coins >= catalogPlant.unlockCost
-                        ? '解锁'
-                        : '金币不足'}
-                  </Text>
-                </Pressable>
+                    <Text style={styles.plantCardIcon}>
+                      {isOwned ? icon : '🔒'}
+                    </Text>
+                    <Text style={styles.plantCardName}>{catalogPlant.name}</Text>
+                    <Text style={styles.plantCardMeta}>
+                      {isOwned
+                        ? `第 ${gardenPlant.level} 级`
+                        : `${catalogPlant.unlockCost} 金币`}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.plantCardAction,
+                        !isOwned && coins < catalogPlant.unlockCost
+                          ? styles.plantCardActionMuted
+                          : null,
+                      ]}
+                    >
+                      {isOwned
+                        ? isSelected
+                          ? '照顾中'
+                          : '切换'
+                        : coins >= catalogPlant.unlockCost
+                          ? '解锁'
+                          : '金币不足'}
+                    </Text>
+                  </Pressable>
+                </Animated.View>
               );
             })}
           </View>
@@ -370,6 +607,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 18,
   },
+  plantIconFrame: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    width: 120,
+    height: 120,
+  },
   plantIconBubble: {
     alignItems: 'center',
     backgroundColor: Colors.lightGreen,
@@ -382,6 +626,23 @@ const styles = StyleSheet.create({
   },
   selectedPlantIcon: {
     fontSize: 58,
+  },
+  matureSparkle: {
+    position: 'absolute',
+    fontSize: 24,
+    zIndex: 2,
+  },
+  matureSparkleOne: {
+    left: 6,
+    top: 8,
+  },
+  matureSparkleTwo: {
+    right: 4,
+    top: 2,
+  },
+  matureSparkleThree: {
+    bottom: 8,
+    left: 10,
   },
   selectedPlantInfo: {
     flex: 1,
