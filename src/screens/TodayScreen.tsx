@@ -96,11 +96,15 @@ export function TodayScreen() {
   const catBreathAnim = useRef(new Animated.Value(0)).current;
   const giftPulseAnim = useRef(new Animated.Value(0)).current;
   const levelRewardGiftAnim = useRef(new Animated.Value(0)).current;
+  const coinBarPulseAnim = useRef(new Animated.Value(0)).current;
+  const fertilizerBarPulseAnim = useRef(new Animated.Value(0)).current;
   const badgeNoticeSlideAnim = useRef(new Animated.Value(0)).current;
   const badgeNoticeIconAnim = useRef(new Animated.Value(0)).current;
   const badgeNoticeSparkleAnim = useRef(new Animated.Value(0)).current;
   const badgeNoticeSparkleLoopRef =
     useRef<Animated.CompositeAnimation | null>(null);
+  const previousCoinsRef = useRef<number | null>(null);
+  const previousFertilizersRef = useRef<number | null>(null);
   const featurePressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -364,6 +368,62 @@ export function TodayScreen() {
   }, [catBreathAnim, giftPulseAnim]);
 
   useEffect(() => {
+    if (previousCoinsRef.current === null) {
+      previousCoinsRef.current = coins;
+      return;
+    }
+
+    if (previousCoinsRef.current === coins) {
+      return;
+    }
+
+    previousCoinsRef.current = coins;
+    coinBarPulseAnim.setValue(0);
+
+    Animated.sequence([
+      Animated.timing(coinBarPulseAnim, {
+        toValue: 1,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.spring(coinBarPulseAnim, {
+        toValue: 0,
+        friction: 5,
+        tension: 165,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [coinBarPulseAnim, coins]);
+
+  useEffect(() => {
+    if (previousFertilizersRef.current === null) {
+      previousFertilizersRef.current = fertilizers;
+      return;
+    }
+
+    if (previousFertilizersRef.current === fertilizers) {
+      return;
+    }
+
+    previousFertilizersRef.current = fertilizers;
+    fertilizerBarPulseAnim.setValue(0);
+
+    Animated.sequence([
+      Animated.timing(fertilizerBarPulseAnim, {
+        toValue: 1,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.spring(fertilizerBarPulseAnim, {
+        toValue: 0,
+        friction: 5,
+        tension: 165,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fertilizerBarPulseAnim, fertilizers]);
+
+  useEffect(() => {
     if (!levelUpRewards) {
       levelRewardGiftAnim.setValue(0);
       return;
@@ -594,6 +654,60 @@ export function TodayScreen() {
     ],
   };
 
+  const coinBarAnimatedStyle = {
+    transform: [
+      {
+        scale: coinBarPulseAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.12],
+        }),
+      },
+    ],
+  };
+
+  const coinTextAnimatedStyle = {
+    color: coinBarPulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['#4B3521', '#FFF8D7'],
+    }),
+    textShadowColor: coinBarPulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['rgba(0, 0, 0, 0)', 'rgba(255, 246, 190, 0.95)'],
+    }),
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: coinBarPulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 10],
+    }),
+  };
+
+  const fertilizerBarAnimatedStyle = {
+    transform: [
+      {
+        scale: fertilizerBarPulseAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 1.12],
+        }),
+      },
+    ],
+  };
+
+  const fertilizerTextAnimatedStyle = {
+    color: fertilizerBarPulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['#4B3521', '#F7FFF2'],
+    }),
+    textShadowColor: fertilizerBarPulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['rgba(0, 0, 0, 0)', 'rgba(213, 255, 201, 0.95)'],
+    }),
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: fertilizerBarPulseAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 10],
+    }),
+  };
+
   return (
     <>
       <ScrollView
@@ -620,22 +734,32 @@ export function TodayScreen() {
             <Text style={styles.gameTitle}>数字花园</Text>
           </View>
           <View style={styles.resourceCluster}>
-            <View style={styles.resourceBar}>
+            <Animated.View style={[styles.resourceBar, coinBarAnimatedStyle]}>
               <Image
                 source={gameAssets.resourceCoin}
                 resizeMode="contain"
                 style={styles.resourceBarImage}
               />
-              <Text style={styles.resourceBarText}>{coins}</Text>
-            </View>
-            <View style={styles.resourceBar}>
+              <Animated.Text
+                style={[styles.resourceBarText, coinTextAnimatedStyle]}
+              >
+                {coins}
+              </Animated.Text>
+            </Animated.View>
+            <Animated.View
+              style={[styles.resourceBar, fertilizerBarAnimatedStyle]}
+            >
               <Image
                 source={gameAssets.resourceFertilizer}
                 resizeMode="contain"
                 style={styles.resourceBarImage}
               />
-              <Text style={styles.resourceBarText}>{fertilizers}</Text>
-            </View>
+              <Animated.Text
+                style={[styles.resourceBarText, fertilizerTextAnimatedStyle]}
+              >
+                {fertilizers}
+              </Animated.Text>
+            </Animated.View>
           </View>
         </View>
 
