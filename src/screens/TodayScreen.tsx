@@ -94,6 +94,7 @@ export function TodayScreen() {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const scrollViewRef = useRef<ScrollView>(null);
   const catBreathAnim = useRef(new Animated.Value(0)).current;
+  const catBreathLoopRef = useRef<Animated.CompositeAnimation | null>(null);
   const giftPulseAnim = useRef(new Animated.Value(0)).current;
   const levelRewardGiftAnim = useRef(new Animated.Value(0)).current;
   const coinBarPulseAnim = useRef(new Animated.Value(0)).current;
@@ -247,13 +248,13 @@ export function TodayScreen() {
       {
         translateY: catBreathAnim.interpolate({
           inputRange: [0, 1],
-          outputRange: [0, -8],
+          outputRange: [0, -4],
         }),
       },
       {
         scale: catBreathAnim.interpolate({
           inputRange: [0, 1],
-          outputRange: [1, 1.035],
+          outputRange: [1, 1.025],
         }),
       },
     ],
@@ -325,20 +326,33 @@ export function TodayScreen() {
   }, [currentMathQuestion?.id]);
 
   useEffect(() => {
-    const catLoop = Animated.loop(
+    catBreathLoopRef.current?.stop();
+    catBreathAnim.setValue(0);
+    catBreathLoopRef.current = Animated.loop(
       Animated.sequence([
         Animated.timing(catBreathAnim, {
           toValue: 1,
-          duration: 1600,
-          useNativeDriver: false,
+          duration: 1200,
+          useNativeDriver: true,
         }),
         Animated.timing(catBreathAnim, {
           toValue: 0,
-          duration: 1600,
-          useNativeDriver: false,
+          duration: 1200,
+          useNativeDriver: true,
         }),
       ]),
     );
+
+    catBreathLoopRef.current.start();
+
+    return () => {
+      catBreathLoopRef.current?.stop();
+      catBreathLoopRef.current = null;
+      catBreathAnim.stopAnimation();
+    };
+  }, [catBreathAnim]);
+
+  useEffect(() => {
     const giftLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(giftPulseAnim, {
@@ -354,11 +368,9 @@ export function TodayScreen() {
       ]),
     );
 
-    catLoop.start();
     giftLoop.start();
 
     return () => {
-      catLoop.stop();
       giftLoop.stop();
 
       if (featurePressTimeoutRef.current) {
