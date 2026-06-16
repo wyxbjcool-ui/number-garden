@@ -179,6 +179,8 @@ export function TodayScreen() {
   const currentPlantStage = getPlantStage(currentPlant.level);
   const currentPlantStageLabel = getPlantStageLabel(currentPlantStage);
   const currentPlantIcon = getPlantIcon(currentPlant, currentPlantStage);
+  const growthProgressPercent = Math.max(0, Math.min(growthXp, 100));
+  const remainingGrowthXp = Math.max(0, 100 - growthXp);
   const unlockedBadgeCount = badges.filter((badge) =>
     unlockedBadgeIds.includes(badge.id),
   ).length;
@@ -939,7 +941,7 @@ export function TodayScreen() {
         </View>
         <View style={styles.sceneTopBar}>
           <View style={styles.welcomeBlock}>
-            <Text style={styles.welcomeText}>欢迎回来</Text>
+            <Text style={styles.welcomeText}>小胖猫正在为你加油</Text>
             <Text style={styles.gameTitle}>数字花园</Text>
           </View>
           <Animated.View
@@ -1033,10 +1035,11 @@ export function TodayScreen() {
                 </View>
                 <View style={styles.currentPlantCopy}>
                   <Text style={styles.currentPlantTitle}>
-                    {currentPlant.name}
+                    我的植物
                   </Text>
                   <Text style={styles.currentPlantMeta}>
-                    Lv.{currentPlant.level} · {currentPlantStageLabel}
+                    {currentPlantIcon} {currentPlant.name} Lv.{currentPlant.level} ·{' '}
+                    {currentPlantStageLabel}
                   </Text>
                 </View>
               </Pressable>
@@ -1101,11 +1104,16 @@ export function TodayScreen() {
               </View>
               <View style={styles.growthCenter}>
                 <View style={styles.growthHeaderRow}>
-                  <Text style={styles.growthText}>成长进度</Text>
+                  <Text style={styles.growthText}>
+                    小园丁等级 Lv.{growthLevel}
+                  </Text>
                   <Text style={styles.growthValue}>
-                    第 {growthLevel} 级 · {growthXp}/100
+                    成长进度
                   </Text>
                 </View>
+                <Text style={styles.growthSubtitle}>
+                  再成长 {remainingGrowthXp} 点，领取下一个奖励
+                </Text>
                 <View style={styles.progressTrack}>
                   <Image
                     source={gameAssets.progressTrack}
@@ -1115,7 +1123,7 @@ export function TodayScreen() {
                   <View
                     style={[
                       styles.progressFillMask,
-                      { width: `${Math.min(growthXp, 100)}%` },
+                      { width: `${growthProgressPercent}%` },
                     ]}
                   >
                     <Image
@@ -1646,26 +1654,33 @@ const styles = StyleSheet.create({
   currentPlantCopy: {
     gap: 1,
     justifyContent: 'center',
+    maxWidth: 164,
   },
   currentPlantTitle: {
     color: '#5B341B',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
   },
   currentPlantMeta: {
     color: Colors.bodyText,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
   },
   growthText: {
     color: '#5A3A1F',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
   },
   growthValue: {
     color: '#31515F',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
+  },
+  growthSubtitle: {
+    color: '#5F6D74',
+    fontSize: 15,
+    fontWeight: '700',
+    paddingHorizontal: 8,
   },
   homeGrowthBar: {
     minHeight: 142,
@@ -1811,29 +1826,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   progressTrack: {
-    height: 42,
+    height: 38,
     overflow: 'hidden',
     position: 'relative',
     width: '100%',
     zIndex: 3,
   },
   progressTrackImage: {
-    height: 150,
+    height: 138,
     position: 'absolute',
-    top: -58,
+    top: -50,
     width: '100%',
     zIndex: 1,
   },
   progressFillMask: {
+    borderRadius: 18,
     height: '100%',
     overflow: 'hidden',
     position: 'absolute',
     zIndex: 2,
   },
   progressFillImage: {
-    height: 150,
+    height: 138,
     position: 'absolute',
-    top: -58,
+    top: -50,
     width: '100%',
   },
   section: {

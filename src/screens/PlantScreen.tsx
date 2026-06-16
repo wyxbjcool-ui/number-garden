@@ -199,7 +199,7 @@ export function PlantScreen() {
 
     if (isOwned) {
       selectPlant(plantId);
-      setMessage('已经切换植物啦');
+      setMessage('现在开始照顾这株植物啦');
       return;
     }
 
@@ -427,7 +427,7 @@ export function PlantScreen() {
                 第 {selectedPlant.level} 级 · {selectedStageLabel}
               </Text>
               <Text style={styles.selectedPlantXp}>
-                成长值 {selectedPlant.xp}/100
+                植物成长 {selectedPlant.xp}/100
               </Text>
             </View>
           </View>
@@ -445,7 +445,7 @@ export function PlantScreen() {
             onPress={handleFeedPlant}
           >
             <Ionicons name="nutrition" size={24} color="#FFFFFF" />
-            <Text style={styles.feedButtonText}>喂肥料 +10 成长值</Text>
+            <Text style={styles.feedButtonText}>给植物施肥 +10 成长</Text>
           </Pressable>
         </View>
 
